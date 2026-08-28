@@ -1,0 +1,9 @@
+# robots.txt for TPM — The Premium Mart
+# When production domain is known, replace sitemap URL with absolute production URL.
+
+User-agent: *
+Allow: /
+
+# Sitemap — update to production URL when domain is live
+# Example: Sitemap: https://www.example.com/sitemap.xml
+Sitemap: sitemap.xml

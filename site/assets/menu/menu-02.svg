@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1100" viewBox="0 0 800 1100" role="img" aria-labelledby="title desc">
+<title id="title">TPM Menu — Page 2 — Cold Infusions &amp; Artisanal Pastries</title>
+<desc id="desc">Cold drinks and pastries menu page</desc>
+<rect width="800" height="1100" fill="#fcf9f3"/>
+<rect x="40" y="40" width="720" height="1020" fill="none" stroke="#3d2b1d" stroke-opacity="0.09" stroke-width="1.2" rx="18"/>
+<text x="400" y="96" text-anchor="middle" font-family="Libre Caslon Text, Georgia, serif" font-size="34" font-weight="700" fill="#003629" letter-spacing="0.08em">TPM</text>
+<text x="400" y="118" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="9" font-weight="700" fill="#94492c" letter-spacing="0.22em">BOTANICAL CAFÉ • HERITAGE ROASTERY</text>
+<line x1="340" y1="132" x2="460" y2="132" stroke="#c0c9c3" stroke-width="1"/>
+<text x="400" y="158" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="9" font-weight="700" fill="#707974" letter-spacing="0.18em">— SINCE 2018 — 123 HERITAGE LANE —</text>
+<text x="400" y="192" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="10" font-weight="700" fill="#94492c" letter-spacing="0.16em">PAGE TWO — COLD &amp; SWEET</text>
+<text x="400" y="220" text-anchor="middle" font-family="Libre Caslon Text, serif" font-size="34" font-weight="700" fill="#003629">Cold Infusions</text>
+<text x="400" y="242" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="11" fill="#404945" font-style="italic">Shaken • Over clear ice • Seasonal fruits &amp; herbs</text>
+<g font-family="Be Vietnam Pro, sans-serif">
+  <text x="62" y="286" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Yuzu Citrus Spritz</text>
+  <rect x="302" y="270" width="68" height="18" rx="9" fill="#ffdbcf" opacity="0.9"/>
+  <text x="336" y="283" text-anchor="middle" font-size="8" font-weight="700" fill="#94492c" letter-spacing="0.06em">SEASONAL</text>
+  <text x="738" y="286" text-anchor="end" font-size="15" font-weight="700" fill="#003629">6.20</text>
+  <text x="62" y="306" font-size="11" fill="#404945">Yuzu, sparkling water, thyme — bright, tart, lightly sweetened with agave</text>
+  <line x1="62" y1="324" x2="738" y2="324" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="62" y="354" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Cucumber &amp; Basil Cooler</text>
+  <text x="738" y="354" text-anchor="end" font-size="15" font-weight="700" fill="#003629">5.90</text>
+  <text x="62" y="374" font-size="11" fill="#404945">Garden cucumber, basil, lime, soda — ultra refreshing, lightly salted</text>
+  <line x1="62" y1="392" x2="738" y2="392" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="62" y="422" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Iced Rosemary Vanilla Latte</text>
+  <rect x="376" y="406" width="112" height="18" rx="9" fill="#ffdbcf" opacity="0.9"/>
+  <text x="432" y="419" text-anchor="middle" font-size="8" font-weight="700" fill="#94492c">HOUSE SPECIALTY</text>
+  <text x="738" y="422" text-anchor="end" font-size="15" font-weight="700" fill="#003629">7.00</text>
+  <text x="62" y="442" font-size="11" fill="#404945">Double ristretto over ice, vanilla bean, rosemary — our signature iced latte</text>
+  <line x1="62" y1="460" x2="738" y2="460" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="62" y="490" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Botanical Cold Brew</text>
+  <text x="738" y="490" text-anchor="end" font-size="15" font-weight="700" fill="#003629">6.00</text>
+  <text x="62" y="510" font-size="11" fill="#404945">18-hour steep, Ethiopian single origin — silky, low acidity, black or with oat</text>
+  <line x1="300" y1="542" x2="500" y2="542" stroke="#c0c9c3" stroke-width="1"/>
+  <text x="400" y="576" text-anchor="middle" font-family="Libre Caslon Text, serif" font-size="32" font-weight="700" fill="#003629">Artisanal Pastries</text>
+  <text x="400" y="596" text-anchor="middle" font-size="11" fill="#404945" font-style="italic">Baked in-house daily • While stocks last</text>
+  <text x="62" y="636" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Earl Grey Sponge</text>
+  <rect x="292" y="620" width="84" height="18" rx="9" fill="#f0eee8"/>
+  <text x="334" y="633" text-anchor="middle" font-size="8" font-weight="700" fill="#404945">LIMITED</text>
+  <text x="738" y="636" text-anchor="end" font-size="15" font-weight="700" fill="#003629">7.20</text>
+  <text x="62" y="656" font-size="11" fill="#404945">Earl Grey sponge, vanilla bean buttercream, edible flowers — by the slice</text>
+  <line x1="62" y1="674" x2="738" y2="674" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="62" y="704" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Cardamom Morning Bun</text>
+  <text x="738" y="704" text-anchor="end" font-size="15" font-weight="700" fill="#003629">5.00</text>
+  <text x="62" y="724" font-size="11" fill="#404945">Swirled brioche, cardamom sugar, orange glaze — best warm</text>
+  <line x1="62" y1="742" x2="738" y2="742" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="62" y="772" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Botanical Citrus Tart</text>
+  <text x="738" y="772" text-anchor="end" font-size="15" font-weight="700" fill="#003629">6.80</text>
+  <text x="62" y="792" font-size="11" fill="#404945">Almond crust, yuzu curd, torched meringue, candied thyme — bright &amp; tart</text>
+  <line x1="62" y1="810" x2="738" y2="810" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <text x="62" y="840" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Heritage Brownie</text>
+  <text x="738" y="840" text-anchor="end" font-size="15" font-weight="700" fill="#003629">5.40</text>
+  <text x="62" y="860" font-size="11" fill="#404945">70% Valrhona, sea salt, toasted walnuts — dense, fudgy, gluten-free</text>
+</g>
+<text x="400" y="910" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="9" fill="#707974" letter-spacing="0.08em">All pastries nut-aware — please inform our team of allergies</text>
+<line x1="62" y1="928" x2="738" y2="928" stroke="#c0c9c3" stroke-width="0.8"/>
+<text x="400" y="956" text-anchor="middle" font-family="Libre Caslon Text, serif" font-size="11" font-weight="700" fill="#003629" letter-spacing="0.06em">123 HERITAGE LANE — OPEN DAILY 7AM — 7PM</text>
+<text x="400" y="998" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="28" fill="#003629" opacity="0.08" font-weight="700" letter-spacing="0.2em">TPM</text>
+</svg>

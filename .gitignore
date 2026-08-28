@@ -1,0 +1,26 @@
+# Node
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+*.local
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dev / QA puppeteer artifacts (not part of the app)
+/pupp_*.png
+/qa_*.png
+/site/pupp_*.png
+/site/qa_*.png
+/check_*.cjs
+/site/check_*.cjs
+/capture_site.js
+/site/capture_site.js
+
+# Logs
+*.log
+npm-debug.log*

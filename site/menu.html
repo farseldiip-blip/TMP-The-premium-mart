@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <title>Menu | TPM — The Premium Mart</title>
+  <meta name="description" content="Explore the TPM — The Premium Mart menu. View our original menu pages — heritage coffee, botanical teas, cold infusions, artisanal pastries and weekend brunch. Tap to view fullscreen." />
+  <meta name="theme-color" content="#004e36" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="icon" href="assets/logo.jpg" />
+  <link rel="apple-touch-icon" href="assets/logo.jpg" />
+  <!-- Canonical — replace with production domain when available -->
+  <!-- <link rel="canonical" href="https://www.example.com/menu.html" /> -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="TPM — The Premium Mart" />
+  <meta property="og:title" content="Menu | TPM — The Premium Mart" />
+  <meta property="og:description" content="Explore the original TPM menu — coffee, cold infusions, pastries and weekend brunch. Tap to view fullscreen." />
+  <!-- <meta property="og:url" content="https://www.example.com/menu.html" /> -->
+  <meta property="og:image" content="assets/menu/menu-01.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Menu | TPM — The Premium Mart" />
+  <meta name="twitter:description" content="Explore the original TPM menu — coffee, cold infusions, pastries and weekend brunch." />
+  <link rel="stylesheet" href="css/style.css?v=20260515e" />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+</head>
+<body data-page="menu">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <div class="header-left">
+        <button type="button" class="hamburger" id="openDrawer" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <a class="brand" href="index.html" aria-label="TPM — The Premium Mart home">
+          <span class="brand-mark" aria-hidden="true">TPM</span>
+          <span class="brand-wordmark"><span class="short">TPM</span><span class="long">TPM — The Premium Mart</span></span>
+        </a>
+      </div>
+      <nav class="desktop-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="index.html#our-story">Our Story</a>
+        <a href="menu.html" aria-current="page">Menu</a>
+        <a href="index.html#visit">Location</a>
+      </nav>
+      <div class="header-right">
+        <button type="button" class="btn-reservations" data-open-reserve>Reservations</button>
+        <a class="header-icon-btn m-only" href="index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <aside class="drawer" id="drawer" aria-label="Mobile menu" aria-hidden="true">
+    <div class="drawer-head">
+      <div class="drawer-brand">TPM</div>
+      <button type="button" class="drawer-close" id="closeDrawer" aria-label="Close menu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <nav class="drawer-nav" aria-label="Drawer primary">
+      <a href="index.html">Home <span aria-hidden="true">→</span></a>
+      <a href="index.html#our-story">Our Story <span aria-hidden="true">→</span></a>
+      <a href="menu.html" aria-current="page">Menu <span aria-hidden="true">→</span></a>
+      <a href="index.html#visit">Find Us <span aria-hidden="true">→</span></a>
+      <a href="index.html#contact">Contact <span aria-hidden="true">→</span></a>
+    </nav>
+    <div class="drawer-foot">
+      <p><strong>TPM — The Premium Mart</strong><br>123 Heritage Lane, City Center<br><a href="tel:+15551234567" style="color:var(--primary);font-weight:700">+1 (555) 123-4567</a></p>
+      <button type="button" class="btn btn-primary" style="width:100%" data-open-reserve>Book a table</button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <!-- Menu header — TPM style -->
+    <section class="page-hero menu-page-hero">
+      <div class="container">
+        <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg> Back to Home</a>
+        <h1>The Menu</h1>
+        <p class="menu-intro">Our original menu — presented exactly as in the café. Scroll vertically through the complete pages. Tap any page to view fullscreen.</p>
+        <p class="menu-hint"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg> Tap to enlarge • Pinch to zoom in fullscreen</p>
+      </div>
+    </section>
+
+    <!-- Image-based menu: vertical scroll — preserved -->
+    <section class="menu-images-wrap" aria-label="Complete menu pages">
+      <div class="container menu-images-container">
+        <figure class="menu-page-figure reveal">
+          <button type="button" class="menu-page-btn" data-menu-lightbox="0" aria-label="View menu page 1 fullscreen — Heritage Coffee and Botanical Teas">
+            <img src="assets/menu/menu-01.svg" alt="TPM Menu page 1 — Heritage Coffee: Single Origin Pour Over 6.50, Rosemary Vanilla Latte 7.00, Botanical Pour-Over 6.80, Heritage Flat White 5.80; Botanical Teas: Hibiscus Mint 5.50, Iced Matcha Reserve 6.40, Chamomile and Lavender Brew 5.90" width="800" height="1100" loading="eager" fetchpriority="high" decoding="async" />
+          </button>
+          <figcaption class="menu-page-caption">Page 1 — Heritage Coffee &amp; Botanical Teas</figcaption>
+        </figure>
+
+        <figure class="menu-page-figure reveal" style="transition-delay:.06s">
+          <button type="button" class="menu-page-btn" data-menu-lightbox="1" aria-label="View menu page 2 fullscreen — Cold Infusions and Artisanal Pastries">
+            <img src="assets/menu/menu-02.svg" alt="TPM Menu page 2 — Cold Infusions: Yuzu Citrus Spritz 6.20, Cucumber and Basil Cooler 5.90, Iced Rosemary Vanilla Latte 7.00, Botanical Cold Brew 6.00; Artisanal Pastries: Earl Grey Sponge 7.20, Cardamom Morning Bun 5.00, Botanical Citrus Tart 6.80, Heritage Brownie 5.40" width="800" height="1100" loading="lazy" decoding="async" />
+          </button>
+          <figcaption class="menu-page-caption">Page 2 — Cold Infusions &amp; Artisanal Pastries</figcaption>
+        </figure>
+
+        <figure class="menu-page-figure reveal" style="transition-delay:.12s">
+          <button type="button" class="menu-page-btn" data-menu-lightbox="2" aria-label="View menu page 3 fullscreen — Weekend Brunch">
+            <img src="assets/menu/menu-03.svg" alt="TPM Menu page 3 — Weekend Brunch Saturday Sunday 9AM to 2PM: Heritage Avocado and Herbs 14.50, Garden Shakshuka 15.00, Miso Mushroom and Greens 14.00, Botanical Pancakes 13.50; To Share: olives, sourdough, cheese selection" width="800" height="1100" loading="lazy" decoding="async" />
+          </button>
+          <figcaption class="menu-page-caption">Page 3 — Weekend Brunch &amp; To Share</figcaption>
+        </figure>
+
+        <div class="menu-foot-note reveal" style="transition-delay:.18s">
+          <p>All items subject to seasonal availability. Please inform our team of allergies — full allergen list available on request.</p>
+          <div class="menu-actions">
+            <a href="tel:+15551234567" class="btn btn-primary">Call to order</a>
+            <a href="index.html#visit" class="btn btn-secondary">Find us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p class="footer-brand">TPM</p>
+      <p class="footer-tagline">The Premium Mart — Drinks, Coffee &amp; More<br/>123 Heritage Lane, City Center</p>
+      <ul class="footer-links" aria-label="Footer links">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+      <p class="footer-copy">© 2026 TPM — The Premium Mart. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg>Home</a>
+    <a href="menu.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 7h2v6H7zM11 7h2v8h-2zM15 7h2v5h-2z"/><path d="M5 17h14"/></svg>Menu</a>
+    <a href="index.html#visit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-4.5 7-10a7 7 0 0 0-14 0c0 5.5 7 10 7 10Z"/><circle cx="12" cy="11" r="2.2"/></svg>Find Us</a>
+    <a href="index.html#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16v12H4z"/><path d="M4 7l8 7 8-7"/></svg>Contact</a>
+  </nav>
+
+  <!-- Fullscreen image viewer -->
+  <div class="menu-lightbox" id="menuLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Menu fullscreen viewer">
+    <button type="button" class="menu-lightbox-close" id="menuLightboxClose" aria-label="Close fullscreen view"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="menu-lightbox-counter" id="menuLightboxCounter" aria-live="polite">Page 1 of 3</div>
+    <button type="button" class="menu-lightbox-nav prev" id="menuLightboxPrev" aria-label="Previous page"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button type="button" class="menu-lightbox-nav next" id="menuLightboxNext" aria-label="Next page"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 6l6 6-6 6"/></svg></button>
+    <div class="menu-lightbox-stage" id="menuLightboxStage">
+      <img id="menuLightboxImg" src="" alt="" width="800" height="1100" />
+    </div>
+    <p class="menu-lightbox-hint">Pinch to zoom • Swipe or use arrows • Tap background or press Esc to close</p>
+  </div>
+
+  <!-- Reserve modal -->
+  <div class="modal" id="reserveModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reserveTitle">
+    <div class="modal-card">
+      <h3 id="reserveTitle">Reserve a table</h3>
+      <p>We hold tables for up to 6 guests. For larger parties, please call us.</p>
+      <form id="reserveForm">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label for="r-date2">Date</label><input id="r-date2" type="date" required /></div>
+          <div class="field"><label for="r-time2">Time</label><select id="r-time2" required><option value="">Select</option><option>8:00 AM</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label for="r-guests2">Guests</label><select id="r-guests2" required><option>2 guests</option><option>1 guest</option><option>3 guests</option><option>4 guests</option><option>5 guests</option><option>6 guests</option></select></div>
+          <div class="field"><label for="r-name2">Name</label><input id="r-name2" required placeholder="Your name" /></div>
+        </div>
+        <div class="field"><label for="r-phone2">Phone</label><input id="r-phone2" type="tel" required placeholder="+1 (555) 000-0000" /></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelReserve">Cancel</button>
+          <button type="submit" class="btn btn-primary">Request booking</button>
+        </div>
+      </form>
+      <button class="sr-only" id="closeReserve">Close</button>
+    </div>
+  </div>
+
+  <script src="js/app.js" defer></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('r-date2'); if(d){const t=new Date(); t.setMinutes(t.getMinutes()-t.getTimezoneOffset()); d.min=t.toISOString().split('T')[0];}});</script>
+</body>
+</html>

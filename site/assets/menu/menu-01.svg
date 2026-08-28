@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1100" viewBox="0 0 800 1100" role="img" aria-labelledby="title desc">
+<title id="title">TPM Menu — Page 1 — Heritage Coffee &amp; Botanical Teas</title>
+<desc id="desc">Heritage coffee and botanical teas menu page</desc>
+<rect width="800" height="1100" fill="#fcf9f3"/>
+<!-- subtle paper texture bands -->
+<rect x="40" y="40" width="720" height="1020" fill="none" stroke="#3d2b1d" stroke-opacity="0.09" stroke-width="1.2" rx="18"/>
+<!-- Header -->
+<text x="400" y="96" text-anchor="middle" font-family="Libre Caslon Text, Georgia, serif" font-size="34" font-weight="700" fill="#003629" letter-spacing="0.08em">TPM</text>
+<text x="400" y="118" text-anchor="middle" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="9" font-weight="700" fill="#94492c" letter-spacing="0.22em">BOTANICAL CAFÉ • HERITAGE ROASTERY</text>
+<line x1="340" y1="132" x2="460" y2="132" stroke="#c0c9c3" stroke-width="1"/>
+<text x="400" y="158" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="9" font-weight="700" fill="#707974" letter-spacing="0.18em">— SINCE 2018 — 123 HERITAGE LANE —</text>
+<!-- Page label -->
+<text x="400" y="192" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="10" font-weight="700" fill="#94492c" letter-spacing="0.16em">PAGE ONE — COFFEE &amp; TEA</text>
+<text x="400" y="220" text-anchor="middle" font-family="Libre Caslon Text, serif" font-size="36" font-weight="700" fill="#003629">Heritage Coffee</text>
+<text x="400" y="242" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="11" fill="#404945" font-style="italic">Ethically sourced • Seasonal • Roasted in-house</text>
+<!-- Items -->
+<g font-family="Be Vietnam Pro, sans-serif">
+  <!-- item 1 -->
+  <text x="62" y="286" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Single Origin Pour Over</text>
+  <text x="738" y="286" text-anchor="end" font-size="15" font-weight="700" fill="#003629">6.50</text>
+  <text x="62" y="306" font-size="11" fill="#404945">Ethiopian highland beans — bright floral, citrus finish — brewed to order</text>
+  <line x1="62" y1="324" x2="738" y2="324" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <!-- item 2 -->
+  <text x="62" y="354" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Rosemary Vanilla Latte</text>
+  <rect x="360" y="338" width="112" height="18" rx="9" fill="#ffdbcf" opacity="0.9"/>
+  <text x="416" y="351" text-anchor="middle" font-size="8" font-weight="700" fill="#94492c" letter-spacing="0.08em">HOUSE SPECIALTY</text>
+  <text x="738" y="354" text-anchor="end" font-size="15" font-weight="700" fill="#003629">7.00</text>
+  <text x="62" y="374" font-size="11" fill="#404945">Double ristretto, house vanilla, fresh rosemary — velvety microfoam</text>
+  <line x1="62" y1="392" x2="738" y2="392" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <!-- item 3 -->
+  <text x="62" y="422" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Botanical Pour-Over</text>
+  <text x="738" y="422" text-anchor="end" font-size="15" font-weight="700" fill="#003629">6.80</text>
+  <text x="62" y="442" font-size="11" fill="#404945">Single-origin Ethiopian infused with jasmine — tea-like, bergamot finish</text>
+  <line x1="62" y1="460" x2="738" y2="460" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <!-- item 4 -->
+  <text x="62" y="490" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Heritage Flat White</text>
+  <text x="738" y="490" text-anchor="end" font-size="15" font-weight="700" fill="#003629">5.80</text>
+  <text x="62" y="510" font-size="11" fill="#404945">Double ristretto, velvety microfoam — served in heritage stoneware</text>
+  <!-- spacer -->
+  <line x1="300" y1="542" x2="500" y2="542" stroke="#c0c9c3" stroke-width="1"/>
+  <text x="400" y="578" text-anchor="middle" font-family="Libre Caslon Text, serif" font-size="32" font-weight="700" fill="#003629">Botanical Teas</text>
+  <text x="400" y="598" text-anchor="middle" font-size="11" fill="#404945" font-style="italic">Organic • Caffeine-free options • Served hot or iced</text>
+  <!-- tea 1 -->
+  <text x="62" y="638" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Hibiscus Mint Infusion</text>
+  <rect x="314" y="622" width="100" height="18" rx="9" fill="#f0eee8"/>
+  <text x="364" y="635" text-anchor="middle" font-size="8" font-weight="700" fill="#404945" letter-spacing="0.06em">CAFFEINE-FREE</text>
+  <text x="738" y="638" text-anchor="end" font-size="15" font-weight="700" fill="#003629">5.50</text>
+  <text x="62" y="658" font-size="11" fill="#404945">Organic hibiscus, cooling peppermint, touch of agave — ruby red &amp; tart</text>
+  <line x1="62" y1="676" x2="738" y2="676" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <!-- tea 2 -->
+  <text x="62" y="706" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Iced Matcha Reserve</text>
+  <rect x="302" y="690" width="92" height="18" rx="9" fill="#9ed1bd" opacity="0.35"/>
+  <text x="348" y="703" text-anchor="middle" font-size="8" font-weight="700" fill="#1d4f40" letter-spacing="0.06em">CEREMONIAL</text>
+  <text x="738" y="706" text-anchor="end" font-size="15" font-weight="700" fill="#003629">6.40</text>
+  <text x="62" y="726" font-size="11" fill="#404945">Stone-milled Kyoto matcha, oat milk, whisper of vanilla — whisked to order</text>
+  <line x1="62" y1="744" x2="738" y2="744" stroke="#3d2b1d" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="4 6"/>
+  <!-- tea 3 -->
+  <text x="62" y="774" font-family="Libre Caslon Text, serif" font-size="17" font-weight="700" fill="#1c1c18">Chamomile &amp; Lavender Brew</text>
+  <text x="738" y="774" text-anchor="end" font-size="15" font-weight="700" fill="#003629">5.90</text>
+  <text x="62" y="794" font-size="11" fill="#404945">Slow-steeped overnight — floral, calming, clear ice, edible flowers</text>
+</g>
+<!-- footer note -->
+<text x="400" y="860" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="9" fill="#707974" letter-spacing="0.08em">Oat • Soy • Almond • Coconut +0.60 &amp;nbsp; • &amp;nbsp; Extra shot +0.80</text>
+<line x1="62" y1="882" x2="738" y2="882" stroke="#c0c9c3" stroke-width="0.8"/>
+<text x="400" y="910" text-anchor="middle" font-family="Libre Caslon Text, serif" font-size="11" font-weight="700" fill="#003629" letter-spacing="0.06em">123 HERITAGE LANE — OPEN DAILY 7AM — 7PM</text>
+<text x="400" y="930" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="8" fill="#707974" letter-spacing="0.12em">PLEASE INFORM OUR TEAM OF ALLERGIES • ALL PRICES INCLUDE VAT</text>
+<text x="400" y="998" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="28" fill="#003629" opacity="0.08" font-weight="700" letter-spacing="0.2em">TPM</text>
+</svg>
