@@ -326,7 +326,11 @@ function showToast(msg){
     y: isMobile ? 130 : 150,
     x: 0,
     scale: 0.90,
-    rotation: key === 'mango' ? -3 : key === 'strawberry' ? 3 : 0
+    rotation: (el) => {
+      if (el === cans.mango) return -3;
+      if (el === cans.strawberry) return 3;
+      return 0;
+    }
   });
 
   // Hero copy reveal
@@ -597,24 +601,34 @@ function showToast(msg){
   });
 
   // ============================================================
-  // 6. REDUCED MOTION FALLBACK (immediate)
+  // 6. REDUCED MOTION FALLBACK (short, subtle animations)
   // ============================================================
   if (prefersReduced) {
     entranceTL.kill();
-    gsap.set([cans.mango, cans.blue, cans.strawberry], {
-      opacity: 1,
+
+    // Reduced motion can animation: gentle rise + subtle spread + settle
+    // Animate from initial GSAP-set positions to final CSS values over 600ms
+    const reducedCanTL = gsap.timeline({
+      defaults: { ease: 'power2.out' }
+    });
+    reducedCanTL.to([cans.mango, cans.blue, cans.strawberry], {
       y: 0,
       scale: 1,
-      rotation: (i, el) => {
-        if (el.classList.contains('tpm-can--mango')) return -10;
-        if (el.classList.contains('tpm-can--strawberry')) return 10;
-        return 0;
-      }
+      rotation: (el) => el === cans.mango ? -5 : el === cans.strawberry ? 5 : 0,
+      duration: 0.6
     });
-    gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
+
+    // Reduced motion hero entrance: subtle fade + minimal movement
+    // Animate from initial GSAP-set positions (opacity:0, y:30) to visible over 500ms
+    const reducedHeroTL = gsap.timeline({
+      defaults: { ease: 'power3.out' }
+    });
+    reducedHeroTL.to([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
       opacity: 1,
-      y: 0
+      y: 0,
+      duration: 0.5
     });
+
     return; // Exit early, no floating/parallax/scroll motion
   }
 
