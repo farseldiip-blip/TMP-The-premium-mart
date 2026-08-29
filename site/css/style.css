@@ -339,6 +339,7 @@ button{font:inherit}
   opacity:.9;
 }
 /* ---- REAL CAN IMAGES — premium editorial composition ---- */
+/* --- Real can images — premium editorial composition --- */
 .tpm-can{
   position:absolute;
   display:block;
@@ -347,10 +348,7 @@ button{font:inherit}
   border:none;
   border-radius:0;
   overflow:visible;
-  transform-style:preserve-3d;
-  transition:transform .45s cubic-bezier(.22,.7,0,1), filter .45s ease, translate .45s cubic-bezier(.22,.7,0,1);
   isolation:isolate;
-  translate:var(--mx,0) var(--my,0);
   filter: drop-shadow(0 18px 22px rgba(14,26,20,.18)) drop-shadow(0 6px 10px rgba(14,26,20,.12));
 }
 .tpm-can::before,
@@ -360,7 +358,6 @@ button{font:inherit}
   display:block;
   object-fit:contain;
   object-position:center center;
-  transition:transform .45s cubic-bezier(.22,.7,0,1), filter .45s ease;
   image-rendering:auto;
 }
 /* per-can atmospheric glow behind real photography — subtle, premium */
@@ -381,47 +378,36 @@ button{font:inherit}
 .tpm-can--blue::before{ background:radial-gradient(ellipse at center, rgba(42,167,224,.38) 0%, rgba(42,167,224,.16) 36%, transparent 70%) }
 .tpm-can--strawberry::before{ background:radial-gradient(ellipse at center, rgba(233,69,69,.36) 0%, rgba(233,69,69,.14) 36%, transparent 70%) }
 
-/* Passion Mango — left supporting, slightly behind — square asset with transparent padding */
-.tpm-can--mango{
-  --rot:-10deg;
-  --tx:0;
-  --sc:1.0;
+/* Mango — left supporting can */
+.can-mango{
   left:1%; top:48px;
   width:300px; height:345px;
   z-index:1;
-  transform:rotate(-10deg) scale(1.0);
- }
-.tpm-can--mango img{ filter:saturate(1.02) contrast(1.02) }
+}
 
-/* Blue Ocean — central hero, primary, forward — square asset */
-.tpm-can--blue{
-  --rot:0deg;
-  --tx:-50%;
-  --sc:1.0;
+/* Blue — central focal can */
+.can-blue{
   left:50%; top:-4px;
   width:345px; height:391px;
   z-index:3;
-  transform:translateX(-50%) rotate(0deg) scale(1.0);
- }
-.tpm-can--blue img{ filter:saturate(1.04) contrast(1.03) }
-.tpm-can--blue::after{ display:none }
+}
 
-/* Passion Strawberry — right supporting, behind — square asset */
-.tpm-can--strawberry{
-  --rot:10deg;
-  --tx:0;
-  --sc:1.0;
+/* Strawberry — right supporting can */
+.can-strawberry{
   right:1%; top:54px;
   width:310px; height:345px;
   z-index:2;
-  transform:rotate(10deg) scale(1.0);
- }
-.tpm-can--strawberry img{ filter:saturate(1.02) contrast(1.02) }
+}
 
-/* hover — premium lift, preserve centering */
-.tpm-can--mango:hover{ transform:rotate(-7deg) scale(0.99) translateY(-6px) }
-.tpm-can--blue:hover{ transform:translateX(-50%) rotate(0deg) scale(1.03) translateY(-6px) }
-.tpm-can--strawberry:hover{ transform:rotate(7deg) scale(1.01) translateY(-6px) }
+/* --- Reduced motion fallback --- */
+@media(prefers-reduced-motion: reduce){
+  .can-mango,
+  .can-blue,
+  .can-strawberry{
+    opacity: 1;
+    transition: opacity 0.6s ease;
+  }
+}
 
 /* Desktop — cinematic scale — square assets, noticeably larger */
 @media(min-width:1024px){
@@ -467,29 +453,42 @@ button{font:inherit}
   .tpm-can--blue{ width:165px; height:187px; top:10px }
   .tpm-can--strawberry{ width:155px; height:176px; right:1%; top:64px }
 }
-/* respect hover on touch — no sticky */
-@media(hover:none){ .tpm-can:hover{ transform:rotate(var(--rot)) scale(var(--sc)) } .tpm-can--blue:hover{transform:translateX(-50%) rotate(0deg) scale(1.0)} }
-
-/* Initial state for GSAP entrance animation — cans start below and hidden */
-.tpm-can{
-  opacity: 0;
-  transform: translateY(160px) rotate(var(--rot, 0deg)) scale(var(--sc, 1));
-  will-change: transform, opacity;
+/* Desktop — cinematic scale — square assets, noticeably larger */
+@media(min-width:1024px){
+  .tpm-can--mango{ width:260px; height:300px; left:1%; top:42px }
+  .tpm-can--blue{ width:300px; height:340px; top:0 }
+  .tpm-can--strawberry{ width:270px; height:300px; right:1%; top:48px }
 }
 
-/* GSAP will animate to the final positioned state */
-/* Final state is defined by the individual .tpm-can--* classes above */
+/* Tablet — balanced — square assets */
+@media(min-width:768px) and (max-width:1023px){
+  .tpm-can-stage{ width:480px; height:480px }
+  .tpm-can--mango{ width:260px; height:300px; left:2%; top:48px }
+  .tpm-can--blue{ width:300px; height:345px; top:-4px }
+  .tpm-can--strawberry{ width:285px; height:310px; right:2%; top:56px }
+}
 
-/* Reduced motion fallback — simple fade in */
-@media(prefers-reduced-motion: reduce){
-  .tpm-can{
-    opacity: 1;
-    transform: rotate(var(--rot, 0deg)) scale(var(--sc, 1));
-    transition: opacity 0.6s ease;
-  }
-  .tpm-hero-visual.reveal .tpm-can{
-    opacity: 1;
-  }
+/* Mobile — dedicated editorial composition: compact but dominant — square assets */
+@media(max-width:767px){
+  .tpm-hero-visual{ min-height:460px; padding:4px 0 8px }
+  .tpm-can-stage{ width:min(360px, 92vw); height:420px }
+  .tpm-can--mango{ width:185px; height:210px; left:2%; top:62px; --sc:1.0 }
+  .tpm-can--blue{ width:195px; height:220px; top:14px; --sc:1.0 }
+  .tpm-can--strawberry{ width:185px; height:210px; right:2%; top:68px; --sc:1.0 }
+  .tpm-store-chip{ bottom:8px; font-size:10px; padding:7px 10px 7px 7px }
+}
+@media(max-width:390px){
+  .tpm-can-stage{ width:min(350px, 92vw); height:400px }
+  .tpm-can--mango{ width:170px; height:193px; left:1%; top:58px }
+  .tpm-can--blue{ width:180px; height:204px; top:12px }
+  .tpm-can--strawberry{ width:170px; height:193px; right:1%; top:64px }
+}
+/* Mobile — dedicated editorial composition: compact but dominant — square assets */
+@media(max-width:375px){
+  .tpm-can-stage{ width:min(340px, 92vw); height:380px }
+  .tpm-can--mango{ width:155px; height:176px; left:1%; top:58px }
+  .tpm-can--blue{ width:165px; height:187px; top:10px }
+  .tpm-can--strawberry{ width:155px; height:176px; right:1%; top:64px }
 }
 
 .tpm-store-chip{
@@ -1053,7 +1052,6 @@ button{font:inherit}
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none;transition:none}
   .card:hover,.menu-card:hover,.tpm-card:hover{transform:none}
-  .tpm-can:hover{transform:rotate(var(--rot))}
 }
 
 /* Fix horizontal overflow */

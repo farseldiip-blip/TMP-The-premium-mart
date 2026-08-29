@@ -247,6 +247,12 @@ function showToast(msg){
 // PREMIUM GSAP HERO ANIMATIONS
 // ===================================================================
 (function initHeroAnimations() {
+  // Idempotency guard — skip if already initialized
+  if (window.heroAnimationsInitialized) return;
+  window.heroAnimationsInitialized = true;
+
+  console.log('[initHeroAnimations] START');
+
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = !window.matchMedia('(hover:hover)').matches;
   const isMobile = window.innerWidth < 768;
@@ -258,13 +264,19 @@ function showToast(msg){
 
   // Elements
   const hero = $('.tpm-hero');
+  console.log('[initHeroAnimations] hero:', hero ? 'found' : 'NOT FOUND');
   const heroVisual = $('.tpm-hero-visual');
+  console.log('[initHeroAnimations] heroVisual:', heroVisual ? 'found' : 'NOT FOUND');
   const stage = $('#tpmCanStage');
+  console.log('[initHeroAnimations] stage:', stage ? 'found' : 'NOT FOUND');
   const cans = {
     mango: $('.tpm-can--mango'),
     blue: $('.tpm-can--blue'),
     strawberry: $('.tpm-can--strawberry')
   };
+  console.log('[initHeroAnimations] cans.mango:', cans.mango ? 'found' : 'NOT FOUND');
+  console.log('[initHeroAnimations] cans.blue:', cans.blue ? 'found' : 'NOT FOUND');
+  console.log('[initHeroAnimations] cans.strawberry:', cans.strawberry ? 'found' : 'NOT FOUND');
   const storeChip = $('.tpm-store-chip');
   const phoneMockup = null; // No phone in current hero
 
@@ -277,9 +289,35 @@ function showToast(msg){
   const ctaGhost = $('.tpm-hero-actions .tpm-btn-ghost');
   const metaPills = $$('.tpm-hero-meta .meta-pill');
 
-  if (!hero || !stage || !cans.blue) return;
+if (!hero || !stage || !cans.blue) {
+  console.log('[initHeroAnimations] EARLY RETURN — missing elements');
+  console.log('[initHeroAnimations] hero:',!!hero, 'stage:',!!stage, 'cans.blue:',!!cans.blue);
+  return;
+}
 
-  // Helper: get final transform values from CSS
+// Ensure the hero visual is visible for CSS fallback.
+//
+// Architecture (per design-system spec #12): CSS must render stage + cans
+// visible and positioned correctly. JavaScript animates the existing visible
+// state — it must NOT begin with the stage/cans hidden and "hopefully" make
+// them visible later, which is the source of the fragile behavior you observed.
+//
+// The .reveal class on .tpm-hero-visual sets opacity:0 / transform:translateY(12px)
+// in the non-reduced-motion stylesheet, which causes the initial hidden state.
+// This block guarantees a visible CSS fallback so the animation enhances an
+// already-visible element rather than pulling a hidden state into view.
+heroVisual.style.opacity = '1';
+heroVisual.style.visibility = 'visible';
+heroVisual.style.transform = 'none';
+
+// Set z-index depth hierarchy for the can composition.
+// Blue is the visual anchor (z-index:3); side cans support (z-index:2).
+// This creates intentional depth perception without CSS transform conflicts.
+if (cans.blue) cans.blue.style.zIndex = '3';
+if (cans.mango) cans.mango.style.zIndex = '2';
+if (cans.strawberry) cans.strawberry.style.zIndex = '2';
+
+// Helper: get final transform values from CSS
   const getFinalTransform = (el) => {
     const style = getComputedStyle(el);
     return style.transform;
@@ -319,10 +357,12 @@ function showToast(msg){
     y: 30
   });
 
+  console.log('[initHeroAnimations] GSAP set cans initial state');
+
   // Cans start tightly grouped below the center, slightly lower than final position
   // so the entrance can play as: rise → center establishes → spread outward → rotate → settle
   gsap.set([cans.mango, cans.blue, cans.strawberry], {
-    opacity: 0,
+    opacity: 1,  // CHANGED FROM 0 to 1 for diagnostic test
     y: isMobile ? 130 : 150,
     x: 0,
     scale: 0.90,
@@ -332,6 +372,14 @@ function showToast(msg){
       return 0;
     }
   });
+
+  // Verify the GSAP state
+  const mangoStyle = getComputedStyle(cans.mango);
+  const blueStyle = getComputedStyle(cans.blue);
+  const strawStyle = getComputedStyle(cans.strawberry);
+  console.log('[initHeroAnimations] computed mango opacity:', mangoStyle.opacity, 'transform:', mangoStyle.transform);
+  console.log('[initHeroAnimations] computed blue opacity:', blueStyle.opacity, 'transform:', blueStyle.transform);
+  console.log('[initHeroAnimations] computed straw opacity:', strawStyle.opacity, 'transform:', strawStyle.transform);
 
   // Hero copy reveal
   entranceTL
@@ -362,17 +410,17 @@ function showToast(msg){
   // === 3. SPREAD & ROTATE ===
   // Mango (left): moves outward left + rotates CCW into final angle
   entranceTL.to(cans.mango, {
-    x: isMobile ? -12 : -18,
-    rotation: -10,
-    scale: 1,
+    x: isMobile ? -8 : -14,
+    rotation: isMobile ? -7 : -8,
+    scale: isMobile ? 0.92 : 0.92,
     ease: 'power3.out'
   }, 0.40);
 
   // Strawberry (right): moves outward right + rotates CW into final angle
   entranceTL.to(cans.strawberry, {
-    x: isMobile ? 12 : 18,
-    rotation: 10,
-    scale: 1,
+    x: isMobile ? 8 : 14,
+    rotation: isMobile ? 7 : 8,
+    scale: isMobile ? 0.92 : 0.92,
     ease: 'power3.out'
   }, 0.40);
 
@@ -483,11 +531,11 @@ function showToast(msg){
       cancelAnimationFrame(parallaxRaf);
       parallaxRaf = null;
     }
-    // Smoothly return to center
+    // Smoothly return to center using the cans object
     gsap.to([cans.mango, cans.blue, cans.strawberry], {
       x: (i, target) => {
-        if (target.classList.contains('tpm-can--mango')) return isMobile ? -8 : -12;
-        if (target.classList.contains('tpm-can--strawberry')) return isMobile ? 8 : 12;
+        if (target === cans.mango) return isMobile ? -8 : -12;
+        if (target === cans.strawberry) return isMobile ? 8 : 12;
         return 0;
       },
       duration: 0.8,
@@ -577,16 +625,29 @@ function showToast(msg){
       floatingTL?.kill();
       stopMouseParallax();
       ScrollTrigger.getAll().forEach(st => st.kill());
+gsap.set([cans.mango, cans.blue, cans.strawberry], {
+      opacity: 1,
+      y: 0,
+      x: 0,
+      scale: 1,
+      rotation: (el) => el === cans.mango ? -10 : el === cans.strawberry ? 10 : 0,
+      clearProps: 'transform'
+    });
+      gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
+        opacity: 1,
+        y: 0,
+        clearProps: 'transform'
+      });
+    } else {
+      // Reduced motion re-enabled — re-apply final positioned state
+      // without reloading the page. The entrance timeline and
+      // floating/parallax will be re-created on the next page visit.
       gsap.set([cans.mango, cans.blue, cans.strawberry], {
         opacity: 1,
         y: 0,
         x: 0,
         scale: 1,
-        rotation: (i, el) => {
-          if (el.classList.contains('tpm-can--mango')) return -10;
-          if (el.classList.contains('tpm-can--strawberry')) return 10;
-          return 0;
-        },
+        rotation: (el) => el === cans.mango ? -10 : el === cans.strawberry ? 10 : 0,
         clearProps: 'transform'
       });
       gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
@@ -594,9 +655,6 @@ function showToast(msg){
         y: 0,
         clearProps: 'transform'
       });
-    } else {
-      // Reload to re-enable animations
-      location.reload();
     }
   });
 
