@@ -319,15 +319,14 @@ function showToast(msg){
     y: 30
   });
 
-  // Cans start below viewport, grouped closer to center
-  Object.entries(cans).forEach(([key, el]) => {
-    if (!el) return;
-    gsap.set(el, {
-      opacity: 0,
-      y: isMobile ? 120 : 160,
-      scale: 0.92,
-      rotation: key === 'mango' ? -2 : key === 'strawberry' ? 2 : 0
-    });
+  // Cans start tightly grouped below the center, slightly lower than final position
+  // so the entrance can play as: rise → center establishes → spread outward → rotate → settle
+  gsap.set([cans.mango, cans.blue, cans.strawberry], {
+    opacity: 0,
+    y: isMobile ? 130 : 150,
+    x: 0,
+    scale: 0.90,
+    rotation: key === 'mango' ? -3 : key === 'strawberry' ? 3 : 0
   });
 
   // Hero copy reveal
@@ -339,65 +338,49 @@ function showToast(msg){
     .to(metaPills, { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: 'power3.out' }, 0.45)
     .to(storeChip, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.55);
 
-  // Can entrance - staggered rise and separation
-  // Blue Ocean (center, primary) - starts first
+  // === 1. COMPACT RISE ===
+  // All three cans rise together from the grouped position
+  entranceTL.to([cans.mango, cans.blue, cans.strawberry], {
+    y: isMobile ? 60 : 80,
+    scale: 0.95,
+    ease: 'power2.out'
+  }, 0.00);
+
+  // === 2. CENTER ESTABLISHES FIRST ===
+  // Blue (center) rises to its final position, scales up
   entranceTL.to(cans.blue, {
-    opacity: 1,
     y: 0,
     scale: 1,
     rotation: 0,
-    duration: 1.1,
-    ease: 'expo.out'
-  }, 0.15);
-
-  // Mango (left) - starts second, moves to left position
-  entranceTL.to(cans.mango, {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    rotation: -7,
-    duration: 1.1,
-    ease: 'expo.out'
-  }, 0.28);
-
-  // Strawberry (right) - starts third, moves to right position
-  entranceTL.to(cans.strawberry, {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    rotation: 7,
-    duration: 1.1,
-    ease: 'expo.out'
-  }, 0.40);
-
-  // Subtle separation movement (horizontal spread) - happens during rise
-  // Mango moves slightly more left
-  entranceTL.to(cans.mango, {
-    x: isMobile ? -8 : -12,
-    duration: 0.6,
     ease: 'power3.out'
-  }, 0.35);
+  }, 0.20);
 
-  // Strawberry moves slightly more right
-  entranceTL.to(cans.strawberry, {
-    x: isMobile ? 8 : 12,
-    duration: 0.6,
-    ease: 'power3.out'
-  }, 0.45);
-
-  // Blue stays centered (x: 0)
-  entranceTL.to(cans.blue, {
-    x: 0,
-    duration: 0.6,
+  // === 3. SPREAD & ROTATE ===
+  // Mango (left): moves outward left + rotates CCW into final angle
+  entranceTL.to(cans.mango, {
+    x: isMobile ? -12 : -18,
+    rotation: -10,
+    scale: 1,
     ease: 'power3.out'
   }, 0.40);
 
-  // Gentle settle - slight overshoot correction
+  // Strawberry (right): moves outward right + rotates CW into final angle
+  entranceTL.to(cans.strawberry, {
+    x: isMobile ? 12 : 18,
+    rotation: 10,
+    scale: 1,
+    ease: 'power3.out'
+  }, 0.40);
+
+  // === 4. GENTLE SETTLE ===
+  // All cans settle into their final positioned state
+  // Blue already at final y/scale/rotation from step 2;
+  // Mango/strawberry now at their final x/rotation from step 3.
+  // This last tweak ensures perfect alignment.
   entranceTL.to([cans.mango, cans.blue, cans.strawberry], {
     scale: 1,
-    duration: 0.3,
     ease: 'power2.out'
-  }, 1.1);
+  }, 0.80);
 
   // ============================================================
   // 2. CONTINUOUS FLOATING ANIMATION
@@ -596,8 +579,8 @@ function showToast(msg){
         x: 0,
         scale: 1,
         rotation: (i, el) => {
-          if (el.classList.contains('tpm-can--mango')) return -7;
-          if (el.classList.contains('tpm-can--strawberry')) return 7;
+          if (el.classList.contains('tpm-can--mango')) return -10;
+          if (el.classList.contains('tpm-can--strawberry')) return 10;
           return 0;
         },
         clearProps: 'transform'
@@ -623,8 +606,8 @@ function showToast(msg){
       y: 0,
       scale: 1,
       rotation: (i, el) => {
-        if (el.classList.contains('tpm-can--mango')) return -7;
-        if (el.classList.contains('tpm-can--strawberry')) return 7;
+        if (el.classList.contains('tpm-can--mango')) return -10;
+        if (el.classList.contains('tpm-can--strawberry')) return 10;
         return 0;
       }
     });
