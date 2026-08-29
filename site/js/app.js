@@ -650,3 +650,22 @@ $('#contactForm')?.addEventListener('submit', e=>{
     showToast('Thanks — we\'ll reply within a few hours.');
   }, 1200);
 });
+
+// Reveal animation initialization — adds .in class when elements enter viewport
+(function initRevealAnimations() {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return; // CSS already handles: .reveal {opacity:1;transform:none}
+
+  const reveals = $$('.reveal');
+  if (reveals.length === 0) return;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+      }
+    });
+  }); // rootMargin+threshold default: triggers when 1+ px visible
+
+  reveals.forEach(el => observer.observe(el));
+})();
