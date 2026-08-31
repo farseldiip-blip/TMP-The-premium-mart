@@ -371,7 +371,7 @@ button{font:inherit}
 /* ===== CAN CLUSTER — right-shifted large product-photo group ===== */
 /* Mango — left supporting can, clearly visible */
 .tpm-can--mango{
-  left:48px; bottom:18px;
+  left:48px; bottom:12px;
   width:235px; height:310px;
   z-index:2;
 }
@@ -404,7 +404,7 @@ button{font:inherit}
 @media(min-width:768px) and (max-width:1023px){
   .tpm-can-stage{ width:min(560px, 100%); height:450px }
   .tpm-can-stage::after{ left:50%; width:58% }
-  .tpm-can--mango{ left:75px; bottom:10px; width:230px; height:305px }
+  .tpm-can--mango{ left:75px; bottom:4px; width:230px; height:305px }
   .tpm-can--blue{ left:280px; bottom:0; width:260px; height:340px; margin-left:-130px }
   .tpm-can--strawberry{ left:280px; bottom:10px; width:190px; height:260px }
 }
@@ -412,7 +412,7 @@ button{font:inherit}
 @media(min-width:1024px){
   .tpm-can-stage{ width:min(620px, 100%); height:500px }
   .tpm-can-stage::after{ left:51%; width:56% }
-  .tpm-can--mango{ left:85px; bottom:12px; width:260px; height:345px }
+  .tpm-can--mango{ left:85px; bottom:6px; width:260px; height:345px }
   .tpm-can--blue{ left:320px; bottom:0; width:290px; height:385px; margin-left:-145px }
   .tpm-can--strawberry{ left:320px; bottom:12px; width:220px; height:300px }
 }
@@ -420,7 +420,7 @@ button{font:inherit}
 @media(min-width:1440px){
   .tpm-can-stage{ width:min(680px, 100%); height:540px }
   .tpm-can-stage::after{ left:52%; width:54% }
-  .tpm-can--mango{ left:100px; bottom:12px; width:290px; height:385px }
+  .tpm-can--mango{ left:100px; bottom:6px; width:290px; height:385px }
   .tpm-can--blue{ left:360px; bottom:0; width:330px; height:435px; margin-left:-165px }
   .tpm-can--strawberry{ left:353px; bottom:12px; width:245px; height:335px }
 }
@@ -428,7 +428,7 @@ button{font:inherit}
 @media(min-width:1920px){
   .tpm-can-stage{ width:min(740px, 100%); height:590px }
   .tpm-can-stage::after{ left:53%; width:52% }
-  .tpm-can--mango{ left:120px; bottom:14px; width:330px; height:435px }
+  .tpm-can--mango{ left:120px; bottom:8px; width:330px; height:435px }
   .tpm-can--blue{ left:420px; bottom:0; width:365px; height:480px; margin-left:-182.5px }
   .tpm-can--strawberry{ left:405px; bottom:14px; width:270px; height:370px }
 }
@@ -438,7 +438,7 @@ button{font:inherit}
   .tpm-hero-visual{ min-height:340px; padding:4px 0 6px }
   .tpm-can-stage{ width:min(340px, 100%); height:165px }
   .tpm-can-stage::after{ left:50%; bottom:20px; width:64% }
-  .tpm-can--mango{ left:calc(26% - 72.5px); bottom:38px; width:145px; height:175px; z-index:2 }
+  .tpm-can--mango{ left:calc(26% - 72.5px); bottom:32px; width:145px; height:175px; z-index:2 }
   .tpm-can--blue{ left:50%; bottom:40px; width:155px; height:190px; margin-left:-77.5px; z-index:3 }
   .tpm-can--strawberry{ left:calc(72% - 60px); bottom:38px; width:120px; height:150px; z-index:2 }
   .tpm-store-chip{ bottom:4px; font-size:8px; padding:5px 7px 5px 5px }
@@ -447,7 +447,7 @@ button{font:inherit}
 @media(max-width:390px){
   .tpm-can-stage{ width:100%; height:155px }
   .tpm-can-stage::after{ bottom:18px; width:68% }
-  .tpm-can--mango{ left:calc(26% - 64px); bottom:34px; width:128px; height:155px }
+  .tpm-can--mango{ left:calc(26% - 64px); bottom:28px; width:128px; height:155px }
   .tpm-can--blue{ left:50%; bottom:36px; width:150px; height:180px; margin-left:-75px }
   .tpm-can--strawberry{ left:calc(72% - 55px); bottom:34px; width:110px; height:140px }
 }
