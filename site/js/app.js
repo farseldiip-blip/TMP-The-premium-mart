@@ -35,7 +35,6 @@ document.addEventListener('keydown', e=>{
     closeDrawer();
     closeLightbox();
     closeMenuLightbox();
-    closeReserve();
   }
   if(menuLightbox?.classList.contains('open')){
     if(e.key==='ArrowLeft') showMenuPage(currentMenuIndex-1);
@@ -76,11 +75,6 @@ function closeLightbox(){
 }
 $('#lbClose')?.addEventListener('click', closeLightbox);
 $('#lbCloseSecondary')?.addEventListener('click', closeLightbox);
-$('#lbOrder')?.addEventListener('click', (e)=>{
-  e.preventDefault();
-  closeLightbox();
-  setTimeout(openReserve, 80);
-});
 lightbox?.addEventListener('click', e=>{
   if(e.target===lightbox) closeLightbox();
 });
@@ -185,43 +179,6 @@ menuLightbox?.addEventListener('touchend', e=>{
     else showMenuPage(currentMenuIndex+1);
   }
 }, {passive:true});
-
-// Reserve modal
-const reserveModal = $('#reserveModal');
-function openReserve(){
-  if(lightbox?.classList.contains('open')) closeLightbox();
-  if(menuLightbox?.classList.contains('open')) closeMenuLightbox();
-  reserveModal?.classList.add('open');
-  reserveModal?.setAttribute('aria-hidden','false');
-  document.body.style.overflow='hidden';
-}
-function closeReserve(){
-  if(!reserveModal) return;
-  reserveModal.classList.remove('open');
-  reserveModal.setAttribute('aria-hidden','true');
-  document.body.style.overflow='';
-}
-$$('[data-open-reserve]').forEach(b=>b.addEventListener('click', e=>{
-  e.preventDefault();
-  openReserve();
-}));
-$('#closeReserve')?.addEventListener('click', closeReserve);
-$('#cancelReserve')?.addEventListener('click', closeReserve);
-reserveModal?.addEventListener('click', e=>{ if(e.target===reserveModal) closeReserve(); });
-$('#reserveForm')?.addEventListener('submit', e=>{
-  e.preventDefault();
-  const btn = e.target.querySelector('button[type="submit"]');
-  const orig = btn.textContent;
-  btn.textContent='Request sent ✓';
-  btn.disabled=true;
-  setTimeout(()=>{
-    closeReserve();
-    btn.textContent=orig;
-    btn.disabled=false;
-    e.target.reset();
-    showToast('Reservation request received — we\'ll confirm shortly.');
-  }, 900);
-});
 
 function showToast(msg){
   let t = $('#toast');

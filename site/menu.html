@@ -43,7 +43,6 @@
         <a href="index.html#visit">Location</a>
       </nav>
       <div class="header-right">
-        <button type="button" class="btn-reservations" data-open-reserve>Reservations</button>
         <a class="header-icon-btn m-only" href="index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg></a>
       </div>
     </div>
@@ -64,7 +63,6 @@
     </nav>
     <div class="drawer-foot">
       <p><strong>TPM — The Premium Mart</strong><br>123 Heritage Lane, City Center<br><a href="tel:+15551234567" style="color:var(--primary);font-weight:700">+1 (555) 123-4567</a></p>
-      <button type="button" class="btn btn-primary" style="width:100%" data-open-reserve>Book a table</button>
     </div>
   </aside>
 
@@ -147,31 +145,6 @@
     <p class="menu-lightbox-hint">Pinch to zoom • Swipe or use arrows • Tap background or press Esc to close</p>
   </div>
 
-  <!-- Reserve modal -->
-  <div class="modal" id="reserveModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reserveTitle">
-    <div class="modal-card">
-      <h3 id="reserveTitle">Reserve a table</h3>
-      <p>We hold tables for up to 6 guests. For larger parties, please call us.</p>
-      <form id="reserveForm">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field"><label for="r-date2">Date</label><input id="r-date2" type="date" required /></div>
-          <div class="field"><label for="r-time2">Time</label><select id="r-time2" required><option value="">Select</option><option>8:00 AM</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field"><label for="r-guests2">Guests</label><select id="r-guests2" required><option>2 guests</option><option>1 guest</option><option>3 guests</option><option>4 guests</option><option>5 guests</option><option>6 guests</option></select></div>
-          <div class="field"><label for="r-name2">Name</label><input id="r-name2" required placeholder="Your name" /></div>
-        </div>
-        <div class="field"><label for="r-phone2">Phone</label><input id="r-phone2" type="tel" required placeholder="+1 (555) 000-0000" /></div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" id="cancelReserve">Cancel</button>
-          <button type="submit" class="btn btn-primary">Request booking</button>
-        </div>
-      </form>
-      <button class="sr-only" id="closeReserve">Close</button>
-    </div>
-  </div>
-
   <script src="js/app.js" defer></script>
-  <script>document.addEventListener('DOMContentLoaded',()=>{const d=document.getElementById('r-date2'); if(d){const t=new Date(); t.setMinutes(t.getMinutes()-t.getTimezoneOffset()); d.min=t.toISOString().split('T')[0];}});</script>
 </body>
 </html>
