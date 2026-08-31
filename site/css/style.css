@@ -433,22 +433,27 @@ button{font:inherit}
   .tpm-can--strawberry{ left:405px; bottom:14px; width:270px; height:370px }
 }
 
-/* Mobile — dedicated compact composition, clear of the location badge */
+/* Mobile — dedicated compact composition, clear of the location badge — tight vertical, no overlap */
 @media(max-width:767px){
-  .tpm-hero-visual{ min-height:340px; padding:4px 0 6px }
-  .tpm-can-stage{ width:min(340px, 100%); height:165px }
-  .tpm-can-stage::after{ left:50%; bottom:20px; width:64% }
+  .tpm-hero-inner{ gap:14px; padding:16px 0 8px }
+  .tpm-hero-visual{ min-height:248px; padding:2px 0 28px }
+  .tpm-can-stage{ width:min(320px, 88vw); height:215px }
+  .tpm-can-stage::after{ left:50%; bottom:14px; width:62% }
   .tpm-can--mango{ left:calc(26% - 72.5px); bottom:32px; width:145px; height:175px; z-index:2 }
-  .tpm-can--blue{ left:50%; bottom:40px; width:155px; height:190px; margin-left:-77.5px; z-index:3 }
+  .tpm-can--blue{ left:50%; bottom:34px; width:155px; height:190px; margin-left:-77.5px; z-index:3 }
   .tpm-can--strawberry{ left:calc(72% - 60px); bottom:38px; width:120px; height:150px; z-index:2 }
-  .tpm-store-chip{ bottom:4px; font-size:8px; padding:5px 7px 5px 5px }
+  .tpm-store-chip{ bottom:2px; font-size:8px; padding:5px 7px 5px 5px }
+  .tpm-hero-kicker{ margin:0 0 10px }
+  .tpm-hero-desc{ margin:0 0 14px }
+  .tpm-hero-meta{ margin-top:10px; gap:8px }
 }
-/* Small mobile */
+/* Small mobile — tighter, consistent with 767 fix */
 @media(max-width:390px){
-  .tpm-can-stage{ width:100%; height:155px }
-  .tpm-can-stage::after{ bottom:18px; width:68% }
+  .tpm-hero-visual{ min-height:228px; padding:2px 0 26px }
+  .tpm-can-stage{ width:100%; height:195px }
+  .tpm-can-stage::after{ bottom:12px; width:68% }
   .tpm-can--mango{ left:calc(26% - 64px); bottom:28px; width:128px; height:155px }
-  .tpm-can--blue{ left:50%; bottom:36px; width:150px; height:180px; margin-left:-75px }
+  .tpm-can--blue{ left:50%; bottom:30px; width:150px; height:180px; margin-left:-75px }
   .tpm-can--strawberry{ left:calc(72% - 55px); bottom:34px; width:110px; height:140px }
 }
 
