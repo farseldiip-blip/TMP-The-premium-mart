@@ -817,6 +817,26 @@ button{font:inherit}
   }
 }
 
+/* Mobile performance — compositor & rendering (no visual change) */
+@media(max-width:767px){
+  .site-header, .bottom-nav{
+    transform:translateZ(0);
+    backface-visibility:hidden;
+  }
+  .reveal{
+    will-change:transform, opacity;
+  }
+  .reveal.in{
+    will-change:auto;
+  }
+  .tpm-can{
+    will-change:transform;
+  }
+  .tpm-hero-visual.animated .tpm-can{
+    will-change:auto;
+  }
+}
+
 /* Visit */
 .visit{background:var(--surface-low);}
 .visit-grid{display:grid;gap:24px;}

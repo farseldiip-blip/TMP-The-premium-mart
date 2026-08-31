@@ -201,14 +201,12 @@ function showToast(msg){
 }
 
 // ===================================================================
-// PREMIUM GSAP HERO ANIMATIONS
+// PREMIUM GSAP HERO ANIMATIONS — idle-deferred, mobile-optimized
 // ===================================================================
-(function initHeroAnimations() {
+function initHeroAnimations() {
   // Idempotency guard — skip if already initialized
   if (window.heroAnimationsInitialized) return;
   window.heroAnimationsInitialized = true;
-
-  console.log('[initHeroAnimations] START');
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = !window.matchMedia('(hover:hover)').matches;
@@ -221,19 +219,13 @@ function showToast(msg){
 
   // Elements
   const hero = $('.tpm-hero');
-  console.log('[initHeroAnimations] hero:', hero ? 'found' : 'NOT FOUND');
   const heroVisual = $('.tpm-hero-visual');
-  console.log('[initHeroAnimations] heroVisual:', heroVisual ? 'found' : 'NOT FOUND');
   const stage = $('#tpmCanStage');
-  console.log('[initHeroAnimations] stage:', stage ? 'found' : 'NOT FOUND');
   const cans = {
     mango: $('.tpm-can--mango'),
     blue: $('.tpm-can--blue'),
     strawberry: $('.tpm-can--strawberry')
   };
-  console.log('[initHeroAnimations] cans.mango:', cans.mango ? 'found' : 'NOT FOUND');
-  console.log('[initHeroAnimations] cans.blue:', cans.blue ? 'found' : 'NOT FOUND');
-  console.log('[initHeroAnimations] cans.strawberry:', cans.strawberry ? 'found' : 'NOT FOUND');
   const storeChip = $('.tpm-store-chip');
   const phoneMockup = null; // No phone in current hero
 
@@ -247,8 +239,6 @@ function showToast(msg){
   const metaPills = $$('.tpm-hero-meta .meta-pill');
 
 if (!hero || !stage || !cans.blue) {
-  console.log('[initHeroAnimations] EARLY RETURN — missing elements');
-  console.log('[initHeroAnimations] hero:',!!hero, 'stage:',!!stage, 'cans.blue:',!!cans.blue);
   return;
 }
 
@@ -297,14 +287,10 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   const entranceTL = gsap.timeline({
     defaults: { ease: 'power4.out' },
     onComplete: () => {
-      // Mark as animated for any CSS fallbacks
       heroVisual.classList.add('animated');
-      // Start floating animation after entrance
       if (!prefersReduced) startFloating();
-      // Start mouse parallax after entrance
       if (!prefersReduced && !isTouch && !isMobile) startMouseParallax();
-      // Start scroll-triggered motion
-      if (!prefersReduced) initScrollMotion();
+      if (!prefersReduced && !isMobile) initScrollMotion();
     }
   });
 
@@ -314,12 +300,10 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     y: 30
   });
 
-  console.log('[initHeroAnimations] GSAP set cans initial state');
-
   // Cans start tightly grouped below the center, slightly lower than final position
   // so the entrance can play as: rise → center establishes → spread outward → rotate → settle
   gsap.set([cans.mango, cans.blue, cans.strawberry], {
-    opacity: 1,  // CHANGED FROM 0 to 1 for diagnostic test
+    opacity: 1,
     y: isMobile ? 130 : 150,
     x: 0,
     scale: 1.5,
@@ -329,14 +313,6 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
       return 0;
     }
   });
-
-  // Verify the GSAP state
-  const mangoStyle = getComputedStyle(cans.mango);
-  const blueStyle = getComputedStyle(cans.blue);
-  const strawStyle = getComputedStyle(cans.strawberry);
-  console.log('[initHeroAnimations] computed mango opacity:', mangoStyle.opacity, 'transform:', mangoStyle.transform);
-  console.log('[initHeroAnimations] computed blue opacity:', blueStyle.opacity, 'transform:', blueStyle.transform);
-  console.log('[initHeroAnimations] computed straw opacity:', strawStyle.opacity, 'transform:', strawStyle.transform);
 
   // Hero copy reveal
   entranceTL
@@ -404,25 +380,33 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
 
     floatingTL = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: 'sine.inOut' } });
 
-    // Blue Ocean - slow vertical float
     floatingTL.to(cans.blue, {
       y: isMobile ? -4 : -6,
       duration: 4.5
     }, 0);
 
-    // Mango - different phase, slightly different amount
     floatingTL.to(cans.mango, {
       y: isMobile ? -3 : -5,
       rotation: isMobile ? -5 : -8,
       duration: 5.2
     }, 0.3);
 
-    // Strawberry - different phase
     floatingTL.to(cans.strawberry, {
       y: isMobile ? -3 : -5,
       rotation: isMobile ? 5 : 8,
       duration: 4.8
     }, 0.6);
+
+    // Mobile: pause floating when hero off-screen
+    if (isMobile && hero && 'IntersectionObserver' in window) {
+      const heroObserver = new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if (entry.isIntersecting) floatingTL?.play();
+          else floatingTL?.pause();
+        });
+      }, { threshold: 0.1 });
+      heroObserver.observe(hero);
+    }
   }
 
   // ============================================================
@@ -524,21 +508,17 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   // 5. CLEANUP ON RESIZE / REDUCED MOTION CHANGE
   // ============================================================
   let resizeTimer = null;
+  let resizeRaf = null;
   window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const newIsMobile = window.innerWidth < 768;
-      const newIsTouch = !window.matchMedia('(hover:hover)').matches;
-
-      if (newIsMobile !== isMobile || newIsTouch !== isTouch) {
-        // Reinitialize animations for new breakpoint
-        location.reload(); // Simple approach for breakpoint change
-      }
-
-      if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh();
-      }
-    }, 250);
+    if (resizeRaf) cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(()=>{
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const newIsMobile = window.innerWidth < 768;
+        if (newIsMobile !== isMobile) location.reload();
+        if (!isMobile && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+      }, 250);
+    });
   }, { passive: true });
 
   // Listen for reduced motion changes
@@ -612,10 +592,15 @@ gsap.set([cans.mango, cans.blue, cans.strawberry], {
       duration: 0.5
     });
 
-    return; // Exit early, no floating/parallax/scroll motion
+    return;
   }
 
-})();
+}
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(()=> initHeroAnimations(), {timeout: 800});
+} else {
+  setTimeout(initHeroAnimations, 1);
+}
 
 // Contact form (visit)
 $('#contactForm')?.addEventListener('submit', e=>{
@@ -643,9 +628,10 @@ $('#contactForm')?.addEventListener('submit', e=>{
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('in');
+        observer.unobserve(entry.target);
       }
     });
-  }); // rootMargin+threshold default: triggers when 1+ px visible
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
 
   reveals.forEach(el => observer.observe(el));
 })();
