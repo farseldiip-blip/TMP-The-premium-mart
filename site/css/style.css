@@ -437,12 +437,12 @@ button{font:inherit}
 @media(max-width:767px){
   .tpm-hero-inner{ gap:14px; padding:16px 0 8px }
   .tpm-hero-visual{ min-height:248px; padding:2px 0 28px }
-  .tpm-can-stage{ width:min(320px, 88vw); height:215px }
+  .tpm-can-stage{ width:min(320px, 88vw); height:215px; transform:translateY(62px) }
   .tpm-can-stage::after{ left:50%; bottom:14px; width:62% }
   .tpm-can--mango{ left:calc(26% - 72.5px); bottom:32px; width:145px; height:175px; z-index:2 }
   .tpm-can--blue{ left:50%; bottom:34px; width:155px; height:190px; margin-left:-77.5px; z-index:3 }
   .tpm-can--strawberry{ left:calc(72% - 60px); bottom:38px; width:120px; height:150px; z-index:2 }
-  .tpm-store-chip{ bottom:2px; font-size:8px; padding:5px 7px 5px 5px }
+  .tpm-store-chip{ bottom:2px; font-size:8px; padding:5px 7px 5px 5px; border:1px solid rgba(14,26,20,.06) }
   .tpm-hero-kicker{ margin:0 0 10px }
   .tpm-hero-desc{ margin:0 0 14px }
   .tpm-hero-meta{ margin-top:10px; gap:8px }
@@ -450,7 +450,7 @@ button{font:inherit}
 /* Small mobile — tighter, consistent with 767 fix */
 @media(max-width:390px){
   .tpm-hero-visual{ min-height:228px; padding:2px 0 26px }
-  .tpm-can-stage{ width:100%; height:195px }
+  .tpm-can-stage{ width:100%; height:195px; transform:translateY(60px) }
   .tpm-can-stage::after{ bottom:12px; width:68% }
   .tpm-can--mango{ left:calc(26% - 64px); bottom:28px; width:128px; height:155px }
   .tpm-can--blue{ left:50%; bottom:30px; width:150px; height:180px; margin-left:-75px }
@@ -473,6 +473,11 @@ button{font:inherit}
 }
 .tpm-store-chip img{width:28px;height:28px;border-radius:999px;object-fit:cover}
 .tpm-store-chip strong{color:var(--tpm-green)}
+
+/* Mobile — hide store chip, keep desktop visible */
+@media(max-width:767px){
+  .tpm-store-chip{ display:none }
+}
 
 /* Buttons */
 .btn{
