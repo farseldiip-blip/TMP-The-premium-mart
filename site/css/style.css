@@ -801,6 +801,21 @@ button{font:inherit}
 .gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
 .gallery-item:hover img{transform:scale(1.05)}
 .gallery-caption{position:absolute;left:10px;right:10px;bottom:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);padding:8px 12px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tpm-green);display:inline-flex;align-items:center;gap:6px;max-width:fit-content;box-shadow:0 4px 14px rgba(0,0,0,.08);}
+/* Mobile Gallery — compact premium 2-col grid, 3 rows, no full-width */
+@media(max-width:767px){
+  .gallery-grid{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .gallery-item,
+  .gallery-item.wide,
+  .gallery-item.tall{
+    grid-column:span 1;
+    aspect-ratio:auto;
+    height:152px;
+    min-height:0;
+  }
+}
 
 /* Visit */
 .visit{background:var(--surface-low);}
