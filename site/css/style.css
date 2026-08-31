@@ -193,7 +193,7 @@ button{font:inherit}
 }
 @media(min-width:1024px){
   .tpm-hero-inner{
-    grid-template-columns:1.05fr .95fr;
+    grid-template-columns:1fr 1.2fr;
     gap:32px;
     padding:36px 0 32px;
     min-height:clamp(620px, 76vh, 760px);
@@ -283,11 +283,10 @@ button{font:inherit}
 }
 .tpm-hero-meta .meta-pill strong{color:var(--ink);}
 
-/* hero visual — colorful can cluster, playful + premium */
+/* hero visual — premium product photo composition */
 .tpm-hero-visual{
   position:relative;
   min-height:400px;
-  display:grid;place-items:center;
   padding:8px 0 6px;
   overflow:visible;
 }
@@ -297,59 +296,50 @@ button{font:inherit}
 .tpm-hero-visual::before{
   content:"";
   position:absolute;
-  left:50%;top:52%;transform:translate(-50%,-50%);
-  width:min(92vw, 520px);height:min(62vw, 420px);
-  background:radial-gradient(closest-side, rgba(0,78,54,.08), transparent 72%);
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(96vw, 600px);height:min(80vw, 480px);
+  background:radial-gradient(ellipse at center, rgba(0,78,54,.06) 0%, rgba(255,200,58,.04) 40%, transparent 72%);
   border-radius:50%;
   z-index:-1;
+  pointer-events:none;
 }
-/* ===== 3D CAN CLUSTER — premium physical packaging ===== */
+/* ===== 3D CAN CLUSTER — premium product-photo composition ===== */
 .tpm-can-stage{
   position:relative;
-  width:min(360px, 90vw);
+  width:min(340px, 100%);
   height:380px;
+  margin-inline:auto;
   display:block;
   perspective:1000px;
   transform-style:preserve-3d;
   overflow:visible;
 }
-@media(min-width:1024px){
-  .tpm-can-stage{width:520px;height:520px}
-}
-@media(min-width:1440px){
-  .tpm-can-stage{width:580px;height:560px}
-}
-@media(min-width:1920px){
-  .tpm-can-stage{width:620px;height:580px}
-}
-@media(max-width:380px){
-  .tpm-can-stage{width:min(330px, 88vw); height:360px}
-}
 /* contact shadow beneath cluster */
 .tpm-can-stage::after{
   content:"";
   position:absolute;
-  left:50%; bottom:10px;
+  left:50%; bottom:28px;
   transform:translateX(-50%);
-  width:72%; height:30px;
-  background:radial-gradient(ellipse at center, rgba(14,26,20,.20) 0%, rgba(14,26,20,.09) 38%, transparent 72%);
-  filter:blur(8px);
+  width:62%; height:26px;
+  background:radial-gradient(ellipse at center, rgba(14,26,20,.18) 0%, rgba(14,26,20,.10) 38%, transparent 72%);
+  filter:blur(12px);
   z-index:0;
   pointer-events:none;
   opacity:.9;
 }
 /* ---- REAL CAN IMAGES — premium editorial composition ---- */
-/* --- Real can images — premium editorial composition --- */
 .tpm-can{
-  position:absolute;
-  display:block;
-  padding:0;
-  background:transparent;
-  border:none;
-  border-radius:0;
-  overflow:visible;
-  isolation:isolate;
-  filter: drop-shadow(0 18px 22px rgba(14,26,20,.18)) drop-shadow(0 6px 10px rgba(14,26,20,.12));
+   position:absolute;
+   display:block;
+   padding:0;
+   background:transparent;
+   border:none;
+   border-radius:0;
+   overflow:visible;
+   isolation:isolate;
+   filter: drop-shadow(0 14px 22px rgba(14,26,20,.16)) drop-shadow(0 5px 10px rgba(14,26,20,.10));
+   transform: scale(1.5);
+   transform-origin: center bottom;
 }
 .tpm-can::before,
 .tpm-can::after{ display:none }
@@ -366,11 +356,11 @@ button{font:inherit}
   content:"";
   position:absolute;
   left:50%; top:50%;
-  width:122%; height:88%;
+  width:118%; height:86%;
   transform:translate(-50%,-44%);
   border-radius:50%;
-  filter:blur(22px);
-  opacity:.28;
+  filter:blur(20px);
+  opacity:.24;
   z-index:-1;
   pointer-events:none;
 }
@@ -378,122 +368,93 @@ button{font:inherit}
 .tpm-can--blue::before{ background:radial-gradient(ellipse at center, rgba(42,167,224,.38) 0%, rgba(42,167,224,.16) 36%, transparent 70%) }
 .tpm-can--strawberry::before{ background:radial-gradient(ellipse at center, rgba(233,69,69,.36) 0%, rgba(233,69,69,.14) 36%, transparent 70%) }
 
-/* Mango — left supporting can */
-.can-mango{
-  left:1%; top:48px;
-  width:300px; height:345px;
-  z-index:1;
+/* ===== CAN CLUSTER — right-shifted large product-photo group ===== */
+/* Mango — left supporting can, clearly visible */
+.tpm-can--mango{
+  left:48px; bottom:18px;
+  width:235px; height:310px;
+  z-index:2;
 }
-
-/* Blue — central focal can */
-.can-blue{
-  left:50%; top:-4px;
-  width:345px; height:391px;
+/* Blue — center-front, largest, slightly in front */
+.tpm-can--blue{
+  left:175px; bottom:8px;
+  width:270px; height:356px;
+  margin-left:-135px;
+  filter:drop-shadow(0 20px 30px rgba(14,26,20,.18)) drop-shadow(0 7px 12px rgba(14,26,20,.11));
   z-index:3;
 }
-
-/* Strawberry — right supporting can */
-.can-strawberry{
-  right:1%; top:54px;
-  width:310px; height:345px;
+/* Strawberry — right, slightly smaller but clearly visible */
+.tpm-can--strawberry{
+  left:175px; bottom:18px;
+  width:200px; height:274px;
   z-index:2;
 }
 
 /* --- Reduced motion fallback --- */
 @media(prefers-reduced-motion: reduce){
-  .can-mango,
-  .can-blue,
-  .can-strawberry{
+  .tpm-can--mango,
+  .tpm-can--blue,
+  .tpm-can--strawberry{
     opacity: 1;
     transition: opacity 0.6s ease;
   }
 }
 
-/* Desktop — cinematic scale — square assets, noticeably larger */
-@media(min-width:1024px){
-  .tpm-can--mango{ width:260px; height:300px; left:1%; top:42px }
-  .tpm-can--blue{ width:300px; height:340px; top:0 }
-  .tpm-can--strawberry{ width:270px; height:300px; right:1%; top:48px }
+/* Tablet — centered editorial trio */
+@media(min-width:768px) and (max-width:1023px){
+  .tpm-can-stage{ width:min(560px, 100%); height:450px }
+  .tpm-can-stage::after{ left:50%; width:58% }
+  .tpm-can--mango{ left:75px; bottom:10px; width:230px; height:305px }
+  .tpm-can--blue{ left:280px; bottom:0; width:260px; height:340px; margin-left:-130px }
+  .tpm-can--strawberry{ left:280px; bottom:10px; width:190px; height:260px }
 }
+/* Desktop — balanced hero composition */
+@media(min-width:1024px){
+  .tpm-can-stage{ width:min(620px, 100%); height:500px }
+  .tpm-can-stage::after{ left:51%; width:56% }
+  .tpm-can--mango{ left:85px; bottom:12px; width:260px; height:345px }
+  .tpm-can--blue{ left:320px; bottom:0; width:290px; height:385px; margin-left:-145px }
+  .tpm-can--strawberry{ left:320px; bottom:12px; width:220px; height:300px }
+}
+/* Large desktop — expanded right-shifted cluster */
 @media(min-width:1440px){
-  .tpm-can--mango{ width:280px; height:320px; left:0; top:46px }
-  .tpm-can--blue{ width:320px; height:360px; top:-4px }
-  .tpm-can--strawberry{ width:290px; height:320px; right:0; top:52px }
+  .tpm-can-stage{ width:min(680px, 100%); height:540px }
+  .tpm-can-stage::after{ left:52%; width:54% }
+  .tpm-can--mango{ left:100px; bottom:12px; width:290px; height:385px }
+  .tpm-can--blue{ left:360px; bottom:0; width:330px; height:435px; margin-left:-165px }
+  .tpm-can--strawberry{ left:353px; bottom:12px; width:245px; height:335px }
 }
+/* Extra large */
 @media(min-width:1920px){
-  .tpm-can--mango{ width:345px; height:391px; left:0; top:56px }
-  .tpm-can--blue{ width:391px; height:444px; top:-10px }
-  .tpm-can--strawberry{ width:355px; height:405px; right:0; top:62px }
-}
-/* Tablet — balanced — square assets */
-@media(min-width:768px) and (max-width:1023px){
-  .tpm-can-stage{ width:480px; height:480px }
-  .tpm-can--mango{ width:260px; height:300px; left:2%; top:48px }
-  .tpm-can--blue{ width:300px; height:345px; top:-4px }
-  .tpm-can--strawberry{ width:285px; height:310px; right:2%; top:56px }
-}
-/* Mobile — dedicated editorial composition: compact but dominant — square assets */
-@media(max-width:767px){
-  .tpm-hero-visual{ min-height:460px; padding:4px 0 8px }
-  .tpm-can-stage{ width:min(360px, 92vw); height:420px }
-  .tpm-can--mango{ width:185px; height:210px; left:2%; top:62px; --sc:1.0 }
-  .tpm-can--blue{ width:195px; height:220px; top:14px; --sc:1.0 }
-  .tpm-can--strawberry{ width:185px; height:210px; right:2%; top:68px; --sc:1.0 }
-  .tpm-store-chip{ bottom:8px; font-size:10px; padding:7px 10px 7px 7px }
-}
-@media(max-width:390px){
-  .tpm-can-stage{ width:min(350px, 92vw); height:400px }
-  .tpm-can--mango{ width:170px; height:193px; left:1%; top:58px }
-  .tpm-can--blue{ width:180px; height:204px; top:12px }
-  .tpm-can--strawberry{ width:170px; height:193px; right:1%; top:64px }
-}
-@media(max-width:375px){
-  .tpm-can-stage{ width:min(340px, 92vw); height:380px }
-  .tpm-can--mango{ width:155px; height:176px; left:1%; top:58px }
-  .tpm-can--blue{ width:165px; height:187px; top:10px }
-  .tpm-can--strawberry{ width:155px; height:176px; right:1%; top:64px }
-}
-/* Desktop — cinematic scale — square assets, noticeably larger */
-@media(min-width:1024px){
-  .tpm-can--mango{ width:260px; height:300px; left:1%; top:42px }
-  .tpm-can--blue{ width:300px; height:340px; top:0 }
-  .tpm-can--strawberry{ width:270px; height:300px; right:1%; top:48px }
+  .tpm-can-stage{ width:min(740px, 100%); height:590px }
+  .tpm-can-stage::after{ left:53%; width:52% }
+  .tpm-can--mango{ left:120px; bottom:14px; width:330px; height:435px }
+  .tpm-can--blue{ left:420px; bottom:0; width:365px; height:480px; margin-left:-182.5px }
+  .tpm-can--strawberry{ left:405px; bottom:14px; width:270px; height:370px }
 }
 
-/* Tablet — balanced — square assets */
-@media(min-width:768px) and (max-width:1023px){
-  .tpm-can-stage{ width:480px; height:480px }
-  .tpm-can--mango{ width:260px; height:300px; left:2%; top:48px }
-  .tpm-can--blue{ width:300px; height:345px; top:-4px }
-  .tpm-can--strawberry{ width:285px; height:310px; right:2%; top:56px }
-}
-
-/* Mobile — dedicated editorial composition: compact but dominant — square assets */
+/* Mobile — dedicated compact composition, clear of the location badge */
 @media(max-width:767px){
-  .tpm-hero-visual{ min-height:460px; padding:4px 0 8px }
-  .tpm-can-stage{ width:min(360px, 92vw); height:420px }
-  .tpm-can--mango{ width:185px; height:210px; left:2%; top:62px; --sc:1.0 }
-  .tpm-can--blue{ width:195px; height:220px; top:14px; --sc:1.0 }
-  .tpm-can--strawberry{ width:185px; height:210px; right:2%; top:68px; --sc:1.0 }
-  .tpm-store-chip{ bottom:8px; font-size:10px; padding:7px 10px 7px 7px }
+  .tpm-hero-visual{ min-height:340px; padding:4px 0 6px }
+  .tpm-can-stage{ width:min(340px, 100%); height:165px }
+  .tpm-can-stage::after{ left:50%; bottom:20px; width:64% }
+  .tpm-can--mango{ left:calc(26% - 72.5px); bottom:38px; width:145px; height:175px; z-index:2 }
+  .tpm-can--blue{ left:50%; bottom:40px; width:155px; height:190px; margin-left:-77.5px; z-index:3 }
+  .tpm-can--strawberry{ left:calc(72% - 60px); bottom:38px; width:120px; height:150px; z-index:2 }
+  .tpm-store-chip{ bottom:4px; font-size:8px; padding:5px 7px 5px 5px }
 }
+/* Small mobile */
 @media(max-width:390px){
-  .tpm-can-stage{ width:min(350px, 92vw); height:400px }
-  .tpm-can--mango{ width:170px; height:193px; left:1%; top:58px }
-  .tpm-can--blue{ width:180px; height:204px; top:12px }
-  .tpm-can--strawberry{ width:170px; height:193px; right:1%; top:64px }
-}
-/* Mobile — dedicated editorial composition: compact but dominant — square assets */
-@media(max-width:375px){
-  .tpm-can-stage{ width:min(340px, 92vw); height:380px }
-  .tpm-can--mango{ width:155px; height:176px; left:1%; top:58px }
-  .tpm-can--blue{ width:165px; height:187px; top:10px }
-  .tpm-can--strawberry{ width:155px; height:176px; right:1%; top:64px }
+  .tpm-can-stage{ width:100%; height:155px }
+  .tpm-can-stage::after{ bottom:18px; width:68% }
+  .tpm-can--mango{ left:calc(26% - 64px); bottom:34px; width:128px; height:155px }
+  .tpm-can--blue{ left:50%; bottom:36px; width:150px; height:180px; margin-left:-75px }
+  .tpm-can--strawberry{ left:calc(72% - 55px); bottom:34px; width:110px; height:140px }
 }
 
 .tpm-store-chip{
   position:absolute;
-  bottom:2px;left:50%;transform:translateX(-50%);
+  bottom:8px;left:50%;transform:translateX(-50%);
   display:inline-flex;align-items:center;gap:8px;
   background:#fff;
   border:1px solid rgba(14,26,20,.08);
@@ -503,6 +464,7 @@ button{font:inherit}
   font-size:11px;font-weight:700;letter-spacing:.05em;
   color:var(--ink);
   white-space:nowrap;
+  z-index:10;
 }
 .tpm-store-chip img{width:28px;height:28px;border-radius:999px;object-fit:cover}
 .tpm-store-chip strong{color:var(--tpm-green)}
@@ -1060,6 +1022,21 @@ html,body{max-width:100%;overflow-x:hidden}
 /* Bottom padding for mobile nav */
 @media(max-width:767px){
   body{padding-bottom:var(--bottom-nav-h)}
+  .menu-images-container{
+    gap:16px;
+  }
+  .menu-page-figure:first-child{
+    grid-column:1 / -1;
+    grid-row:1;
+  }
+  .menu-page-figure:nth-child(2){
+    grid-column:1;
+    grid-row:2;
+  }
+  .menu-page-figure:nth-child(3){
+    grid-column:2;
+    grid-row:2;
+  }
 }
 
 /* Image-based Menu — vertical scroll */
@@ -1085,12 +1062,15 @@ html,body{max-width:100%;overflow-x:hidden}
   width:calc(100% - var(--gutter) * 2);
   max-width:760px;
   margin-inline:auto;
-  display:flex;flex-direction:column;gap:16px;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:16px;
 }
-@media(min-width:768px){ .menu-images-container{gap:20px} .menu-images-wrap{padding:24px 0 44px} }
+@media(min-width:768px){ .menu-images-container{display:flex;flex-direction:column;gap:20px} .menu-images-wrap{padding:24px 0 44px} }
 .menu-page-figure{
   margin:0;
   display:flex;flex-direction:column;gap:8px;
+  min-width:0;
 }
 .menu-page-btn{
   display:block;width:100%;padding:0;border:0;background:transparent;cursor:zoom-in;

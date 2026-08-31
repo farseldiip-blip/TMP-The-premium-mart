@@ -311,10 +311,10 @@
           <p class="prose" style="margin:0 0 16px">Questions about the mart, private hire or wholesale? Drop us a line — we reply within hours.</p>
           <form id="contactForm" novalidate>
             <div style="display:grid;gap:12px">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                <div class="field" style="margin:0"><label for="c-name">Name</label><input id="c-name" name="name" required placeholder="Amina Karim" autocomplete="name" /></div>
-                <div class="field" style="margin:0"><label for="c-email">Email</label><input id="c-email" name="email" type="email" required placeholder="amina@email.com" autocomplete="email" /></div>
-              </div>
+<div class="form-grid">
+               <div class="field" style="margin:0"><label for="c-name">Name</label><input id="c-name" name="name" required placeholder="Amina Karim" autocomplete="name" /></div>
+               <div class="field" style="margin:0"><label for="c-email">Email</label><input id="c-email" name="email" type="email" required placeholder="amina@email.com" autocomplete="email" /></div>
+             </div>
               <div class="field" style="margin:0"><label for="c-msg">Message</label><input id="c-msg" name="message" required placeholder="Hello TPM team..." /></div>
             </div>
             <div class="form-actions" style="margin-top:14px">
@@ -356,14 +356,14 @@
       <h3 id="reserveTitle">Reserve a table</h3>
       <p>We hold tables for up to 6 guests. For larger parties, please call us.</p>
       <form id="reserveForm">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field"><label for="r-date">Date</label><input id="r-date" type="date" required /></div>
-          <div class="field"><label for="r-time">Time</label><select id="r-time" required><option value="">Select</option><option>8:00 AM</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field"><label for="r-guests">Guests</label><select id="r-guests" required><option>2 guests</option><option>1 guest</option><option>3 guests</option><option>4 guests</option><option>5 guests</option><option>6 guests</option></select></div>
-          <div class="field"><label for="r-name">Name</label><input id="r-name" required placeholder="Your name" /></div>
-        </div>
+<div class="form-grid">
+           <div class="field"><label for="r-date">Date</label><input id="r-date" type="date" required /></div>
+           <div class="field"><label for="r-time">Time</label><select id="r-time" required><option value="">Select</option><option>8:00 AM</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option><option>6:00 PM</option></select></div>
+         </div>
+         <div class="form-grid">
+           <div class="field"><label for="r-guests">Guests</label><select id="r-guests" required><option>2 guests</option><option>1 guest</option><option>3 guests</option><option>4 guests</option><option>5 guests</option><option>6 guests</option></select></div>
+           <div class="field"><label for="r-name">Name</label><input id="r-name" required placeholder="Your name" /></div>
+         </div>
         <div class="field"><label for="r-phone">Phone</label><input id="r-phone" type="tel" required placeholder="+1 (555) 000-0000" /></div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" id="cancelReserve">Cancel</button>

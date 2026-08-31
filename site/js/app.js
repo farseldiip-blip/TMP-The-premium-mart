@@ -365,7 +365,7 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     opacity: 1,  // CHANGED FROM 0 to 1 for diagnostic test
     y: isMobile ? 130 : 150,
     x: 0,
-    scale: 0.90,
+    scale: 1.5,
     rotation: (el) => {
       if (el === cans.mango) return -3;
       if (el === cans.strawberry) return 3;
@@ -394,7 +394,7 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   // All three cans rise together from the grouped position
   entranceTL.to([cans.mango, cans.blue, cans.strawberry], {
     y: isMobile ? 60 : 80,
-    scale: 0.95,
+    scale: 1.425,
     ease: 'power2.out'
   }, 0.00);
 
@@ -402,25 +402,28 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   // Blue (center) rises to its final position, scales up
   entranceTL.to(cans.blue, {
     y: 0,
-    scale: 1,
+    scale: 1.5,
     rotation: 0,
     ease: 'power3.out'
   }, 0.20);
 
-  // === 3. SPREAD & ROTATE ===
-  // Mango (left): moves outward left + rotates CCW into final angle
+  // === 3. BOUQUET OPEN ===
+  // Blue establishes itself first as the center anchor.
+  // Mango and Strawberry gently move outward to frame Blue.
+  // The movement is controlled — the cans stay close enough to read as one group.
+  // (Blue's y/scale final state was set in Phase 2 above.)
   entranceTL.to(cans.mango, {
-    x: isMobile ? -8 : -14,
-    rotation: isMobile ? -7 : -8,
-    scale: isMobile ? 0.92 : 0.92,
+    x: isMobile ? -6 : -8,
+    rotation: isMobile ? -6 : -8,
+    scale: 1.38,
     ease: 'power3.out'
   }, 0.40);
 
-  // Strawberry (right): moves outward right + rotates CW into final angle
+  // Strawberry (right): moves gently right + rotates into final angle
   entranceTL.to(cans.strawberry, {
-    x: isMobile ? 8 : 14,
-    rotation: isMobile ? 7 : 8,
-    scale: isMobile ? 0.92 : 0.92,
+    x: isMobile ? 6 : 8,
+    rotation: isMobile ? 6 : 8,
+    scale: 1.38,
     ease: 'power3.out'
   }, 0.40);
 
@@ -430,7 +433,7 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   // Mango/strawberry now at their final x/rotation from step 3.
   // This last tweak ensures perfect alignment.
   entranceTL.to([cans.mango, cans.blue, cans.strawberry], {
-    scale: 1,
+    scale: 1.5,
     ease: 'power2.out'
   }, 0.80);
 
@@ -453,14 +456,14 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     // Mango - different phase, slightly different amount
     floatingTL.to(cans.mango, {
       y: isMobile ? -3 : -5,
-      rotation: -6.5,
+      rotation: isMobile ? -5 : -8,
       duration: 5.2
     }, 0.3);
 
     // Strawberry - different phase
     floatingTL.to(cans.strawberry, {
       y: isMobile ? -3 : -5,
-      rotation: 6.5,
+      rotation: isMobile ? 5 : 8,
       duration: 4.8
     }, 0.6);
   }
@@ -468,9 +471,8 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   // ============================================================
   // 3. MOUSE PARALLAX (Desktop only)
   // ============================================================
-  let parallaxRaf = null;
-  let lastMouse = { x: 0, y: 0 };
-  let currentParallax = { x: 0, y: 0 };
+  let moveStageX = null;
+  let moveStageY = null;
 
   function startMouseParallax() {
     if (!hero || !stage) return;
@@ -478,35 +480,11 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     hero.addEventListener('mousemove', onMouseMove);
     hero.addEventListener('mouseleave', onMouseLeave);
 
-    // Smooth parallax loop
-    function animateParallax() {
-      // Smooth interpolation
-      currentParallax.x += (lastMouse.x - currentParallax.x) * 0.08;
-      currentParallax.y += (lastMouse.y - currentParallax.y) * 0.08;
-
-      // Apply to cans with depth-based multipliers
-      if (cans.mango) {
-        gsap.set(cans.mango, {
-          x: '+=' + (currentParallax.x * 0.4),
-          y: ' += ' + (currentParallax.y * 0.25)
-        });
-      }
-      if (cans.blue) {
-        gsap.set(cans.blue, {
-          x: ' += ' + (currentParallax.x * 0.7),
-          y: ' += ' + (currentParallax.y * 0.4)
-        });
-      }
-      if (cans.strawberry) {
-        gsap.set(cans.strawberry, {
-          x: ' += ' + (currentParallax.x * 0.4),
-          y: ' += ' + (currentParallax.y * 0.25)
-        });
-      }
-
-      parallaxRaf = requestAnimationFrame(animateParallax);
-    }
-    animateParallax();
+    // Move the stage as one unit. Updating individual cans with relative
+    // values on every animation frame made their offsets accumulate, which
+    // eventually pulled the composition apart.
+    moveStageX = gsap.quickTo(stage, 'x', { duration: 0.7, ease: 'power3.out' });
+    moveStageY = gsap.quickTo(stage, 'y', { duration: 0.7, ease: 'power3.out' });
   }
 
   function onMouseMove(e) {
@@ -515,32 +493,22 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2); // -1 to 1
     const dy = (e.clientY - cy) / (rect.height / 2);
-    lastMouse.x = dx * 15;
-    lastMouse.y = dy * 10;
+    moveStageX?.(dx * 14);
+    moveStageY?.(dy * 9);
   }
 
   function onMouseLeave() {
-    lastMouse.x = 0;
-    lastMouse.y = 0;
+    moveStageX?.(0);
+    moveStageY?.(0);
   }
 
   function stopMouseParallax() {
     hero?.removeEventListener('mousemove', onMouseMove);
     hero?.removeEventListener('mouseleave', onMouseLeave);
-    if (parallaxRaf) {
-      cancelAnimationFrame(parallaxRaf);
-      parallaxRaf = null;
-    }
-    // Smoothly return to center using the cans object
-    gsap.to([cans.mango, cans.blue, cans.strawberry], {
-      x: (i, target) => {
-        if (target === cans.mango) return isMobile ? -8 : -12;
-        if (target === cans.strawberry) return isMobile ? 8 : 12;
-        return 0;
-      },
-      duration: 0.8,
-      ease: 'power3.out'
-    });
+    gsap.killTweensOf(stage);
+    gsap.set(stage, { x: 0, y: 0 });
+    moveStageX = null;
+    moveStageY = null;
   }
 
   // ============================================================
@@ -562,7 +530,7 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
         if (progress > 0 && progress < 1) {
           // Cans move up slightly and scale down
           const yOffset = -progress * (isMobile ? 30 : 50);
-          const scaleReduce = 1 - progress * 0.03;
+           const scaleReduce = 1.5 * (1 - progress * 0.03);
 
           gsap.set([cans.mango, cans.blue, cans.strawberry], {
             y: yOffset,
@@ -629,27 +597,27 @@ gsap.set([cans.mango, cans.blue, cans.strawberry], {
       opacity: 1,
       y: 0,
       x: 0,
-      scale: 1,
-      rotation: (el) => el === cans.mango ? -10 : el === cans.strawberry ? 10 : 0,
-      clearProps: 'transform'
-    });
-      gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
-        opacity: 1,
-        y: 0,
-        clearProps: 'transform'
-      });
-    } else {
-      // Reduced motion re-enabled — re-apply final positioned state
-      // without reloading the page. The entrance timeline and
-      // floating/parallax will be re-created on the next page visit.
-      gsap.set([cans.mango, cans.blue, cans.strawberry], {
-        opacity: 1,
-        y: 0,
-        x: 0,
-        scale: 1,
-        rotation: (el) => el === cans.mango ? -10 : el === cans.strawberry ? 10 : 0,
-        clearProps: 'transform'
-      });
+       scale: 1.5,
+       rotation: (el) => el === cans.mango ? -8 : el === cans.strawberry ? 8 : 0,
+       clearProps: 'transform'
+     });
+       gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
+         opacity: 1,
+         y: 0,
+         clearProps: 'transform'
+       });
+     } else {
+       // Reduced motion re-enabled — re-apply final positioned state
+       // without reloading the page. The entrance timeline and
+       // floating/parallax will be re-created on the next page visit.
+       gsap.set([cans.mango, cans.blue, cans.strawberry], {
+         opacity: 1,
+         y: 0,
+         x: 0,
+         scale: 1.5,
+         rotation: (el) => el === cans.mango ? -8 : el === cans.strawberry ? 8 : 0,
+         clearProps: 'transform'
+       });
       gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
         opacity: 1,
         y: 0,
@@ -671,7 +639,7 @@ gsap.set([cans.mango, cans.blue, cans.strawberry], {
     });
     reducedCanTL.to([cans.mango, cans.blue, cans.strawberry], {
       y: 0,
-      scale: 1,
+      scale: 1.5,
       rotation: (el) => el === cans.mango ? -5 : el === cans.strawberry ? 5 : 0,
       duration: 0.6
     });
