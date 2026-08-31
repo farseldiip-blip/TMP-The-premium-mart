@@ -1086,6 +1086,15 @@ html,body{max-width:100%;overflow-x:hidden}
     grid-column:2;
     grid-row:2;
   }
+  .menu-foot-note.reveal{
+    grid-column:1 / -1;
+    grid-row:3;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    padding:20px 18px 18px;
+  }
 }
 
 /* Image-based Menu — vertical scroll */
