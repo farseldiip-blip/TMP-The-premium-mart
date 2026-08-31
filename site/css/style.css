@@ -696,6 +696,42 @@ button{font:inherit}
   min-width:min(100%, 340px);
 }
 @media(min-width:768px){ .tpm-preview-cta .btn{min-width:320px} }
+/* Mobile Menu — compact 3-part layout: A featured full, B+C side-by-side, D full small + CTA */
+@media(max-width:767px){
+  .tpm-preview-grid{
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .tpm-card.tpm-card--a.reveal{
+    grid-column:1 / -1;
+    aspect-ratio:16 / 9.2;
+    min-height:210px;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  .tpm-card--b,
+  .tpm-card--c{
+    min-height:168px;
+    aspect-ratio:1 / 1.08;
+  }
+  .tpm-card--b{ grid-column:1; }
+  .tpm-card--c{ grid-column:2; }
+  .tpm-card--d{
+    grid-column:1 / -1;
+    aspect-ratio:16 / 9;
+    min-height:185px;
+  }
+  .tpm-preview-cta{
+    margin-top:16px;
+  }
+  .tpm-preview-cta .btn{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+  }
+}
 .tpm-preview-cta p{
   margin:12px 0 0;
   font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;
