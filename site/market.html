@@ -72,8 +72,8 @@
       <div class="container">
         <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg> Back to Home</a>
         <h1>The Market</h1>
-        <p class="menu-intro">Market &amp; Café — fresh categories and products, updated live from the Dashboard. Filter by Market or Café.</p>
-        <p class="menu-hint"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg> Tap a product to view • All products are is_active only</p>
+        <p class="menu-intro">Fresh finds, signature drinks &amp; everyday favorites — all in one place. Browse by category below.</p>
+        <div id="menuTypeFilter" style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap"></div>
       </div>
     </section>
 
@@ -81,7 +81,7 @@
     <section class="menu-images-wrap" aria-label="Market and Café">
       <div class="container menu-images-container">
         <!-- Dynamic categories/products injected by js/market.js from Supabase categories/products -->
-        <div class="admin-loading" style="grid-column:1/-1;min-height:120px"><span class="admin-spinner"></span> Loading market…</div>
+        <div class="admin-loading" style="min-height:120px"><span class="admin-spinner"></span> Loading market…</div>
       </div>
     </section>
   </main>
