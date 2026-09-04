@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin Login — TPM The Premium Mart</title>
+  <link rel="icon" href="../assets/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body class="admin-body">
+  <div class="admin-login-wrap">
+    <div class="admin-card" role="main" aria-labelledby="login-title">
+      <div class="admin-brand" aria-label="TPM Admin">
+        <span class="admin-brand-mark" aria-hidden="true">TPM</span>
+        <span>TPM — Admin</span>
+      </div>
+      <h1 id="login-title" class="admin-title">Admin Login</h1>
+      <p class="admin-muted">Sign in with your Supabase admin account. Only users in <code>admin_users</code> can access the dashboard (verified via <code>is_admin()</code> — RLS enforced).</p>
+
+      <form id="loginForm" novalidate>
+        <div class="admin-field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" placeholder="admin@tpm.cafe" />
+        </div>
+        <div class="admin-field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <button type="submit" id="loginBtn" class="admin-btn admin-btn-primary">Sign in</button>
+        <div id="loginAlert" class="admin-alert" role="alert" aria-live="polite"></div>
+      </form>
+
+      <p class="admin-foot">
+        <a href="../index.html">← Back to website</a> · <span id="loginHint" style="opacity:.8">Local: <code>http://127.0.0.1:54321</code> — set keys in <code>js/config.js</code></span>
+      </p>
+      <div id="loginLoading" class="admin-loading" style="display:none">
+        <span class="admin-spinner" aria-hidden="true"></span> Checking session…
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getSupabase } from "./js/supabase.js";
+    import { getAuthState } from "./js/auth.js";
+
+    const supabase = getSupabase();
+    const form = document.getElementById("loginForm");
+    const alertBox = document.getElementById("loginAlert");
+    const btn = document.getElementById("loginBtn");
+    const loading = document.getElementById("loginLoading");
+
+    function showAlert(msg, kind="error"){
+      alertBox.textContent = msg;
+      alertBox.className = "admin-alert show" + (kind==="info" ? " admin-alert--info" : "");
+    }
+    function hideAlert(){ alertBox.className="admin-alert"; alertBox.textContent=""; }
+
+    // If already authenticated and admin → go to dashboard (reuse existing session)
+    (async () => {
+      loading.style.display = "grid";
+      try {
+        const state = await getAuthState();
+        if (state.user && state.isAdmin) {
+          window.location.replace("./index.html");
+          return;
+        }
+        if (state.user && !state.isAdmin) {
+          // Authenticated but not admin — show blocked, force sign out
+          showAlert("Signed in as " + state.user.email + " — not an admin. Access denied (admin_users). Signing out…");
+          await supabase.auth.signOut();
+        }
+      } catch (e) {
+        console.warn("[TPM login] pre-check failed", e);
+      } finally {
+        loading.style.display = "none";
+      }
+    })();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideAlert();
+      const email = form.email.value.trim();
+      const password = form.password.value;
+      if (!email || !password) { showAlert("Email and password are required."); return; }
+      btn.disabled = true; btn.textContent = "Signing in…";
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        // Verify admin via existing is_admin() — never trust UI alone
+        const { data: isAdmin, error: rpcErr } = await supabase.rpc("is_admin");
+        if (rpcErr) throw rpcErr;
+        if (!isAdmin) {
+          await supabase.auth.signOut();
+          showAlert("Access denied — " + email + " is not in admin_users. Contact an existing admin to be added via promote_admin_by_email().");
+          return;
+        }
+        // Success — go to dashboard (session persisted via supabase.auth)
+        window.location.replace("./index.html");
+      } catch (err) {
+        const msg = err?.message || "Sign-in failed.";
+        // Do not leak whether email exists — show generic + helpful hint
+        showAlert(msg);
+        console.error("[TPM login] error", err);
+      } finally {
+        btn.disabled = false; btn.textContent = "Sign in";
+      }
+    });
+  </script>
+</body>
+</html>

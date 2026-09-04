@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Dashboard — TPM Admin</title>
+  <link rel="icon" href="../assets/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body class="admin-body">
+  <!-- Loading / blocked states (shown before shell) -->
+  <div id="gateLoading" class="admin-login-wrap" style="min-height:100vh">
+    <div class="admin-loading">
+      <span class="admin-spinner" aria-hidden="true"></span>
+      <span>Verifying session & admin access (is_admin())…</span>
+    </div>
+  </div>
+
+  <div id="gateBlocked" class="admin-login-wrap" style="display:none;min-height:100vh">
+    <div class="admin-denied" role="alert">
+      <h2>Access denied</h2>
+      <p class="admin-muted" id="blockedMsg">You are signed in but not in <code>admin_users</code>. Authorization uses the existing <code>is_admin()</code> function — RLS remains enforced.</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:14px">
+        <a class="admin-btn admin-btn-primary" href="./login.html">Go to login</a>
+        <button class="admin-btn admin-btn-ghost" id="blockedSignOut">Sign out</button>
+      </div>
+      <p class="admin-foot">Need access? Ask an existing admin to run <code>select public.promote_admin_by_email('you@email')</code> via Studio.</p>
+    </div>
+  </div>
+
+  <!-- Dashboard shell (hidden until allowed) -->
+  <div id="adminShell" class="admin-layout" style="display:none" aria-hidden="true">
+    <div id="adminBackdrop" class="admin-backdrop" aria-hidden="true"></div>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+      <div class="admin-sidebar-head">
+        <span class="mark" aria-hidden="true">TPM</span>
+        <div class="word">TPM — Admin <span>The Premium Mart</span></div>
+      </div>
+      <nav class="admin-nav" aria-label="Primary">
+        <a href="#overview" data-nav="overview" class="active" aria-current="page">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 13h7V4H4v9Z"/><path d="M13 20h7v-9h-7v9Z"/><path d="M13 4v5h7V4h-7Z"/><path d="M4 20h7v-5H4v5Z"/></svg>
+          Overview
+        </a>
+        <a href="#products" data-nav="products">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 7h10v10H7z"/><path d="M7 11h10"/><path d="M11 7v10"/></svg>
+          Products
+        </a>
+        <a href="#categories" data-nav="categories">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+          Categories
+        </a>
+        <a href="#store" data-nav="store">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10h16L12 4 4 10Z"/><path d="M6 10v8h12v-8"/><path d="M9 18v-5h6v5"/></svg>
+          Store Information
+        </a>
+        <a href="#contact" data-nav="contact">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16v12H4z"/><path d="M4 7l8 7 8-7"/></svg>
+          Contact
+        </a>
+        <a href="#social" data-nav="social">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M15 10a3.5 3.5 0 1 1-3 5"/><path d="M9 8h.01"/><path d="M15 8h.01"/></svg>
+          Social Links
+        </a>
+        <a href="#video" data-nav="video">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 8l6 4-6 4V8Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+          Showcase Video
+        </a>
+      </nav>
+      <div class="admin-sidebar-foot">
+        <div class="user" title="">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 19a7 7 0 0 1 14 0"/></svg>
+          <div style="min-width:0;flex:1">
+            <strong id="sidebarUserEmail" style="font-weight:700">—</strong>
+            <span style="font-size:11px;opacity:.7">Admin · RLS via is_admin()</span>
+          </div>
+        </div>
+        <button class="admin-btn admin-btn-ghost" id="sidebarLogout" style="width:100%;margin-top:10px">Logout</button>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button class="admin-icon-btn admin-hamburger" id="openSidebar" aria-label="Open menu" aria-expanded="false" aria-controls="adminSidebar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <h1 id="pageTitle">Overview</h1>
+        <span class="spacer" aria-hidden="true"></span>
+        <div class="top-actions">
+          <a class="admin-btn admin-btn-ghost" href="../index.html" style="min-height:40px;padding:0 14px;font-size:11px">View site</a>
+          <button class="admin-btn admin-btn-primary" id="topLogout" style="min-height:40px;padding:0 14px;font-size:11px">Logout</button>
+        </div>
+      </header>
+
+      <main class="admin-content" id="adminContent">
+        <!-- Overview -->
+        <section data-view="overview" class="admin-view">
+          <div class="admin-grid" style="margin-bottom:14px">
+            <div class="admin-stat"><strong>—</strong><span>Products</span></div>
+            <div class="admin-stat"><strong>—</strong><span>Categories</span></div>
+            <div class="admin-stat"><strong>One</strong><span>Showcase video · 15s max</span></div>
+          </div>
+          <div class="admin-panel">
+            <h3>Welcome to TPM Admin</h3>
+            <p>Dashboard shell only — no CRUD yet. Navigation placeholders are wired; management for Products, Categories, Store Information, Contact, Social Links and Showcase Video will be added in the next step. Auth uses existing Supabase Auth; authorization uses existing <code>admin_users</code> + <code>is_admin()</code> (RLS enforced).</p>
+            <div class="admin-placeholder" style="margin-top:14px">
+              <strong style="font-size:13px">Next steps (not implemented yet):</strong>
+              <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--muted)">
+                <li>Products / Categories CRUD (reads filtered by <code>is_active</code>, writes gated by RLS)</li>
+                <li>Store & Contact singletons (one row)</li>
+                <li>Social Links + Storage buckets (<code>product-images</code>, <code>category-backgrounds</code>, <code>store-logo</code>, <code>showcase-video</code>)</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Products Management (Step 3B) -->
+        <section data-view="products" class="admin-view" hidden>
+          <div id="prodWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Products</h3>
+              <span class="spacer"></span>
+              <input id="prodSearch" class="admin-search" type="search" placeholder="Search name, slug, badge…" aria-label="Search products" />
+              <select id="prodCatFilter" class="admin-filter" aria-label="Filter by category"><option value="all">All categories</option></select>
+              <select id="prodTypeFilter" class="admin-filter" aria-label="Filter by type"><option value="all">All types</option><option value="market">Market</option><option value="cafe">Café</option></select>
+              <button id="prodRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+              <button id="prodAddBtn" class="admin-btn admin-btn-primary admin-btn--sm" type="button">Add Product</button>
+            </div>
+            <div id="prodStats" class="cat-stats"></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" aria-label="Products">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Badge</th>
+                    <th>Status</th>
+                    <th>Sort</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="prodTbody"></tbody>
+              </table>
+              <div id="prodCards" class="cat-cards"></div>
+            </div>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Bucket <code>product-images</code> — image optional, preserved on edit. RLS: public reads active only, admin writes via <code>is_admin()</code>.</p>
+          </div>
+
+          <!-- Add/Edit Product Modal -->
+          <div id="prodModal" class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="prodModalTitle">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card" style="max-width:620px">
+              <div class="admin-modal-head">
+                <h3 id="prodModalTitle">Add Product</h3>
+                <button id="prodModalClose" class="admin-modal-close" type="button" aria-label="Close">×</button>
+              </div>
+              <form id="prodForm" novalidate>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-prod-name">
+                    <label for="prodName">Name *</label>
+                    <input id="prodName" type="text" placeholder="e.g., Heritage Flat White" required maxlength="120" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-prod-category">
+                    <label for="prodCategory">Category</label>
+                    <select id="prodCategory">
+                      <option value="">— No category —</option>
+                    </select>
+                    <span class="error"></span>
+                    <span class="hint">Shows Market/Café via category type.</span>
+                  </div>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-prod-slug">
+                    <label for="prodSlug">Slug *</label>
+                    <input id="prodSlug" type="text" placeholder="e.g., heritage-flat-white" required maxlength="120" />
+                    <span class="hint">a-z, 0-9, hyphens. Auto from name.</span>
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-prod-sort">
+                    <label for="prodSort">Sort order *</label>
+                    <input id="prodSort" type="number" min="0" step="1" value="0" required />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-field" id="field-prod-desc">
+                  <label for="prodDesc">Description</label>
+                  <textarea id="prodDesc" placeholder="Optional description" rows="2"></textarea>
+                  <span class="error"></span>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-prod-price">
+                    <label for="prodPrice">Price</label>
+                    <input id="prodPrice" type="number" min="0" step="0.01" placeholder="e.g., 6.50" />
+                    <span class="hint">≥0, leave blank for no price.</span>
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-prod-badge">
+                    <label for="prodBadge">Badge</label>
+                    <input id="prodBadge" type="text" placeholder="e.g., Popular, New" maxlength="40" />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-field">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input id="prodActive" type="checkbox" class="admin-toggle" checked />
+                    <span>Active (visible to public)</span>
+                  </label>
+                </div>
+                <div class="admin-field" style="margin-top:8px">
+                  <label>Product image (optional)</label>
+                  <div style="display:grid;gap:8px">
+                    <input id="prodImgFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" />
+                    <span class="hint">≤5 MiB, jpeg/png/webp/avif/svg → uploads to <code>product-images</code> bucket.</span>
+                    <div id="prodImgPreview" class="hint">No image</div>
+                    <div class="admin-form-grid cols-2">
+                      <div class="admin-field">
+                        <label for="prodImgPath">Image path</label>
+                        <input id="prodImgPath" type="text" placeholder="product-images/..." />
+                      </div>
+                      <div class="admin-field">
+                        <label for="prodImgUrl">Image URL</label>
+                        <input id="prodImgUrl" type="text" placeholder="https://..." />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="admin-modal-actions">
+                  <button id="prodModalCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                  <button type="submit" class="admin-btn admin-btn-primary">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Delete Product Confirm -->
+          <div id="prodDeleteModal" class="admin-modal" role="dialog" aria-modal="true" aria-label="Confirm delete product">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card" style="max-width:420px">
+              <h3 style="margin:0 0 8px">Delete product?</h3>
+              <p class="admin-muted" style="margin:0 0 6px">This will permanently delete <strong id="prodDeleteName"></strong>.</p>
+              <p class="admin-muted" style="font-size:11px">Image in storage is not deleted automatically.</p>
+              <div class="admin-modal-actions">
+                <button id="prodDeleteCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                <button id="prodDeleteConfirm" class="admin-btn admin-btn--danger" type="button">Delete</button>
+              </div>
+              <button id="prodDeleteClose" class="admin-modal-close" type="button" aria-label="Close" style="position:absolute;top:12px;right:12px">×</button>
+            </div>
+          </div>
+        </section>
+        <!-- Categories Management (Step 3A) -->
+        <section data-view="categories" class="admin-view" hidden>
+          <div id="catWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Categories</h3>
+              <span class="spacer"></span>
+              <input id="catSearch" class="admin-search" type="search" placeholder="Search name, slug…" aria-label="Search categories" />
+              <select id="catTypeFilter" class="admin-filter" aria-label="Filter by type">
+                <option value="all">All types</option>
+                <option value="market">Market</option>
+                <option value="cafe">Café</option>
+              </select>
+              <button id="catRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+              <button id="catAddBtn" class="admin-btn admin-btn-primary admin-btn--sm" type="button">Add Category</button>
+            </div>
+            <div id="catStats" class="cat-stats"></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" aria-label="Categories">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Slug</th>
+                    <th>Status</th>
+                    <th>Sort</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="catTbody"></tbody>
+              </table>
+              <div id="catCards" class="cat-cards"></div>
+              <div id="catEmpty" class="admin-empty" style="display:none"></div>
+            </div>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Bucket <code>category-backgrounds</code> — background fields preserved on edit. RLS: public reads active only, admin writes via <code>is_admin()</code>.</p>
+          </div>
+
+          <!-- Add/Edit Modal -->
+          <div id="catModal" class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card">
+              <div class="admin-modal-head">
+                <h3 id="catModalTitle">Add Category</h3>
+                <button id="catModalClose" class="admin-modal-close" type="button" aria-label="Close">×</button>
+              </div>
+              <form id="catForm" novalidate>
+                <input type="hidden" id="catId" />
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-name">
+                    <label for="catName">Name *</label>
+                    <input id="catName" type="text" placeholder="e.g., Fresh Favorites" required maxlength="80" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-type">
+                    <label for="catType">Type *</label>
+                    <select id="catType" required>
+                      <option value="market">Market</option>
+                      <option value="cafe">Café</option>
+                    </select>
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-slug">
+                    <label for="catSlug">Slug *</label>
+                    <input id="catSlug" type="text" placeholder="e.g., fresh-favorites" required maxlength="80" />
+                    <span class="hint">Lowercase a-z, 0-9, hyphens. Auto-generated from name.</span>
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-sort">
+                    <label for="catSort">Sort order *</label>
+                    <input id="catSort" type="number" min="0" step="1" value="0" required />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-field" id="field-desc">
+                  <label for="catDesc">Description</label>
+                  <textarea id="catDesc" placeholder="Optional short description" rows="2"></textarea>
+                  <span class="error"></span>
+                </div>
+                <div class="admin-field">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input id="catActive" type="checkbox" class="admin-toggle" checked />
+                    <span>Active (visible to public)</span>
+                  </label>
+                </div>
+                <div class="admin-form-grid cols-2" style="margin-top:10px">
+                  <div class="admin-field">
+                    <label for="catBgPath">Background image path</label>
+                    <input id="catBgPath" type="text" placeholder="category-backgrounds/..." />
+                    <span class="hint">Storage path preserved; leave blank to clear.</span>
+                  </div>
+                  <div class="admin-field">
+                    <label for="catBgUrl">Background image URL</label>
+                    <input id="catBgUrl" type="text" placeholder="https://..." />
+                  </div>
+                </div>
+                <div class="admin-modal-actions">
+                  <button id="catModalCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                  <button type="submit" class="admin-btn admin-btn-primary">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Delete Confirm Modal -->
+          <div id="catDeleteModal" class="admin-modal" role="dialog" aria-modal="true" aria-label="Confirm delete">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card" style="max-width:420px">
+              <h3 style="margin:0 0 8px">Delete category?</h3>
+              <p class="admin-muted" style="margin:0 0 6px">This will permanently delete <strong id="catDeleteName"></strong>.</p>
+              <p class="admin-muted" style="font-size:11px">Products linked to this category will have <code>category_id</code> set to NULL (ON DELETE SET NULL). This cannot be undone.</p>
+              <div class="admin-modal-actions">
+                <button id="catDeleteCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                <button id="catDeleteConfirm" class="admin-btn admin-btn--danger" type="button">Delete</button>
+              </div>
+              <button id="catDeleteClose" class="admin-modal-close" type="button" aria-label="Close" style="position:absolute;top:12px;right:12px">×</button>
+            </div>
+          </div>
+        </section>
+        <!-- Store Information Management (singleton) -->
+        <section data-view="store" class="admin-view" hidden>
+          <div id="storeWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Store Information</h3>
+              <span class="spacer"></span>
+              <button id="storeRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+            </div>
+            <div id="storeLoading" class="admin-loading" style="min-height:120px">
+              <span class="admin-spinner"></span> Loading store info…
+            </div>
+            <div id="storeContent" style="display:none">
+              <form id="storeForm" novalidate>
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Brand</h3>
+                  <div class="admin-field" id="field-store-name">
+                    <label for="storeName">Name *</label>
+                    <input id="storeName" type="text" placeholder="TPM — The Premium Mart" required />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-store-tagline">
+                    <label for="storeTagline">Tagline</label>
+                    <input id="storeTagline" type="text" placeholder="More Than Your Everyday Stop." />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-store-desc">
+                    <label for="storeDesc">Description</label>
+                    <textarea id="storeDesc" rows="3" placeholder="Short brand description"></textarea>
+                    <span class="error"></span>
+                  </div>
+                </div>
+
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Address</h3>
+                  <div class="admin-field" id="field-store-addr1">
+                    <label for="storeAddr1">Address line 1</label>
+                    <input id="storeAddr1" type="text" placeholder="123 Heritage Lane" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-store-addr2">
+                    <label for="storeAddr2">Address line 2</label>
+                    <input id="storeAddr2" type="text" placeholder="City Center" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-form-grid cols-2">
+                    <div class="admin-field" id="field-store-city">
+                      <label for="storeCity">City</label>
+                      <input id="storeCity" type="text" placeholder="City Center" />
+                      <span class="error"></span>
+                    </div>
+                    <div class="admin-field" id="field-store-country">
+                      <label for="storeCountry">Country *</label>
+                      <input id="storeCountry" type="text" placeholder="US" required />
+                      <span class="error"></span>
+                    </div>
+                  </div>
+                  <div class="admin-field" id="field-store-postal">
+                    <label for="storePostal">Postal code</label>
+                    <input id="storePostal" type="text" placeholder="12345" />
+                    <span class="error"></span>
+                  </div>
+                </div>
+
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Contact</h3>
+                  <div class="admin-form-grid cols-2">
+                    <div class="admin-field" id="field-store-phone">
+                      <label for="storePhone">Phone</label>
+                      <input id="storePhone" type="tel" placeholder="+15551234567" />
+                      <span class="error"></span>
+                    </div>
+                    <div class="admin-field" id="field-store-phonedisplay">
+                      <label for="storePhoneDisplay">Phone display</label>
+                      <input id="storePhoneDisplay" type="text" placeholder="+1 (555) 123-4567" />
+                      <span class="error"></span>
+                    </div>
+                  </div>
+                  <div class="admin-field" id="field-store-email">
+                    <label for="storeEmail">Email</label>
+                    <input id="storeEmail" type="email" placeholder="hello@tpm.cafe" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-store-mapurl">
+                    <label for="storeMapUrl">Map URL</label>
+                    <input id="storeMapUrl" type="url" placeholder="https://maps.google.com/..." />
+                    <span class="hint">Must be http/https if provided.</span>
+                    <span class="error"></span>
+                  </div>
+                </div>
+
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Logo</h3>
+                  <p class="admin-muted" style="font-size:11px;margin:0 0 10px">Optional — uploads to <code>store-logo</code> bucket (≤2 MiB). Existing logo preserved if no new file selected.</p>
+                  <div id="storeLogoPreview" class="hint" style="margin-bottom:10px">No logo</div>
+                  <div class="admin-field">
+                    <label for="storeLogoFile">Upload new logo</label>
+                    <input id="storeLogoFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" />
+                    <span class="hint">Will upload on Save.</span>
+                  </div>
+                  <div class="admin-form-grid cols-2">
+                    <div class="admin-field" id="field-store-logopath">
+                      <label for="storeLogoPath">Logo path</label>
+                      <input id="storeLogoPath" type="text" placeholder="store-logo/..." />
+                      <span class="error"></span>
+                    </div>
+                    <div class="admin-field" id="field-store-logourl">
+                      <label for="storeLogoUrl">Logo URL</label>
+                      <input id="storeLogoUrl" type="text" placeholder="https://..." />
+                      <span class="hint">Valid URL if provided.</span>
+                      <span class="error"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Opening hours</h3>
+                  <div class="admin-field" id="field-store-opening">
+                    <label for="storeOpeningHours">JSON</label>
+                    <textarea id="storeOpeningHours" rows="6" placeholder='{"mon_fri":"7:00 AM — 7:00 PM","sat_sun":"8:00 AM — 8:00 PM"}' style="font-family:ui-monospace,monospace;font-size:13px"></textarea>
+                    <span class="hint">Must be a valid JSON object. Example: {"mon_fri":"7AM-7PM","brunch":"Sat-Sun 9AM-2PM"}</span>
+                    <span class="error"></span>
+                  </div>
+                </div>
+
+                <div class="admin-panel" style="margin-bottom:14px;opacity:.85">
+                  <h3 style="margin:0 0 8px">Showcase video (read-only)</h3>
+                  <p class="admin-muted" style="font-size:11px;margin:0 0 10px">Preserved on save. Management coming later — not editable here.</p>
+                  <div class="admin-field">
+                    <label for="storeVideoPath">Video path</label>
+                    <input id="storeVideoPath" type="text" readonly style="background:var(--surface-2)" />
+                  </div>
+                  <div class="admin-field">
+                    <label for="storeVideoUrl">Video URL</label>
+                    <input id="storeVideoUrl" type="text" readonly style="background:var(--surface-2)" />
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+                  <button id="storeSaveBtn" type="submit" class="admin-btn admin-btn-primary" style="min-width:140px">Save changes</button>
+                </div>
+              </form>
+              <p class="admin-muted" style="margin-top:10px;font-size:11px">RLS: authenticated admin only via <code>is_admin()</code>. Public reads via <code>store_info_public_read</code>.</p>
+            </div>
+          </div>
+        </section>
+        <!-- Contact Information Management (singleton) -->
+        <section data-view="contact" class="admin-view" hidden>
+          <div id="contactWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Contact Information</h3>
+              <span class="spacer"></span>
+              <button id="contactRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+            </div>
+            <div id="contactLoading" class="admin-loading" style="min-height:120px">
+              <span class="admin-spinner"></span> Loading contact info…
+            </div>
+            <div id="contactContent" style="display:none">
+              <form id="contactForm" novalidate>
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Primary contact</h3>
+                  <div class="admin-form-grid cols-2">
+                    <div class="admin-field" id="field-contact-phone">
+                      <label for="contactPhone">Phone</label>
+                      <input id="contactPhone" type="tel" placeholder="+15551234567" />
+                      <span class="error"></span>
+                    </div>
+                    <div class="admin-field" id="field-contact-phonedisplay">
+                      <label for="contactPhoneDisplay">Phone display</label>
+                      <input id="contactPhoneDisplay" type="text" placeholder="+1 (555) 123-4567" />
+                      <span class="error"></span>
+                    </div>
+                  </div>
+                  <div class="admin-field" id="field-contact-email">
+                    <label for="contactEmail">Email</label>
+                    <input id="contactEmail" type="email" placeholder="hello@tpm.cafe" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-contact-whatsapp">
+                    <label for="contactWhatsapp">WhatsApp</label>
+                    <input id="contactWhatsapp" type="text" placeholder="+15551234567 or https://wa.me/..." />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Address</h3>
+                  <div class="admin-field" id="field-contact-address">
+                    <label for="contactAddress">Address</label>
+                    <input id="contactAddress" type="text" placeholder="123 Heritage Lane, City Center" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-contact-addressdisplay">
+                    <label for="contactAddressDisplay">Address display</label>
+                    <input id="contactAddressDisplay" type="text" placeholder="123 Heritage Lane, City Center" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-contact-mapurl">
+                    <label for="contactMapUrl">Map URL</label>
+                    <input id="contactMapUrl" type="url" placeholder="https://maps.google.com/..." />
+                    <span class="hint">Must be http/https if provided.</span>
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-panel" style="margin-bottom:14px">
+                  <h3 style="margin:0 0 12px">Extra contacts (JSON)</h3>
+                  <div class="admin-field" id="field-contact-extra">
+                    <label for="contactExtra">JSON array / object</label>
+                    <textarea id="contactExtra" rows="6" placeholder='[{"label":"Instagram","value":"@tpm","type":"social"}]' style="font-family:ui-monospace,monospace;font-size:13px"></textarea>
+                    <span class="hint">Valid JSON array or object. Example: [] or [{"label":"Support","value":"+1..."}]</span>
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+                  <button id="contactSaveBtn" type="submit" class="admin-btn admin-btn-primary" style="min-width:140px">Save changes</button>
+                </div>
+              </form>
+              <p class="admin-muted" style="margin-top:10px;font-size:11px">RLS: authenticated admin only via <code>is_admin()</code>. Public reads via <code>contact_info_public_read</code>.</p>
+            </div>
+          </div>
+        </section>
+        <!-- Social Links Management -->
+        <section data-view="social" class="admin-view" hidden>
+          <div id="socialWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Social Links</h3>
+              <span class="spacer"></span>
+              <input id="socialSearch" class="admin-search" type="search" placeholder="Search platform, url…" aria-label="Search social links" />
+              <button id="socialRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+              <button id="socialAddBtn" class="admin-btn admin-btn-primary admin-btn--sm" type="button">Add Link</button>
+            </div>
+            <div id="socialStats" class="cat-stats"></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" aria-label="Social links">
+                <thead>
+                  <tr>
+                    <th>Platform</th>
+                    <th>URL</th>
+                    <th>Order</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="socialTbody"></tbody>
+              </table>
+              <div id="socialCards" class="cat-cards"></div>
+            </div>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Sort by <code>sort_order</code> ascending. RLS: public reads active only, admin writes via <code>is_admin()</code>.</p>
+          </div>
+
+          <!-- Add/Edit Modal -->
+          <div id="socialModal" class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="socialModalTitle">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card">
+              <div class="admin-modal-head">
+                <h3 id="socialModalTitle">Add Social Link</h3>
+                <button id="socialModalClose" class="admin-modal-close" type="button" aria-label="Close">×</button>
+              </div>
+              <form id="socialForm" novalidate>
+                <div class="admin-field" id="field-social-platform">
+                  <label for="socialPlatform">Platform *</label>
+                  <input id="socialPlatform" type="text" placeholder="e.g., instagram, tiktok, facebook" required maxlength="40" />
+                  <span class="error"></span>
+                </div>
+                <div class="admin-field" id="field-social-url">
+                  <label for="socialUrl">URL *</label>
+                  <input id="socialUrl" type="url" placeholder="https://www.instagram.com/..." required />
+                  <span class="hint">Must be http/https.</span>
+                  <span class="error"></span>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-social-handle">
+                    <label for="socialHandle">Handle</label>
+                    <input id="socialHandle" type="text" placeholder="@tpm_thepremiummart" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-social-icon">
+                    <label for="socialIcon">Icon</label>
+                    <input id="socialIcon" type="text" placeholder="e.g., instagram" />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-social-sort">
+                    <label for="socialSort">Sort order *</label>
+                    <input id="socialSort" type="number" min="0" step="1" value="0" required />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" style="display:flex;align-items:center;gap:8px;padding-top:22px">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                      <input id="socialActive" type="checkbox" class="admin-toggle" checked />
+                      <span>Active</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="admin-modal-actions">
+                  <button id="socialModalCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                  <button type="submit" class="admin-btn admin-btn-primary">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Delete Confirm -->
+          <div id="socialDeleteModal" class="admin-modal" role="dialog" aria-modal="true" aria-label="Confirm delete">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card" style="max-width:420px">
+              <h3 style="margin:0 0 8px">Delete social link?</h3>
+              <p class="admin-muted" style="margin:0 0 6px">This will permanently delete <strong id="socialDeleteName"></strong>.</p>
+              <div class="admin-modal-actions">
+                <button id="socialDeleteCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                <button id="socialDeleteConfirm" class="admin-btn admin-btn--danger" type="button">Delete</button>
+              </div>
+              <button id="socialDeleteClose" class="admin-modal-close" type="button" aria-label="Close" style="position:absolute;top:12px;right:12px">×</button>
+            </div>
+          </div>
+        </section>
+        <!-- Showcase Video Management (ONE file, 15s, 50 MiB) -->
+        <section data-view="video" class="admin-view" hidden>
+          <div id="videoWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Showcase Video</h3>
+              <span class="spacer"></span>
+              <button id="videoRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+            </div>
+            <div id="videoLoading" class="admin-loading" style="min-height:120px">
+              <span class="admin-spinner"></span> Loading video…
+            </div>
+            <div id="videoContent" style="display:none">
+              <div class="admin-panel" style="margin-bottom:14px">
+                <h3 style="margin:0 0 8px">Current video</h3>
+                <div id="videoInfo" class="hint" style="margin-bottom:10px"></div>
+                <div id="videoEmpty" class="admin-empty" style="display:none">
+                  <strong>No showcase video</strong><br>Upload one video — 15s max, 50 MiB, mp4/webm/mov.
+                </div>
+                <div id="videoPreviewWrap" style="display:none;margin-bottom:12px">
+                  <div id="videoPreview"></div>
+                  <div style="margin-top:8px;font-size:11px;color:var(--muted)">
+                    <div>Path: <code id="videoPathDisplay" style="word-break:break-all">—</code></div>
+                    <div>URL: <span id="videoUrlDisplay">—</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="admin-panel" style="margin-bottom:14px">
+                <h3 style="margin:0 0 12px">Upload / Replace</h3>
+                <p class="admin-muted" style="font-size:11px;margin:0 0 10px">ONE video only — new upload replaces old and deletes previous file. Max 15s duration, 50 MiB, types: <code>video/mp4, video/webm, video/quicktime</code>.</p>
+                <div class="admin-field">
+                  <label for="videoFile">Select video</label>
+                  <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime" />
+                  <span class="hint" id="videoHint">Choose a file — duration checked before upload.</span>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+                  <button id="videoUploadBtn" type="button" class="admin-btn admin-btn-primary" style="min-width:140px">Upload / Replace</button>
+                  <button id="videoDeleteBtn" type="button" class="admin-btn admin-btn--danger" style="min-width:120px" disabled>Delete video</button>
+                </div>
+              </div>
+
+              <p class="admin-muted" style="margin-top:10px;font-size:11px">RLS: admin only via <code>is_admin()</code>. Bucket <code>showcase-video</code> public read, admin write. Other <code>store_info</code> fields preserved.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAdmin, signOutAndRedirect } from "./js/auth.js";
+    import { getSupabase } from "./js/supabase.js";
+    import { initCategories } from "./js/categories.js";
+    import { initProducts } from "./js/products.js";
+    import { initStoreInfo } from "./js/store_info.js";
+    import { initContactInfo } from "./js/contact_info.js";
+    import { initSocialLinks } from "./js/social_links.js";
+    import { initShowcaseVideo } from "./js/showcase_video.js";
+
+    const gateLoading = document.getElementById("gateLoading");
+    const gateBlocked = document.getElementById("gateBlocked");
+    const shell = document.getElementById("adminShell");
+    const blockedMsg = document.getElementById("blockedMsg");
+    const sidebarEmail = document.getElementById("sidebarUserEmail");
+
+    // Auth guard — uses existing is_admin()
+    (async () => {
+      try {
+        const state = await requireAdmin({ redirectToLogin: false });
+        if (!state.user) {
+          window.location.replace("./login.html");
+          return;
+        }
+        if (!state.allowed) {
+          gateLoading.style.display = "none";
+          gateBlocked.style.display = "grid";
+          if (state.reason === "not_admin") {
+            blockedMsg.textContent = `Signed in as ${state.user.email} — not in admin_users. Access denied.`;
+          }
+          document.getElementById("blockedSignOut").addEventListener("click", signOutAndRedirect);
+          return;
+        }
+        // Allowed — show shell
+        gateLoading.style.display = "none";
+        shell.style.display = "grid";
+        shell.removeAttribute("aria-hidden");
+        sidebarEmail.textContent = state.user.email || "—";
+        sidebarEmail.parentElement.parentElement.title = state.user.email || "";
+        // Init Categories (3A) + Products (3B) + Store/Contact/Social/Video — uses RLS, no service_role
+        try { await initCategories(); } catch (e) { console.error("[TPM categories] init failed", e); }
+        try { await initProducts(); } catch (e) { console.error("[TPM products] init failed", e); }
+        try { await initStoreInfo(); } catch (e) { console.error("[TPM store] init failed", e); }
+        try { await initContactInfo(); } catch (e) { console.error("[TPM contact] init failed", e); }
+        try { await initSocialLinks(); } catch (e) { console.error("[TPM social] init failed", e); }
+        try { await initShowcaseVideo(); } catch (e) { console.error("[TPM video] init failed", e); }
+        // Watch for sign-out in other tab
+        getSupabase().auth.onAuthStateChange((event) => {
+          if (event === "SIGNED_OUT") window.location.replace("./login.html");
+        });
+      } catch (e) {
+        console.error("[TPM admin] gate error", e);
+        gateLoading.innerHTML = `<div class="admin-denied"><h2>Error</h2><p class="admin-muted">${(e?.message||"Failed to verify session.")}</p><a class="admin-btn admin-btn-primary" href="./login.html">Go to login</a></div>`;
+      }
+    })();
+
+    // Sidebar / responsive
+    const sidebar = document.getElementById("adminSidebar");
+    const backdrop = document.getElementById("adminBackdrop");
+    const openBtn = document.getElementById("openSidebar");
+    function openSidebar(){
+      sidebar.classList.add("open");
+      backdrop.classList.add("open");
+      backdrop.setAttribute("aria-hidden","false");
+      openBtn.setAttribute("aria-expanded","true");
+    }
+    function closeSidebar(){
+      sidebar.classList.remove("open");
+      backdrop.classList.remove("open");
+      backdrop.setAttribute("aria-hidden","true");
+      openBtn.setAttribute("aria-expanded","false");
+    }
+    openBtn.addEventListener("click", () => sidebar.classList.contains("open") ? closeSidebar() : openSidebar());
+    backdrop.addEventListener("click", closeSidebar);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSidebar(); });
+
+    // Logout (proper session termination)
+    document.getElementById("sidebarLogout").addEventListener("click", signOutAndRedirect);
+    document.getElementById("topLogout").addEventListener("click", signOutAndRedirect);
+
+    // Placeholder nav (no CRUD yet) — hash-based
+    const views = document.querySelectorAll("[data-view]");
+    const navLinks = document.querySelectorAll("[data-nav]");
+    function setView(name){
+      views.forEach(v => v.hidden = v.dataset.view !== name);
+      navLinks.forEach(a => {
+        const active = a.dataset.nav === name;
+        a.classList.toggle("active", active);
+        if (active) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
+      });
+      const titles = { overview:"Overview", products:"Products", categories:"Categories", store:"Store Information", contact:"Contact", social:"Social Links", video:"Showcase Video" };
+      document.getElementById("pageTitle").textContent = titles[name] || "Overview";
+      closeSidebar();
+    }
+    function currentViewFromHash(){
+      const h = (location.hash || "#overview").replace("#","").trim() || "overview";
+      return ["overview","products","categories","store","contact","social","video"].includes(h) ? h : "overview";
+    }
+    navLinks.forEach(a => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const name = a.dataset.nav;
+      location.hash = name;
+      setView(name);
+    }));
+    window.addEventListener("hashchange", () => setView(currentViewFromHash()));
+    // Init
+    setView(currentViewFromHash());
+  </script>
+</body>
+</html>

@@ -4,6 +4,8 @@ node_modules/
 # Environment / secrets
 .env
 .env.*
+!.env.example
+!supabase/.env.example
 *.local
 
 # OS cruft

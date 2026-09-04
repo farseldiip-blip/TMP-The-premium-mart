@@ -1,0 +1,58 @@
+# supabase/config.toml — TPM The Premium Mart
+# Generated for local Supabase CLI. No frontend files were modified.
+# Docs: https://supabase.com/docs/guides/local-development/cli/config
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1:54321"
+
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[storage]
+enabled = true
+port = 54325
+# Buckets are created via migration (storage.buckets). See migrations/20250902000002_storage.sql
+file_size_limit = "50MiB"
+# Image transformation enabled for product/category assets
+image_transformation_enabled = true
+
+[auth]
+enabled = true
+port = 54321
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = ["http://127.0.0.1:5173", "http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = false
+enable_confirmations = true
+enable_manual_linking = true
+# Email provider — local dev uses Inbucket. For production set via dashboard or env.
+# NOTE: enable_signup controls GOTRUE_EXTERNAL_EMAIL_ENABLED (email/password logins).
+# Must be true to allow admin logins; top-level [auth] enable_signup=false still blocks public signup.
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+
+[auth.external.google]
+enabled = false
+[auth.external.github]
+enabled = false
+
+# No custom auth hooks yet — reserved for future admin invite flow

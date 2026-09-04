@@ -67,47 +67,21 @@
   </aside>
 
   <main id="main">
-    <!-- Menu header — TPM style -->
+    <!-- Menu header — dynamic Market + Café -->
     <section class="page-hero menu-page-hero">
       <div class="container">
         <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg> Back to Home</a>
         <h1>The Menu</h1>
-        <p class="menu-intro">Our original menu — presented exactly as in the café. Scroll vertically through the complete pages. Tap any page to view fullscreen.</p>
-        <p class="menu-hint"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg> Tap to enlarge • Pinch to zoom in fullscreen</p>
+        <p class="menu-intro">Market &amp; Café — fresh categories and products, updated live from the Dashboard. Filter by Market or Café.</p>
+        <p class="menu-hint"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg> Tap a product to view • All products are is_active only</p>
       </div>
     </section>
 
-    <!-- Image-based menu: vertical scroll — preserved -->
-    <section class="menu-images-wrap" aria-label="Complete menu pages">
+    <!-- Dynamic Market + Café menu — uses existing menu-images-container shell -->
+    <section class="menu-images-wrap" aria-label="Market and Café menu">
       <div class="container menu-images-container">
-        <figure class="menu-page-figure reveal">
-          <button type="button" class="menu-page-btn" data-menu-lightbox="0" aria-label="View menu page 1 fullscreen — Heritage Coffee and Botanical Teas">
-            <img src="assets/menu/menu-01.svg" alt="TPM Menu page 1 — Heritage Coffee: Single Origin Pour Over 6.50, Rosemary Vanilla Latte 7.00, Botanical Pour-Over 6.80, Heritage Flat White 5.80; Botanical Teas: Hibiscus Mint 5.50, Iced Matcha Reserve 6.40, Chamomile and Lavender Brew 5.90" width="800" height="1100" loading="eager" fetchpriority="high" decoding="async" />
-          </button>
-          <figcaption class="menu-page-caption">Page 1 — Heritage Coffee &amp; Botanical Teas</figcaption>
-        </figure>
-
-        <figure class="menu-page-figure reveal" style="transition-delay:.06s">
-          <button type="button" class="menu-page-btn" data-menu-lightbox="1" aria-label="View menu page 2 fullscreen — Cold Infusions and Artisanal Pastries">
-            <img src="assets/menu/menu-02.svg" alt="TPM Menu page 2 — Cold Infusions: Yuzu Citrus Spritz 6.20, Cucumber and Basil Cooler 5.90, Iced Rosemary Vanilla Latte 7.00, Botanical Cold Brew 6.00; Artisanal Pastries: Earl Grey Sponge 7.20, Cardamom Morning Bun 5.00, Botanical Citrus Tart 6.80, Heritage Brownie 5.40" width="800" height="1100" loading="lazy" decoding="async" />
-          </button>
-          <figcaption class="menu-page-caption">Page 2 — Cold Infusions &amp; Artisanal Pastries</figcaption>
-        </figure>
-
-        <figure class="menu-page-figure reveal" style="transition-delay:.12s">
-          <button type="button" class="menu-page-btn" data-menu-lightbox="2" aria-label="View menu page 3 fullscreen — Weekend Brunch">
-            <img src="assets/menu/menu-03.svg" alt="TPM Menu page 3 — Weekend Brunch Saturday Sunday 9AM to 2PM: Heritage Avocado and Herbs 14.50, Garden Shakshuka 15.00, Miso Mushroom and Greens 14.00, Botanical Pancakes 13.50; To Share: olives, sourdough, cheese selection" width="800" height="1100" loading="lazy" decoding="async" />
-          </button>
-          <figcaption class="menu-page-caption">Page 3 — Weekend Brunch &amp; To Share</figcaption>
-        </figure>
-
-        <div class="menu-foot-note reveal" style="transition-delay:.18s">
-          <p>All items subject to seasonal availability. Please inform our team of allergies — full allergen list available on request.</p>
-          <div class="menu-actions">
-            <a href="tel:+15551234567" class="btn btn-primary">Call to order</a>
-            <a href="index.html#visit" class="btn btn-secondary">Find us</a>
-          </div>
-        </div>
+        <!-- Dynamic categories/products injected by js/menu.js from Supabase categories/products -->
+        <div class="admin-loading" style="grid-column:1/-1;min-height:120px"><span class="admin-spinner"></span> Loading menu…</div>
       </div>
     </section>
   </main>
@@ -133,7 +107,7 @@
     <a href="index.html#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16v12H4z"/><path d="M4 7l8 7 8-7"/></svg>Contact</a>
   </nav>
 
-  <!-- Fullscreen image viewer -->
+  <!-- Fullscreen image viewer (legacy for menu SVGs, kept for fallback) -->
   <div class="menu-lightbox" id="menuLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Menu fullscreen viewer">
     <button type="button" class="menu-lightbox-close" id="menuLightboxClose" aria-label="Close fullscreen view"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="menu-lightbox-counter" id="menuLightboxCounter" aria-live="polite">Page 1 of 3</div>
@@ -145,6 +119,24 @@
     <p class="menu-lightbox-hint">Pinch to zoom • Swipe or use arrows • Tap background or press Esc to close</p>
   </div>
 
+  <!-- Product lightbox (for dynamic Market + Café) -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Product details">
+    <div class="lightbox-panel">
+      <div class="lightbox-media">
+        <img id="lbImg" src="" alt="" width="800" height="600" />
+        <button type="button" class="lightbox-close" id="lbClose" aria-label="Close"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <span id="lbBadge" class="menu-card-badge" style="display:none"></span>
+      </div>
+      <div class="lightbox-body">
+        <h3 id="lbTitle"></h3>
+        <p id="lbDesc"></p>
+        <p id="lbPrice" style="font-weight:700;color:var(--tpm-green)"></p>
+        <button type="button" class="btn btn-secondary" id="lbCloseSecondary" style="margin-top:12px">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/app.js" defer></script>
+  <script type="module" src="js/menu.js"></script>
 </body>
 </html>

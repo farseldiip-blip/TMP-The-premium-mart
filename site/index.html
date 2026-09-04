@@ -101,10 +101,9 @@
             <a class="btn tpm-btn-primary" href="menu.html">Explore the Menu <span aria-hidden="true">→</span></a>
             <a class="btn tpm-btn-ghost" href="#visit">Visit TPM</a>
           </div>
-          <div class="tpm-hero-meta" aria-label="Highlights">
-            <span class="meta-pill">◍ Fresh daily</span>
-            <span class="meta-pill">◍ Signature drinks</span>
-            <span class="meta-pill"><strong>Since 2018</strong></span>
+          <div class="tpm-hero-meta" aria-label="Social links" id="heroSocialLinks">
+            <!-- Social icons injected by js/public.js from active social_links (instagram/facebook/tiktok) -->
+            <span class="meta-pill" style="opacity:.6">Loading social…</span>
           </div>
         </div>
 
@@ -216,37 +215,20 @@
       </div>
     </section>
 
-    <!-- Gallery -->
+    <!-- Gallery — replaced with ONE showcase video (Market + Café) -->
     <section class="section" aria-labelledby="gallery-heading" style="background:var(--surface-bright);border-top:1px solid var(--line)">
       <div class="container">
         <div class="section-head reveal" style="text-align:left;margin:0 0 18px;max-width:640px">
           <h2 id="gallery-heading" style="font-family:'Space Grotesk',sans-serif;letter-spacing:-.03em">A sanctuary that<br/>feels like TPM</h2>
-          <p style="text-align:left;color:var(--muted)">Sun-lit shelves, colorful cans, plants and people — the energy is part of the menu.</p>
+          <p style="text-align:left;color:var(--muted)">Sun-lit shelves, colorful cans, plants and people — the energy is part of the menu. One video, the full experience: Market + Café.</p>
         </div>
-        <div class="gallery-grid reveal" style="transition-delay:.08s">
-          <div class="gallery-item tall">
-            <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&q=80&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=300&q=80&auto=format&fit=crop 300w, https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&q=80&auto=format&fit=crop 600w" sizes="(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px" alt="TPM-style mart interior with brick walls and hanging plants" width="600" height="650" loading="lazy" decoding="async" fetchpriority="low" />
-            <span class="gallery-caption">Indoor energy</span>
-          </div>
-          <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&q=80&auto=format&fit=crop 300w, https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80&auto=format&fit=crop 600w" sizes="(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px" alt="Latte art on wooden table" width="600" height="570" loading="lazy" decoding="async" fetchpriority="low" />
-            <span class="gallery-caption">Artisan brews</span>
-          </div>
-          <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&q=80&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=300&q=80&auto=format&fit=crop 300w, https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&q=80&auto=format&fit=crop 600w" sizes="(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px" alt="Pastries display with modern mart decor" width="600" height="570" loading="lazy" decoding="async" fetchpriority="low" />
-            <span class="gallery-caption">Fresh bakes</span>
-          </div>
-          <div class="gallery-item wide">
-            <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=900&q=80&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400&q=80&auto=format&fit=crop 400w, https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=80&auto=format&fit=crop 600w, https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=900&q=80&auto=format&fit=crop 900w" sizes="(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px" alt="Friends sharing coffee in sunlit modern café" width="900" height="430" loading="lazy" decoding="async" fetchpriority="low" />
-            <span class="gallery-caption">Gather &amp; linger</span>
-          </div>
-          <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=300&q=80&auto=format&fit=crop 300w, https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80&auto=format&fit=crop 600w" sizes="(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px" alt="Vibrant colorful drinks lined on a counter" width="600" height="570" loading="lazy" decoding="async" fetchpriority="low" />
-            <span class="gallery-caption">Color served cold</span>
-          </div>
-          <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1498804103079-a6351b050096?w=600&q=80&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1498804103079-a6351b050096?w=300&q=80&auto=format&fit=crop 300w, https://images.unsplash.com/photo-1498804103079-a6351b050096?w=600&q=80&auto=format&fit=crop 600w" sizes="(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px" alt="Iced colorful drinks with garnish on terrace" width="600" height="570" loading="lazy" decoding="async" fetchpriority="low" />
-            <span class="gallery-caption">Terrace sips</span>
+        <div class="gallery-grid reveal showcase-video-grid" style="transition-delay:.08s">
+          <!-- Showcase video injected by js/public.js from store_info.showcase_video_url; fallback below -->
+          <div class="showcase-video-wrap" style="grid-column:1/-1;position:relative;border-radius:22px;overflow:hidden;background:#0e1a14;box-shadow:var(--shadow-soft);aspect-ratio:16/9;max-height:520px;display:grid;place-items:center">
+            <div style="text-align:center;padding:32px 20px;color:rgba(255,255,255,.92)">
+              <p style="font-family:'Space Grotesk',sans-serif;font-weight:700;margin:0 0 6px">Showcase video coming soon</p>
+              <p style="font-size:13px;color:rgba(255,255,255,.72);margin:0">Our space in motion — soon here as one 15-second loop.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -351,6 +333,7 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
   <script src="js/app.js" defer></script>
+  <script type="module" src="js/public.js"></script>
   <!-- LocalBusiness Structured Data — update with verified production details -->
   <script type="application/ld+json">
   {
