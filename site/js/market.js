@@ -1,4 +1,4 @@
-// site/js/menu.js — Dynamic Market + Café Menu (Part 5)
+// site/js/market.js — Dynamic Market + Café Market (Part 5)
 // Loads active categories (type market/cafe) and active products, renders inside .menu-images-container
 // Uses existing getPublicSupabase() from site/js/supabase.js, respects RLS, no new client.
 
@@ -21,7 +21,7 @@ let allCategories=[];
 let allProducts=[];
 let currentFilter='all';
 
-async function loadMenu(){
+async function loadMarket(){
   const container=document.querySelector('.menu-images-container');
   if(!container) return;
 
@@ -48,7 +48,7 @@ async function loadMenu(){
   }
 
   // Show loading state inside container (preserve shell)
-  container.innerHTML=`<div class="admin-loading" style="grid-column:1/-1;min-height:120px"><span class="admin-spinner"></span> Loading menu…</div>`;
+  container.innerHTML=`<div class="admin-loading" style="grid-column:1/-1;min-height:120px"><span class="admin-spinner"></span> Loading market…</div>`;
 
   const supa=getPublicSupabase();
   try{
@@ -71,8 +71,8 @@ async function loadMenu(){
     }
     // Remove old menu lightbox dependency if no longer needed (keep for product lightbox)
   }catch(err){
-    console.warn('[TPM menu] load failed', err);
-    container.innerHTML=`<div class="admin-empty" style="grid-column:1/-1;text-align:center;padding:32px;background:var(--surface);border:1px solid var(--line);border-radius:18px"><strong>Menu unavailable</strong><br><span style="font-size:12px;color:var(--muted)">Please try again later.</span></div>`;
+    console.warn('[TPM market] load failed', err);
+    container.innerHTML=`<div class="admin-empty" style="grid-column:1/-1;text-align:center;padding:32px;background:var(--surface);border:1px solid var(--line);border-radius:18px"><strong>Market unavailable</strong><br><span style="font-size:12px;color:var(--muted)">Please try again later.</span></div>`;
   }
 }
 
@@ -168,7 +168,7 @@ function render(){
         const src=el.dataset.src || el.querySelector('img')?.src;
         if(window.openLightbox) window.openLightbox({
           src,
-          title: el.dataset.title || 'Menu item',
+          title: el.dataset.title || 'Market item',
           desc: el.dataset.desc || '',
           price: el.dataset.price || '',
           badge: el.dataset.badge || ''
@@ -199,11 +199,11 @@ function render(){
 }
 
 // Expose for testing
-window._menuLoadMenu=loadMenu;
+window._marketLoadMenu=loadMarket;
 
 // Init on DOM ready
 if(document.readyState==="loading"){
-  document.addEventListener("DOMContentLoaded", loadMenu);
+  document.addEventListener("DOMContentLoaded", loadMarket);
 } else {
-  loadMenu();
+  loadMarket();
 }

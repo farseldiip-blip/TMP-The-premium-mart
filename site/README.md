@@ -10,8 +10,7 @@ CSS, ship it anywhere.
 
 - **`index.html`** — Home. Art-directed hero with real product can imagery and a GSAP motion
   system, editorial "taste of TPM" preview, story/stats, gallery, visit + contact.
-- **`menu.html`** — The original menu, image-based and vertically scrollable. Each page opens
-  in a fullscreen viewer with pinch-zoom, swipe, arrows and keyboard nav.
+- **`market.html`** — The Market page, dynamic categories/products loaded from Supabase with Market/Café filtering.
 
 ## Highlights
 
@@ -31,13 +30,15 @@ CSS, ship it anywhere.
 ```
 site/
   index.html        Home page
-  menu.html         Menu page
+  market.html       Market page
   css/style.css     All styles (design tokens, layout, components)
   js/app.js         Drawer, lightbox, reserve modal, toast, reveal, GSAP hero motion
+  js/market.js      Dynamic Market/Café menu loader
+  js/public.js      Public Supabase integration
   assets/
     logo.jpg        Favicon / OG image
     cans/           Product can renders (passion-mango, blue-ocean, passion-strawberry)
-    menu/           Menu page images (menu-01/02/03.svg)
+    menu/           Legacy market page images (menu-01/02/03.svg)
   robots.txt        Crawling rules (sitemap URL is a TODO for production)
   sitemap.xml       Sitemap (domain URLs are TODOs for production)
   package.json      Dev deps only (see below)

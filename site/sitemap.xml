@@ -3,7 +3,7 @@
   <!--
     Sitemap for TPM — The Premium Mart
     TODO: Replace example.com with production domain when available.
-    Keep URLs consistent with canonical URLs in index.html / menu.html.
+    Keep URLs consistent with canonical URLs in index.html / market.html.
   -->
   <url>
     <!-- TODO: replace with production URL e.g. https://www.example.com/ -->
@@ -13,8 +13,8 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <!-- TODO: replace with production URL e.g. https://www.example.com/menu.html -->
-    <loc>menu.html</loc>
+    <!-- TODO: replace with production URL e.g. https://www.example.com/market.html -->
+    <loc>market.html</loc>
     <lastmod>2026-05-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>

@@ -115,14 +115,14 @@ async function loadAndRender(){
 
       // Preserve existing card structure and classes for animations
       return `
-        <a class="tpm-card tpm-card--${cardClass} reveal ${idx===0?'in':''}" role="listitem" href="menu.html" aria-label="${escapeHtml(cat.name)} — View menu" style="transition-delay:${(0.04+idx*0.04).toFixed(2)}s">
+        <a class="tpm-card tpm-card--${cardClass} reveal ${idx===0?'in':''}" role="listitem" href="market.html" aria-label="${escapeHtml(cat.name)} — View market" style="transition-delay:${(0.04+idx*0.04).toFixed(2)}s">
           <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(cat.name)}" width="900" height="675" loading="${idx<2?'eager':'lazy'}" decoding="async" fetchpriority="${idx<2?'high':'low'}" onerror="this.src='${FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length]}'" />
           <div class="tpm-card-content">
             <span class="tpm-card-kicker ${kickerClass}">${escapeHtml(cat.type==="cafe"?"Café":"Market")} • ${escapeHtml(cat.name)}</span>
             <h3>${escapeHtml(cat.name)}</h3>
             <p>${escapeHtml(cat.description||"")}</p>
             ${productSnippet}
-            <div class="tpm-card-meta"><span>View in menu →</span></div>
+            <div class="tpm-card-meta"><span>View in market →</span></div>
           </div>
         </a>
       `;
@@ -531,7 +531,7 @@ async function loadSocialLinks(){
         return `<a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="color:rgba(255,255,255,.66);text-decoration:underline;text-underline-offset:3px">${escapeHtml(label)}${handle?` ${escapeHtml(handle)}`:''}</a>`;
       }).join(' • ');
       // Keep Menu link at end
-      footerP.innerHTML=`${linksHtml} • <a href="menu.html" style="color:rgba(255,255,255,.66)">Menu</a>`;
+      footerP.innerHTML=`${linksHtml} • <a href="market.html" style="color:rgba(255,255,255,.66)">Market</a>`;
     } else if(footerInstagram){
       // Fallback: update single Instagram if footerP not found
       const insta=map.get("instagram");

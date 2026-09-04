@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <title>The Market | TPM — The Premium Mart</title>
+  <meta name="description" content="Explore the TPM — The Premium Mart market. View our original market pages — heritage coffee, botanical teas, cold infusions, artisanal pastries and weekend brunch. Tap to view fullscreen." />
+  <meta name="theme-color" content="#004e36" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="icon" href="assets/logo.jpg" />
+  <link rel="apple-touch-icon" href="assets/logo.jpg" />
+  <!-- Canonical — replace with production domain when available -->
+  <!-- <link rel="canonical" href="https://www.example.com/market.html" /> -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="TPM — The Premium Mart" />
+  <meta property="og:title" content="The Market | TPM — The Premium Mart" />
+  <meta property="og:description" content="Explore the original TPM market — coffee, cold infusions, pastries and weekend brunch. Tap to view fullscreen." />
+  <!-- <meta property="og:url" content="https://www.example.com/market.html" /> -->
+  <meta property="og:image" content="assets/menu/market-01.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Market | TPM — The Premium Mart" />
+  <meta name="twitter:description" content="Explore the original TPM market — coffee, cold infusions, pastries and weekend brunch." />
+  <link rel="stylesheet" href="css/style.css?v=20260515e" />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+</head>
+<body data-page="market">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <div class="header-left">
+        <button type="button" class="hamburger" id="openDrawer" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <a class="brand" href="index.html" aria-label="TPM — The Premium Mart home">
+          <span class="brand-mark" aria-hidden="true">TPM</span>
+          <span class="brand-wordmark"><span class="short">TPM</span><span class="long">TPM — The Premium Mart</span></span>
+        </a>
+      </div>
+      <nav class="desktop-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="index.html#our-story">Our Story</a>
+        <a href="market.html" aria-current="page">Market</a>
+        <a href="index.html#visit">Location</a>
+      </nav>
+      <div class="header-right">
+        <a class="header-icon-btn m-only" href="index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <aside class="drawer" id="drawer" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="drawer-head">
+      <div class="drawer-brand">TPM</div>
+      <button type="button" class="drawer-close" id="closeDrawer" aria-label="Close menu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <nav class="drawer-nav" aria-label="Drawer primary">
+      <a href="index.html">Home <span aria-hidden="true">→</span></a>
+      <a href="index.html#our-story">Our Story <span aria-hidden="true">→</span></a>
+      <a href="market.html" aria-current="page">Market <span aria-hidden="true">→</span></a>
+      <a href="index.html#visit">Find Us <span aria-hidden="true">→</span></a>
+      <a href="index.html#contact">Contact <span aria-hidden="true">→</span></a>
+    </nav>
+    <div class="drawer-foot">
+      <p><strong>TPM — The Premium Mart</strong><br>123 Heritage Lane, City Center<br><a href="tel:+15551234567" style="color:var(--primary);font-weight:700">+1 (555) 123-4567</a></p>
+    </div>
+  </aside>
+
+  <main id="main">
+    <!-- Market header — dynamic Market + Café -->
+    <section class="page-hero menu-page-hero">
+      <div class="container">
+        <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg> Back to Home</a>
+        <h1>The Market</h1>
+        <p class="menu-intro">Market &amp; Café — fresh categories and products, updated live from the Dashboard. Filter by Market or Café.</p>
+        <p class="menu-hint"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg> Tap a product to view • All products are is_active only</p>
+      </div>
+    </section>
+
+    <!-- Dynamic Market + Café market — uses existing menu-images-container shell -->
+    <section class="menu-images-wrap" aria-label="Market and Café">
+      <div class="container menu-images-container">
+        <!-- Dynamic categories/products injected by js/market.js from Supabase categories/products -->
+        <div class="admin-loading" style="grid-column:1/-1;min-height:120px"><span class="admin-spinner"></span> Loading market…</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p class="footer-brand">TPM</p>
+      <p class="footer-tagline">The Premium Mart — Drinks, Coffee &amp; More<br/>123 Heritage Lane, City Center</p>
+      <ul class="footer-links" aria-label="Footer links">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+      <p class="footer-copy">© 2026 TPM — The Premium Mart. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg>Home</a>
+    <a href="market.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 7h2v6H7zM11 7h2v8h-2zM15 7h2v5h-2z"/><path d="M5 17h14"/></svg>Market</a>
+    <a href="index.html#visit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-4.5 7-10a7 7 0 0 0-14 0c0 5.5 7 10 7 10Z"/><circle cx="12" cy="11" r="2.2"/></svg>Find Us</a>
+    <a href="index.html#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16v12H4z"/><path d="M4 7l8 7 8-7"/></svg>Contact</a>
+  </nav>
+
+  <!-- Fullscreen image viewer (legacy for menu SVGs, kept for fallback) -->
+  <div class="menu-lightbox" id="menuLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Market fullscreen viewer">
+    <button type="button" class="menu-lightbox-close" id="menuLightboxClose" aria-label="Close fullscreen view"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="menu-lightbox-counter" id="menuLightboxCounter" aria-live="polite">Page 1 of 3</div>
+    <button type="button" class="menu-lightbox-nav prev" id="menuLightboxPrev" aria-label="Previous page"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button type="button" class="menu-lightbox-nav next" id="menuLightboxNext" aria-label="Next page"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 6l6 6-6 6"/></svg></button>
+    <div class="menu-lightbox-stage" id="menuLightboxStage">
+      <img id="menuLightboxImg" src="" alt="" width="800" height="1100" />
+    </div>
+    <p class="menu-lightbox-hint">Pinch to zoom • Swipe or use arrows • Tap background or press Esc to close</p>
+  </div>
+
+  <!-- Product lightbox (for dynamic Market + Café) -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Product details">
+    <div class="lightbox-panel">
+      <div class="lightbox-media">
+        <img id="lbImg" src="" alt="" width="800" height="600" />
+        <button type="button" class="lightbox-close" id="lbClose" aria-label="Close"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <span id="lbBadge" class="menu-card-badge" style="display:none"></span>
+      </div>
+      <div class="lightbox-body">
+        <h3 id="lbTitle"></h3>
+        <p id="lbDesc"></p>
+        <p id="lbPrice" style="font-weight:700;color:var(--tpm-green)"></p>
+        <button type="button" class="btn btn-secondary" id="lbCloseSecondary" style="margin-top:12px">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js" defer></script>
+  <script type="module" src="js/market.js"></script>
+</body>
+</html>

@@ -83,7 +83,7 @@ $$('[data-lightbox]').forEach(el=>{
     const src = el.dataset.src || el.querySelector('img')?.src;
     openLightbox({
       src,
-      title: el.dataset.title || 'Menu item',
+      title: el.dataset.title || 'Market item',
       desc: el.dataset.desc || '',
       price: el.dataset.price || '',
       badge: el.dataset.badge || ''
