@@ -298,6 +298,16 @@ button{font:inherit}
   .cat-cards{display:grid}
   .admin-toolbar{flex-direction:column;align-items:stretch}
   .admin-toolbar .admin-search{max-width:none}
+  #catSearch.admin-search{
+    height:44px;
+    padding:0 16px;
+    font-size:14.5px;
+    border-radius:999px;
+    width:100%;
+    max-width:100%;
+    flex:0 0 auto;
+    box-sizing:border-box;
+  }
 }
 
 /* Modal */

@@ -55,6 +55,11 @@ let editingId = null; // null = add, else id
 let searchTerm = "";
 let typeFilter = "all";
 let slugManuallyEdited = false;
+let pendingBgFile = null;
+let pendingBgPreviewUrl = null;
+let bgRemoved = false;
+let originalBgPath = null;
+let originalBgUrl = null;
 
 const els = {};
 
@@ -83,6 +88,10 @@ export async function initCategories() {
   els.fDesc = document.getElementById("catDesc");
   els.fBgPath = document.getElementById("catBgPath");
   els.fBgUrl = document.getElementById("catBgUrl");
+  els.fBgFile = document.getElementById("catBgFile");
+  els.fBgPreview = document.getElementById("catBgPreview");
+  els.fBgRemove = document.getElementById("catBgRemove");
+  els.fBgPathDisplay = document.getElementById("catBgPathDisplay");
   els.fId = document.getElementById("catId");
   els.deleteModal = document.getElementById("catDeleteModal");
   els.deleteName = document.getElementById("catDeleteName");
@@ -123,6 +132,8 @@ export async function initCategories() {
       clearFieldError("slug");
     }
   });
+  els.fBgFile?.addEventListener("change", handleBgFileSelect);
+  els.fBgRemove?.addEventListener("click", handleBgRemove);
 
   // form submit
   els.form?.addEventListener("submit", async (e) => {
@@ -283,10 +294,78 @@ function render() {
   }
 }
 
+function handleBgFileSelect(){
+  const file = els.fBgFile?.files?.[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ toast("Image must be ≤5 MiB", "err"); els.fBgFile.value=""; return; }
+  if(!file.type.startsWith("image/")){ toast("Only images allowed", "err"); els.fBgFile.value=""; return; }
+  if(pendingBgPreviewUrl){ URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl=null; }
+  pendingBgFile = file;
+  bgRemoved = false;
+  pendingBgPreviewUrl = URL.createObjectURL(file);
+  updateBgPreview();
+}
+function updateBgPreview(){
+  if(!els.fBgPreview) return;
+  // pending file takes precedence
+  if(pendingBgFile && pendingBgPreviewUrl){
+    els.fBgPreview.innerHTML = `<img src="${pendingBgPreviewUrl}" alt="Preview" style="max-width:160px;max-height:100px;border-radius:8px;border:1px solid var(--line);object-fit:cover" /> <span class="hint">${escapeHtml(pendingBgFile.name)} (${(pendingBgFile.size/1024).toFixed(0)} KB) — will upload on Save</span>`;
+    if(els.fBgPathDisplay) els.fBgPathDisplay.textContent = `Selected: ${pendingBgFile.name}`;
+    return;
+  }
+  if(bgRemoved){
+    els.fBgPreview.innerHTML = `<span class="hint">No image — will be removed on Save</span>`;
+    if(els.fBgPathDisplay) els.fBgPathDisplay.textContent = "";
+    return;
+  }
+  const url = safeDisplayForPreview(originalBgUrl);
+  const path = safeDisplayForPreview(originalBgPath);
+  if(url){
+    els.fBgPreview.innerHTML = `<img src="${escapeHtml(url)}" alt="Current background" style="max-width:160px;max-height:100px;border-radius:8px;border:1px solid var(--line);object-fit:cover" onerror="this.style.display='none'" /> <span class="hint">Current image</span>`;
+    if(els.fBgPathDisplay) els.fBgPathDisplay.textContent = path || url;
+  } else if(path){
+    els.fBgPreview.innerHTML = `<span class="hint">Path: ${escapeHtml(path)}</span>`;
+    if(els.fBgPathDisplay) els.fBgPathDisplay.textContent = path;
+  } else {
+    els.fBgPreview.innerHTML = `<span class="hint">No image</span>`;
+    if(els.fBgPathDisplay) els.fBgPathDisplay.textContent = "";
+  }
+}
+function safeDisplayForPreview(v){ return v==null||v==="undefined" ? "" : String(v); }
+function handleBgRemove(){
+  if(pendingBgPreviewUrl){ URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl=null; }
+  pendingBgFile = null;
+  if(els.fBgFile) els.fBgFile.value = "";
+  // if there was no original and no pending, just stay No image
+  // if there was original, mark removed so it will be cleared on save
+  if(originalBgPath || originalBgUrl || pendingBgFile){
+    bgRemoved = true;
+  } else {
+    bgRemoved = false;
+  }
+  // If editing and original exists, removing means will clear; if adding with no image, just clear
+  updateBgPreview();
+}
+
 function openModal(cat) {
   editingId = cat ? cat.id : null;
   if (els.fId) els.fId.value = editingId || "";
   if (els.modalTitle) els.modalTitle.textContent = editingId ? "Edit Category" : "Add Category";
+  // reset bg state
+  if(pendingBgPreviewUrl){ URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl=null; }
+  pendingBgFile = null;
+  bgRemoved = false;
+  originalBgPath = cat ? (cat.background_image_path || null) : null;
+  originalBgUrl = cat ? (cat.background_image_url || null) : null;
+  if(els.fBgFile) els.fBgFile.value = "";
+  // keep hidden inputs in sync for submission fallback, but UI is file picker
+  if(cat){
+    els.fBgPath.value = cat.background_image_path || "";
+    els.fBgUrl.value = cat.background_image_url || "";
+  } else {
+    els.fBgPath.value = "";
+    els.fBgUrl.value = "";
+  }
   // reset errors
   clearAllErrors();
   if (cat) {
@@ -297,8 +376,6 @@ function openModal(cat) {
     els.fSort.value = cat.sort_order ?? 0;
     els.fActive.checked = !!cat.is_active;
     els.fDesc.value = cat.description || "";
-    els.fBgPath.value = cat.background_image_path || "";
-    els.fBgUrl.value = cat.background_image_url || "";
   } else {
     els.fName.value = "";
     els.fSlug.value = "";
@@ -306,16 +383,18 @@ function openModal(cat) {
     els.fSort.value = 0;
     els.fActive.checked = true;
     els.fDesc.value = "";
-    els.fBgPath.value = "";
-    els.fBgUrl.value = "";
     slugManuallyEdited = false;
   }
+  updateBgPreview();
   els.modal?.classList.add("open");
   // focus name
   setTimeout(() => els.fName?.focus(), 50);
 }
 
 function closeModal() {
+  if(pendingBgPreviewUrl){ URL.revokeObjectURL(pendingBgPreviewUrl); pendingBgPreviewUrl=null; }
+  pendingBgFile = null;
+  bgRemoved = false;
   els.modal?.classList.remove("open");
   editingId = null;
   clearAllErrors();
@@ -395,26 +474,48 @@ async function handleSubmit() {
     // allow to proceed to let DB unique handle it, but show toast
   }
 
-  const payload = {
-    name,
-    slug,
-    type,
-    sort_order,
-    is_active,
-    description,
-    background_image_path,
-    background_image_url,
-  };
-
   const submitBtn = els.form.querySelector('button[type="submit"]');
   const prevText = submitBtn ? submitBtn.textContent : "";
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = editingId ? "Saving…" : "Creating…"; }
 
   try {
     const supabase = getSupabase();
+    let background_image_path = null;
+    let background_image_url = null;
+    if (bgRemoved) {
+      background_image_path = null;
+      background_image_url = null;
+    } else if (pendingBgFile) {
+      const safeSlug = slugify(name) || "category";
+      const ext = pendingBgFile.name.split(".").pop() || "jpg";
+      const path = Date.now() + "-" + safeSlug + "." + ext;
+      toast("Uploading background…", "ok");
+      const { error: upErr } = await supabase.storage.from("category-backgrounds").upload(path, pendingBgFile, { upsert:false, contentType: pendingBgFile.type });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("category-backgrounds").getPublicUrl(path);
+      background_image_path = path;
+      background_image_url = pub?.publicUrl || null;
+    } else if (editingId) {
+      background_image_path = originalBgPath;
+      background_image_url = originalBgUrl;
+    } else {
+      background_image_path = null;
+      background_image_url = null;
+    }
+
+    const payload = {
+      name,
+      slug,
+      type,
+      sort_order,
+      is_active,
+      description,
+      background_image_path,
+      background_image_url,
+    };
+
     let result;
     if (editingId) {
-      // preserve created_at/updated_at handled by trigger
       result = await supabase.from("categories").update(payload).eq("id", editingId).select().single();
     } else {
       result = await supabase.from("categories").insert(payload).select().single();

@@ -21,7 +21,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="The Market | TPM — The Premium Mart" />
   <meta name="twitter:description" content="Explore the original TPM market — coffee, cold infusions, pastries and weekend brunch." />
-  <link rel="stylesheet" href="css/style.css?v=20260515e" />
+  <link rel="stylesheet" href="css/style.css?v=20260515q" />
   <link rel="preconnect" href="https://images.unsplash.com" />
 </head>
 <body data-page="market">
@@ -32,8 +32,8 @@
       <div class="header-left">
         <button type="button" class="hamburger" id="openDrawer" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
         <a class="brand" href="index.html" aria-label="TPM — The Premium Mart home">
-          <span class="brand-mark" aria-hidden="true">TPM</span>
-          <span class="brand-wordmark"><span class="short">TPM</span><span class="long">TPM — The Premium Mart</span></span>
+          <span class="brand-mark" aria-hidden="true"><img src="assets/logo.jpg" alt="" width="32" height="32" loading="eager" decoding="async" /></span>
+          <span class="brand-wordmark"><span class="short">TPM</span><span class="long">THE PREMIUM MART</span></span>
         </a>
       </div>
       <nav class="desktop-nav" aria-label="Primary">
@@ -47,6 +47,8 @@
       </div>
     </div>
   </header>
+
+  <button id="categoriesButton" class="categories-btn" aria-label="Open categories">CATEGORIES <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
 
   <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
   <aside class="drawer" id="drawer" aria-label="Mobile navigation" aria-hidden="true">
@@ -66,6 +68,19 @@
     </div>
   </aside>
 
+  <!-- Categories drawer (mobile) -->
+  <div class="categories-backdrop" id="categoriesBackdrop" aria-hidden="true"></div>
+  <aside class="categories-drawer" id="categoriesDrawer" aria-label="Categories" aria-hidden="true">
+    <div class="categories-drawer-head">
+      <div class="categories-drawer-brand">TPM</div>
+      <button type="button" class="categories-drawer-close" aria-label="Close categories"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <nav class="categories-drawer-nav" aria-label="Categories"></nav>
+    <div class="categories-drawer-foot">
+      <button type="button" class="btn btn-secondary categories-drawer-close" style="width:100%">Done</button>
+    </div>
+  </aside>
+
   <main id="main">
     <!-- Market header — dynamic Market + Café -->
     <section class="page-hero menu-page-hero">
@@ -73,17 +88,31 @@
         <a href="index.html" class="back-link"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18l-6-6 6-6"/></svg> Back to Home</a>
         <h1>The Market</h1>
         <p class="menu-intro">Fresh finds, signature drinks &amp; everyday favorites — all in one place. Browse by category below.</p>
-        <div id="menuTypeFilter" style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap"></div>
       </div>
     </section>
 
-    <!-- Dynamic Market + Café market — uses existing menu-images-container shell -->
-    <section class="menu-images-wrap" aria-label="Market and Café">
-      <div class="container menu-images-container">
-        <!-- Dynamic categories/products injected by js/market.js from Supabase categories/products -->
-        <div class="admin-loading" style="min-height:120px"><span class="admin-spinner"></span> Loading market…</div>
+    <!-- Market layout: main content left, categories right (desktop) -->
+    <div class="market-layout">
+      <div class="market-main">
+        <section class="menu-images-wrap" aria-label="Market and Café">
+          <div class="container menu-images-container">
+            <!-- Dynamic categories/products injected by js/market.js from Supabase categories/products -->
+            <div class="admin-loading" style="min-height:120px"><span class="admin-spinner"></span> Loading market…</div>
+          </div>
+        </section>
       </div>
-    </section>
+      <aside class="market-sidebar" id="marketSidebar" aria-label="Market categories">
+        <div class="market-sidebar-card">
+          <div class="market-sidebar-head">
+            <span class="market-sidebar-label">Browse</span>
+            <span class="market-sidebar-count" id="marketSidebarCount"></span>
+          </div>
+          <nav aria-label="Market categories">
+            <ul id="marketSidebarList"></ul>
+          </nav>
+        </div>
+      </aside>
+    </div>
   </main>
 
   <footer class="site-footer" role="contentinfo">

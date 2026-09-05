@@ -339,15 +339,20 @@
                     <span>Active (visible to public)</span>
                   </label>
                 </div>
-                <div class="admin-form-grid cols-2" style="margin-top:10px">
-                  <div class="admin-field">
-                    <label for="catBgPath">Background image path</label>
-                    <input id="catBgPath" type="text" placeholder="category-backgrounds/..." />
-                    <span class="hint">Storage path preserved; leave blank to clear.</span>
-                  </div>
-                  <div class="admin-field">
-                    <label for="catBgUrl">Background image URL</label>
-                    <input id="catBgUrl" type="text" placeholder="https://..." />
+                <div class="admin-field" style="margin-top:10px">
+                  <label>Category background image</label>
+                  <div style="display:grid;gap:8px">
+                    <input id="catBgFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" />
+                    <span class="hint">Image ≤5 MiB, jpeg/png/webp/avif/svg → uploads to <code>category-backgrounds</code> bucket. Will upload on Save.</span>
+                    <div id="catBgPreview" class="hint">No image</div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <button id="catBgRemove" type="button" class="admin-btn admin-btn-ghost admin-btn--sm">Remove image</button>
+                      <span class="hint" id="catBgPathDisplay" style="word-break:break-all"></span>
+                    </div>
+                    <div style="display:none">
+                      <input id="catBgPath" type="hidden" />
+                      <input id="catBgUrl" type="hidden" />
+                    </div>
                   </div>
                 </div>
                 <div class="admin-modal-actions">
