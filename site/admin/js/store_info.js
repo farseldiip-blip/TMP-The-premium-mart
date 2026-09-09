@@ -22,7 +22,43 @@ function isValidUrl(v){
 
 let storeRow=null;
 let originalShowcase={ path:null, url:null };
+let loadingOrigHtml=null;
 const els={};
+
+function isMissingRowError(err){
+  if(!err) return true;
+  if(err.code==="PGRST116") return true;
+  const msg=String(err.message||"").toLowerCase();
+  return msg.includes("singleton missing")
+    || msg.includes("no store_info row")
+    || msg.includes("results contain 0")
+    || msg.includes("contain 0 rows")
+    || msg.includes("0 rows")
+    || msg.includes("cannot coerce")
+    || msg==="no row";
+}
+
+function showEmptyState(){
+  storeRow=null;
+  originalShowcase.path=null;
+  originalShowcase.url=null;
+  populateForm(null);
+  if(els.loading) els.loading.style.display="none";
+  if(els.content) els.content.style.display="block";
+  const hint=document.getElementById("storeEmptyHint");
+  if(hint) hint.style.display="block";
+}
+
+function showLoadError(err){
+  console.error("[TPM store] load failed",err);
+  toast(err?.message||"Failed to load store info","err");
+  if(els.loading){
+    els.loading.style.display="grid";
+    els.loading.innerHTML=`<div class="admin-empty"><strong>Failed to load</strong><br>${escapeHtml(err?.message||"Failed to load store info")}<br><br><button type="button" class="admin-btn admin-btn-ghost" data-retry="store" style="min-height:44px">Retry</button></div>`;
+    els.loading.querySelector('[data-retry="store"]')?.addEventListener("click", ()=>loadStore());
+  }
+  if(els.content) els.content.style.display="none";
+}
 
 export async function initStoreInfo(){
   els.wrap=document.getElementById("storeWrap");
@@ -55,7 +91,12 @@ export async function initStoreInfo(){
 
   if(!els.form) return;
 
+  if(els.loading && loadingOrigHtml===null) loadingOrigHtml=els.loading.innerHTML;
   els.refreshBtn?.addEventListener("click", ()=>loadStore());
+  document.getElementById("storeEmptyAddBtn")?.addEventListener("click", ()=>{
+    els.fName?.scrollIntoView({ behavior:"smooth", block:"center" });
+    els.fName?.focus({ preventScroll:true });
+  });
   els.fLogoFile?.addEventListener("change", handleFileSelect);
   els.fLogoPath?.addEventListener("input", updatePreview);
   els.fLogoUrl?.addEventListener("input", updatePreview);
@@ -89,34 +130,68 @@ function updatePreview(){
 
 async function loadStore(){
   const supa=getSupabase();
-  if(els.loading) els.loading.style.display="grid";
+  if(els.loading){
+    if(loadingOrigHtml!==null) els.loading.innerHTML=loadingOrigHtml;
+    els.loading.style.display="grid";
+  }
   if(els.content) els.content.style.display="none";
   try{
     const { data, error } = await supa.from("store_info").select("*").eq("singleton_key", true).maybeSingle();
     if(error) throw error;
     if(!data){
-      // fallback to any row
       const { data: anyRow, error: e2 } = await supa.from("store_info").select("*").limit(1).maybeSingle();
       if(e2) throw e2;
       storeRow=anyRow;
     } else {
       storeRow=data;
     }
-    if(!storeRow) throw new Error("No store_info row found (singleton missing)");
+    if(!storeRow){
+      // Empty table — no data added yet, not an error. No toast, no console error.
+      showEmptyState();
+      return;
+    }
     originalShowcase.path=storeRow.showcase_video_path||null;
     originalShowcase.url=storeRow.showcase_video_url||null;
     populateForm(storeRow);
     if(els.loading) els.loading.style.display="none";
     if(els.content) els.content.style.display="block";
+    const hint=document.getElementById("storeEmptyHint");
+    if(hint) hint.style.display="none";
   }catch(err){
-    console.error("[TPM store] load failed",err);
-    toast(err.message||"Failed to load store info","err");
-    if(els.loading) els.loading.innerHTML=`<div class="admin-empty"><strong>Failed to load</strong><br>${escapeHtml(err.message)}</div>`;
+    // Missing singleton row is an empty state, not a real failure.
+    if(isMissingRowError(err)){
+      showEmptyState();
+      return;
+    }
+    showLoadError(err);
   }
 }
 
 function populateForm(row){
-  if(!row) return;
+  if(!row){
+    // Empty Cloud state — allow admin to create first row, no error
+    els.fName.value="";
+    els.fTagline.value="";
+    els.fDesc.value="";
+    els.fAddr1.value="";
+    els.fAddr2.value="";
+    els.fCity.value="";
+    els.fCountry.value="US";
+    els.fPostal.value="";
+    els.fPhone.value="";
+    els.fPhoneDisplay.value="";
+    els.fEmail.value="";
+    els.fMapUrl.value="";
+    els.fLogoPath.value="";
+    els.fLogoUrl.value="";
+    if(els.fLogoFile) els.fLogoFile.value="";
+    els.fOpening.value="{}";
+    if(els.fVideoPath) els.fVideoPath.value="";
+    if(els.fVideoUrl) els.fVideoUrl.value="";
+    updatePreview();
+    clearAllErrors();
+    return;
+  }
   els.fName.value=row.name||"";
   els.fTagline.value=row.tagline||"";
   els.fDesc.value=row.description||"";
@@ -247,12 +322,17 @@ async function handleSave(){
       showcase_video_url,
       singleton_key: true,
     };
-    // update singleton where singleton_key=true (or id)
+    // update singleton where singleton_key=true (or id), or insert if missing (empty Cloud)
     let result;
     if(storeRow?.id){
       result=await supa.from("store_info").update(payload).eq("id", storeRow.id).select().single();
     } else {
-      result=await supa.from("store_info").update(payload).eq("singleton_key", true).select().single();
+      // No existing row — create first singleton
+      result=await supa.from("store_info").insert(payload).select().single();
+      if(result.error && result.error.code==="23505"){
+        // Race: singleton already exists, fallback to update
+        result=await supa.from("store_info").update(payload).eq("singleton_key", true).select().single();
+      }
     }
     if(result.error) throw result.error;
     storeRow=result.data;
@@ -260,6 +340,8 @@ async function handleSave(){
     originalShowcase.url=storeRow.showcase_video_url||null;
     toast("Store information saved","ok");
     populateForm(storeRow);
+    const hint=document.getElementById("storeEmptyHint");
+    if(hint) hint.style.display="none";
   }catch(err){
     console.error("[TPM store] save failed",err);
     const msg=err.message||"Save failed";
@@ -277,4 +359,4 @@ function slugify(input){
 }
 
 // expose for testing
-export const _test={ isValidEmail, isValidUrl };
+export const _test={ isValidEmail, isValidUrl, isMissingRowError };

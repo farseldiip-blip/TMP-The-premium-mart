@@ -19,6 +19,47 @@ export function slugify(input) {
     .replace(/^-|-$/g, "");
 }
 function validateSlug(s) { return SLUG_RE.test(s); }
+
+function randomSlugSuffix(len=6){
+  const chars="abcdefghijklmnopqrstuvwxyz0123456789";
+  let s="";
+  try{
+    const buf=new Uint32Array(len);
+    crypto.getRandomValues(buf);
+    for(let i=0;i<len;i++) s+=chars[buf[i]%chars.length];
+  }catch{
+    for(let i=0;i<len;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  }
+  return s;
+}
+
+// Internal slug resolution — the Slug field is hidden from the form, and
+// Name accepts any language (Arabic, English, mixed):
+// - English/mixed names → clean lowercase hyphenated slug (unchanged behavior).
+// - Arabic-only names → keep the existing slug on edit (stable); on add, a
+//   safe unique fallback like "product-x7k2q9" that satisfies the DB format
+//   check. The original name is always stored verbatim.
+function resolveSlug(name, kind, existingSlug){
+  const base=slugify(name||"");
+  if(base) return { slug: base, fallback: false };
+  if(existingSlug && SLUG_RE.test(existingSlug)) return { slug: existingSlug, fallback: false };
+  return { slug: `${kind}-${randomSlugSuffix()}`, fallback: true };
+}
+
+// Ensure a generated fallback slug is unique (re-check, suffix on collision).
+// Only used for random fallbacks — never rejects the user's name.
+async function ensureUniqueSlug(supa, table, slug, editingId){
+  let candidate=slug;
+  for(let i=0;i<5;i++){
+    let q=supa.from(table).select("id").eq("slug",candidate);
+    if(editingId) q=q.neq("id",editingId);
+    const {data,error}=await q.limit(1);
+    if(error) throw error;
+    if(!data||!data.length) return candidate;
+    candidate=`${slug}-${i+2}`;
+  }
+  return `${slug}-${Date.now().toString(36)}`;
+}
 function escapeHtml(s) {
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
@@ -32,7 +73,7 @@ function formatPrice(p){
   if(p===null || p===undefined || p==="") return "—";
   const n=Number(p);
   if(Number.isNaN(n)) return String(p);
-  return `$${n.toFixed(2)}`;
+  return `EGP${n.toFixed(2)}`;
 }
 
 // State
@@ -43,7 +84,10 @@ let editingId=null;
 let searchTerm="";
 let categoryFilter="all";
 let typeFilter="all";
-let slugManuallyEdited=false;
+let imgRemoved=false;
+let originalImgPath=null;
+let originalImgUrl=null;
+let pendingImgPreviewUrl=null;
 const els={};
 
 export async function initProducts(){
@@ -63,17 +107,14 @@ export async function initProducts(){
   els.modalTitle=document.getElementById("prodModalTitle");
   els.form=document.getElementById("prodForm");
   els.fName=document.getElementById("prodName");
-  els.fSlug=document.getElementById("prodSlug");
   els.fCat=document.getElementById("prodCategory");
   els.fDesc=document.getElementById("prodDesc");
   els.fPrice=document.getElementById("prodPrice");
   els.fBadge=document.getElementById("prodBadge");
-  els.fSort=document.getElementById("prodSort");
   els.fActive=document.getElementById("prodActive");
-  els.fImgPath=document.getElementById("prodImgPath");
-  els.fImgUrl=document.getElementById("prodImgUrl");
   els.fImgFile=document.getElementById("prodImgFile");
   els.fImgPreview=document.getElementById("prodImgPreview");
+  els.fImgRemove=document.getElementById("prodImgRemove");
   els.deleteModal=document.getElementById("prodDeleteModal");
   els.deleteName=document.getElementById("prodDeleteName");
   els.deleteCancel=document.getElementById("prodDeleteCancel");
@@ -96,17 +137,8 @@ export async function initProducts(){
   els.deleteOverlay?.addEventListener("click", closeDeleteModal);
   els.deleteConfirm?.addEventListener("click", confirmDelete);
 
-  els.fSlug?.addEventListener("input", ()=>{ slugManuallyEdited=true; });
-  els.fName?.addEventListener("input", ()=>{
-    if(editingId===null && !slugManuallyEdited){
-      els.fSlug.value=slugify(els.fName.value);
-      clearFieldError("prod-slug");
-    }
-  });
   els.fImgFile?.addEventListener("change", handleFileSelect);
-  // clear preview when path manually edited
-  els.fImgPath?.addEventListener("input", updatePreview);
-  els.fImgUrl?.addEventListener("input", updatePreview);
+  els.fImgRemove?.addEventListener("click", handleImgRemove);
 
   els.form?.addEventListener("submit", async e=>{ e.preventDefault(); await handleSubmit(); });
 
@@ -129,19 +161,34 @@ function handleFileSelect(){
   if(!file) return;
   if(file.size>5*1024*1024){ toast("Image must be ≤5 MiB", "err"); els.fImgFile.value=""; return; }
   if(!file.type.startsWith("image/")){ toast("Only images allowed", "err"); els.fImgFile.value=""; return; }
-  const url=URL.createObjectURL(file);
-  if(els.fImgPreview){
-    els.fImgPreview.innerHTML=`<img src="${url}" alt="Preview" style="max-width:120px;max-height:120px;border-radius:8px;border:1px solid var(--line)" /> <span class="hint">${escapeHtml(file.name)} (${(file.size/1024).toFixed(0)} KB)</span>`;
-  }
+  if(pendingImgPreviewUrl){ URL.revokeObjectURL(pendingImgPreviewUrl); pendingImgPreviewUrl=null; }
+  imgRemoved=false;
+  pendingImgPreviewUrl=URL.createObjectURL(file);
+  updatePreview();
+}
+
+function handleImgRemove(){
+  if(pendingImgPreviewUrl){ URL.revokeObjectURL(pendingImgPreviewUrl); pendingImgPreviewUrl=null; }
+  if(els.fImgFile) els.fImgFile.value="";
+  imgRemoved = !!(originalImgPath || originalImgUrl);
+  updatePreview();
 }
 
 function updatePreview(){
-  const path=els.fImgPath?.value.trim();
-  const url=els.fImgUrl?.value.trim();
-  if(els.fImgPreview){
-    if(url) els.fImgPreview.innerHTML=`<img src="${escapeHtml(url)}" alt="Preview" style="max-width:120px;max-height:120px;border-radius:8px;border:1px solid var(--line)" onerror="this.style.display='none'" />`;
-    else if(path) els.fImgPreview.innerHTML=`<span class="hint">Path: ${escapeHtml(path)}</span>`;
-    else els.fImgPreview.innerHTML=`<span class="hint">No image</span>`;
+  if(!els.fImgPreview) return;
+  const file=els.fImgFile?.files?.[0];
+  if(file && pendingImgPreviewUrl){
+    els.fImgPreview.innerHTML=`<img src="${pendingImgPreviewUrl}" alt="Preview" style="max-width:120px;max-height:120px;border-radius:8px;border:1px solid var(--line)" /> <span class="hint">${escapeHtml(file.name)} (${(file.size/1024).toFixed(0)} KB) — will upload on Save</span>`;
+    return;
+  }
+  if(imgRemoved){
+    els.fImgPreview.innerHTML=`<span class="hint">No image — will be removed on Save</span>`;
+    return;
+  }
+  if(originalImgUrl){
+    els.fImgPreview.innerHTML=`<img src="${escapeHtml(originalImgUrl)}" alt="Current image" style="max-width:120px;max-height:120px;border-radius:8px;border:1px solid var(--line)" onerror="this.style.display='none'" /> <span class="hint">Current image</span>`;
+  } else {
+    els.fImgPreview.innerHTML=`<span class="hint">No image</span>`;
   }
 }
 
@@ -175,7 +222,7 @@ function populateCategorySelect(){
   // form select
   const formSel=els.fCat;
   const prevVal=formSel.value;
-  formSel.innerHTML=`<option value="">— No category —</option>`+
+  formSel.innerHTML=`<option value="">— Select a category —</option>`+
     `<optgroup label="Market">${categories.filter(c=>c.type==='market').map(c=>`<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.slug)})</option>`).join("")}</optgroup>`+
     `<optgroup label="Café">${categories.filter(c=>c.type==='cafe').map(c=>`<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.slug)})</option>`).join("")}</optgroup>`;
   if(prevVal) formSel.value=prevVal;
@@ -228,6 +275,9 @@ function render(){
     const unc=products.filter(p=>!p.category_id).length;
     els.stats.innerHTML=`<span>${total} total</span><span>${active} active</span><span>${market} market</span><span>${cafe} café</span><span>${unc} uncategorized</span><span>${filtered.length} shown</span>`;
   }
+  // Overview counter uses the same already-loaded data (no extra query).
+  const ovStat=document.getElementById("statProducts");
+  if(ovStat) ovStat.textContent=products.length;
   if(!filtered.length){
     if(els.tbody) els.tbody.innerHTML=`<tr><td colspan="7" class="admin-empty"><strong>No products</strong>${searchTerm||categoryFilter!=="all"||typeFilter!=="all"?"<br>Try adjusting filters.":"<br>Click “Add Product” to create the first one."}</td></tr>`;
     if(els.cards) els.cards.innerHTML=`<div class="admin-empty"><strong>No products</strong><br>${searchTerm||categoryFilter!=="all"||typeFilter!=="all"?"Try adjusting filters.":"Tap Add Product to start."}</div>`;
@@ -276,27 +326,31 @@ function openModal(prod){
   editingId=prod?prod.id:null;
   if(els.modalTitle) els.modalTitle.textContent=editingId?"Edit Product":"Add Product";
   clearAllErrors();
+  // reset image state
+  if(pendingImgPreviewUrl){ URL.revokeObjectURL(pendingImgPreviewUrl); pendingImgPreviewUrl=null; }
+  imgRemoved=false;
+  originalImgPath=prod?(prod.image_path||null):null;
+  originalImgUrl=prod?(prod.image_url||null):null;
+  if(els.fImgFile) els.fImgFile.value="";
   if(prod){
-    slugManuallyEdited=true;
     els.fName.value=prod.name||"";
-    els.fSlug.value=prod.slug||"";
     els.fCat.value=prod.category_id||"";
     els.fDesc.value=prod.description||"";
     els.fPrice.value=prod.price ?? "";
     els.fBadge.value=prod.badge||"";
-    els.fSort.value=prod.sort_order??0;
     els.fActive.checked=!!prod.is_active;
-    els.fImgPath.value=prod.image_path||"";
-    els.fImgUrl.value=prod.image_url||"";
-    if(els.fImgFile) els.fImgFile.value="";
     updatePreview();
   } else {
-    els.fName.value=""; els.fSlug.value=""; els.fCat.value=""; els.fDesc.value=""; els.fPrice.value=""; els.fBadge.value=""; els.fSort.value=0; els.fActive.checked=true; els.fImgPath.value=""; els.fImgUrl.value=""; if(els.fImgFile) els.fImgFile.value=""; slugManuallyEdited=false; updatePreview();
+    els.fName.value=""; els.fCat.value=""; els.fDesc.value=""; els.fPrice.value=""; els.fBadge.value=""; els.fActive.checked=true; updatePreview();
   }
   els.modal?.classList.add("open");
   setTimeout(()=>els.fName?.focus(),50);
 }
-function closeModal(){ els.modal?.classList.remove("open"); editingId=null; clearAllErrors(); }
+function closeModal(){
+  if(pendingImgPreviewUrl){ URL.revokeObjectURL(pendingImgPreviewUrl); pendingImgPreviewUrl=null; }
+  imgRemoved=false;
+  els.modal?.classList.remove("open"); editingId=null; clearAllErrors();
+}
 
 let pendingDeleteId=null;
 function openDeleteModal(prod){
@@ -327,8 +381,6 @@ function clearAllErrors(){ document.querySelectorAll("#prodForm .admin-field.has
 
 async function handleSubmit(){
   const name=els.fName.value.trim();
-  const rawSlug=els.fSlug.value.trim().toLowerCase();
-  const slug=slugify(rawSlug||name);
   const category_id=els.fCat.value?Number(els.fCat.value):null;
   const description=els.fDesc.value.trim()||null;
   let priceVal=els.fPrice.value.trim();
@@ -338,66 +390,81 @@ async function handleSubmit(){
     if(Number.isNaN(price)) price=null;
   }
   const badge=els.fBadge.value.trim()||null;
-  const sort_order=parseInt(els.fSort.value,10);
   const is_active=!!els.fActive.checked;
-  let image_path=els.fImgPath.value.trim()||null;
-  let image_url=els.fImgUrl.value.trim()||null;
 
   clearAllErrors();
   let hasError=false;
   if(!name){ setFieldError("name","Name is required."); hasError=true; }
-  if(!slug){ setFieldError("slug","Slug is required."); hasError=true; }
-  else if(!validateSlug(slug)){ setFieldError("slug","Slug must be a-z, 0-9, hyphens (e.g., my-product)."); hasError=true; }
-  if(isNaN(sort_order)||sort_order<0){ setFieldError("sort","Sort order must be >=0."); hasError=true; }
+  if(category_id===null){ setFieldError("category","Please choose a category."); hasError=true; }
+  else if(!categories.find(c=>c.id===category_id)){ setFieldError("category","Invalid category."); hasError=true; }
   if(price!==null && (isNaN(price) || price<0)){ setFieldError("price","Price must be >=0."); hasError=true; }
-  if(category_id!==null && !categories.find(c=>c.id===category_id)){ setFieldError("category","Invalid category."); hasError=true; }
 
-  if(els.fSlug.value!==slug) els.fSlug.value=slug;
   if(hasError) return;
 
-  // duplicate slug check
-  try{
-    const supa=getSupabase();
-    let q=supa.from("products").select("id").eq("slug",slug);
-    if(editingId) q=q.neq("id",editingId);
-    const {data:dup,error:dupErr}=await q.limit(1);
-    if(dupErr) throw dupErr;
-    if(dup&&dup.length){ setFieldError("slug","Slug already exists."); toast("Slug already exists","err"); return; }
-  }catch(err){ console.error("[TPM products] dup check",err); }
+  // Internal slug: hidden from the form, accepts any language in Name.
+  const existingProd=editingId?products.find(p=>p.id===editingId):null;
+  let { slug, fallback }=resolveSlug(name, "product", existingProd?existingProd.slug:null);
+  const supaForSlug=getSupabase();
+  if(fallback){
+    try{
+      slug=await ensureUniqueSlug(supaForSlug, "products", slug, editingId);
+    }catch(err){
+      console.error("[TPM products] fallback slug check failed",err);
+      // proceed — DB unique index is the backstop
+    }
+  } else {
+    // duplicate slug check (English/mixed names keep existing reject behavior)
+    try{
+      const supa=supaForSlug;
+      let q=supa.from("products").select("id").eq("slug",slug);
+      if(editingId) q=q.neq("id",editingId);
+      const {data:dup,error:dupErr}=await q.limit(1);
+      if(dupErr) throw dupErr;
+      if(dup&&dup.length){ setFieldError("name","A product with this name already exists."); toast("A product with this name already exists","err"); return; }
+    }catch(err){ console.error("[TPM products] dup check",err); }
+  }
+
+  // sort_order is handled internally: keep existing on edit, append at end on add
+  let sort_order=0;
+  if(editingId){
+    const existing=products.find(p=>p.id===editingId);
+    sort_order=existing ? (Number(existing.sort_order)||0) : 0;
+  } else {
+    sort_order=products.reduce((m,p)=>Math.max(m, Number(p.sort_order)||0), 0)+1;
+  }
 
   const submitBtn=els.form.querySelector('button[type="submit"]');
   const prevText=submitBtn?submitBtn.textContent:"";
   if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent=editingId?"Saving…":"Creating…"; }
 
-  // handle image upload if file selected
-  try{
+  // resolve image: explicit remove wins, then new upload, else preserve original on edit
+  let image_path=null;
+  let image_url=null;
+  if(!imgRemoved){
     const file=els.fImgFile?.files?.[0];
     if(file){
-      const supa=getSupabase();
-      const safeSlug=slugify(name)||"product";
-      const ext=file.name.split(".").pop()||"jpg";
-      const path=`${Date.now()}-${safeSlug}.${ext}`;
-      toast("Uploading image…","ok");
-      const { error: upErr }=await supa.storage.from("product-images").upload(path, file, { upsert:false, contentType:file.type });
-      if(upErr) throw upErr;
-      const { data: pub }=supa.storage.from("product-images").getPublicUrl(path);
-      image_path=path;
-      image_url=pub?.publicUrl||null;
-      // reflect back to inputs
-      els.fImgPath.value=image_path||"";
-      els.fImgUrl.value=image_url||"";
-      updatePreview();
+      try{
+        const supa=getSupabase();
+        const safeSlug=slugify(name)||"product";
+        const ext=file.name.split(".").pop()||"jpg";
+        const path=`${Date.now()}-${safeSlug}.${ext}`;
+        toast("Uploading image…","ok");
+        const { error: upErr }=await supa.storage.from("product-images").upload(path, file, { upsert:false, contentType:file.type });
+        if(upErr) throw upErr;
+        const { data: pub }=supa.storage.from("product-images").getPublicUrl(path);
+        image_path=path;
+        image_url=pub?.publicUrl||null;
+      }catch(err){
+        console.error("[TPM products] upload failed",err);
+        toast("Image upload failed: "+(err.message||""),"err");
+        if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent=prevText; }
+        return;
+      }
+    } else if(editingId){
+      image_path=originalImgPath;
+      image_url=originalImgUrl;
     }
-  }catch(err){
-    console.error("[TPM products] upload failed",err);
-    toast("Image upload failed: "+(err.message||""),"err");
-    if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent=prevText; }
-    return;
   }
-
-  // preserve existing image if editing and no new file and fields blank but original had value?
-  // Our form is prefilled, so blank means intentionally cleared. That's per spec: do not delete automatically — but clearing via empty field is intentional.
-  // If editing and user didn't touch image fields, they remain prefilled, so preserved.
 
   const payload={ name, slug, category_id, description, price, badge, sort_order, is_active, image_path, image_url };
 
@@ -416,7 +483,7 @@ async function handleSubmit(){
   }catch(err){
     console.error("[TPM products] save failed",err);
     const msg=err.message||"Save failed";
-    if(msg.toLowerCase().includes("duplicate")||msg.toLowerCase().includes("slug")) setFieldError("slug","Slug already exists.");
+    if(msg.toLowerCase().includes("duplicate")||msg.toLowerCase().includes("slug")) setFieldError("name","A product with this name already exists.");
     else if(msg.toLowerCase().includes("price")) setFieldError("price",msg);
     toast(msg,"err");
   }finally{
@@ -452,4 +519,4 @@ async function toggleActive(prod){
   }
 }
 
-export const _test={slugify,validateSlug};
+export const _test={slugify,validateSlug,resolveSlug,ensureUniqueSlug,randomSlugSuffix};

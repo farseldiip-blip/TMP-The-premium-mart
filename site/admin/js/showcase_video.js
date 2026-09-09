@@ -19,7 +19,43 @@ const MAX_DURATION = 15; // seconds
 let storeRow=null;
 let currentPath=null;
 let currentUrl=null;
+let loadingOrigHtml=null;
 const els={};
+
+function isMissingRowError(err){
+  if(!err) return true;
+  if(err.code==="PGRST116") return true;
+  const msg=String(err.message||"").toLowerCase();
+  return msg.includes("singleton missing")
+    || msg.includes("no store_info row")
+    || msg.includes("no store row")
+    || msg.includes("results contain 0")
+    || msg.includes("contain 0 rows")
+    || msg.includes("0 rows")
+    || msg.includes("cannot coerce")
+    || msg==="no row";
+}
+
+function showEmptyNoVideo(){
+  // Missing store_info row OR row without video — no video uploaded yet, not an error.
+  storeRow=storeRow||null;
+  currentPath=null;
+  currentUrl=null;
+  render();
+  if(els.loading) els.loading.style.display="none";
+  if(els.content) els.content.style.display="block";
+}
+
+function showLoadError(err){
+  console.error("[TPM video] load failed",err);
+  toast(err?.message||"Failed to load video","err");
+  if(els.loading){
+    els.loading.style.display="grid";
+    els.loading.innerHTML=`<div class="admin-empty"><strong>Failed to load</strong><br>${escapeHtml(err?.message||"Failed to load video")}<br><br><button type="button" class="admin-btn admin-btn-ghost" data-retry="video" style="min-height:44px">Retry</button></div>`;
+    els.loading.querySelector('[data-retry="video"]')?.addEventListener("click", ()=>loadVideo());
+  }
+  if(els.content) els.content.style.display="none";
+}
 
 export async function initShowcaseVideo(){
   els.wrap=document.getElementById("videoWrap");
@@ -40,17 +76,22 @@ export async function initShowcaseVideo(){
 
   if(!els.fileInput) return;
 
+  if(els.loading && loadingOrigHtml===null) loadingOrigHtml=els.loading.innerHTML;
   els.refreshBtn?.addEventListener("click", ()=>loadVideo());
   els.fileInput?.addEventListener("change", handleFileSelect);
   els.uploadBtn?.addEventListener("click", handleUpload);
   els.deleteBtn?.addEventListener("click", handleDelete);
+  document.getElementById("videoEmptyAddBtn")?.addEventListener("click", ()=>els.fileInput?.click());
 
   await loadVideo();
 }
 
 async function loadVideo(){
   const supa=getSupabase();
-  if(els.loading) els.loading.style.display="grid";
+  if(els.loading){
+    if(loadingOrigHtml!==null) els.loading.innerHTML=loadingOrigHtml;
+    els.loading.style.display="grid";
+  }
   if(els.content) els.content.style.display="none";
   try{
     const { data, error }=await supa.from("store_info").select("id, showcase_video_path, showcase_video_url, name").eq("singleton_key", true).maybeSingle();
@@ -62,7 +103,13 @@ async function loadVideo(){
     } else {
       storeRow=data;
     }
-    if(!storeRow) throw new Error("No store_info row");
+    if(!storeRow){
+      // Empty table — no store profile and no video uploaded yet. Not an error.
+      // Do not insert fake data, do not auto-create rows. Show professional empty state.
+      storeRow=null;
+      showEmptyNoVideo();
+      return;
+    }
     currentPath=storeRow.showcase_video_path||null;
     currentUrl=storeRow.showcase_video_url||null;
     // if url missing but path exists, try to get public url
@@ -74,9 +121,13 @@ async function loadVideo(){
     if(els.loading) els.loading.style.display="none";
     if(els.content) els.content.style.display="block";
   }catch(err){
-    console.error("[TPM video] load failed",err);
-    toast(err.message||"Failed to load video","err");
-    if(els.loading) els.loading.innerHTML=`<div class="admin-empty"><strong>Failed to load</strong><br>${escapeHtml(err.message)}</div>`;
+    // Missing singleton row means "no video uploaded yet", not a real failure.
+    if(isMissingRowError(err)){
+      storeRow=null;
+      showEmptyNoVideo();
+      return;
+    }
+    showLoadError(err);
   }
 }
 
@@ -212,7 +263,12 @@ async function handleUpload(){
     // preserve other store fields — we only update showcase fields, but need to fetch current row id
     if(!storeRow){
       await loadVideo();
-      if(!storeRow) throw new Error("No store row");
+      if(!storeRow){
+        // No store profile yet — do not auto-create rows or fake data.
+        // Guide admin to create Store Information first.
+        toast("No store profile yet — add Store Information first, then upload the showcase video.","err");
+        return;
+      }
     }
     const oldPath=currentPath;
     // generate new path: showcase/<timestamp>-<sanitized>.<ext>
@@ -285,4 +341,4 @@ async function handleDelete(){
 }
 
 // expose for testing
-export const _test={ ALLOWED_MIME, MAX_SIZE, MAX_DURATION, getVideoDuration };
+export const _test={ ALLOWED_MIME, MAX_SIZE, MAX_DURATION, getVideoDuration, isMissingRowError };

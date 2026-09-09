@@ -14,7 +14,42 @@ function isValidEmail(v){ if(!v) return true; return /^[^@\s]+@[^@\s]+\.[^@\s]+$
 function isValidUrl(v){ if(!v) return true; try{ const u=new URL(v); return u.protocol==="http:"||u.protocol==="https:"; }catch{ return false; } }
 
 let contactRow=null;
+let loadingOrigHtml=null;
 const els={};
+
+function isMissingRowError(err){
+  if(!err) return true;
+  if(err.code==="PGRST116") return true;
+  const msg=String(err.message||"").toLowerCase();
+  return msg.includes("singleton missing")
+    || msg.includes("no contact_info row")
+    || msg.includes("no store_info row")
+    || msg.includes("results contain 0")
+    || msg.includes("contain 0 rows")
+    || msg.includes("0 rows")
+    || msg.includes("cannot coerce")
+    || msg==="no row";
+}
+
+function showEmptyState(){
+  contactRow=null;
+  populateForm(null);
+  if(els.loading) els.loading.style.display="none";
+  if(els.content) els.content.style.display="block";
+  const hint=document.getElementById("contactEmptyHint");
+  if(hint) hint.style.display="block";
+}
+
+function showLoadError(err){
+  console.error("[TPM contact] load failed",err);
+  toast(err?.message||"Failed to load contact info","err");
+  if(els.loading){
+    els.loading.style.display="grid";
+    els.loading.innerHTML=`<div class="admin-empty"><strong>Failed to load</strong><br>${escapeHtml(err?.message||"Failed to load contact info")}<br><br><button type="button" class="admin-btn admin-btn-ghost" data-retry="contact" style="min-height:44px">Retry</button></div>`;
+    els.loading.querySelector('[data-retry="contact"]')?.addEventListener("click", ()=>loadContact());
+  }
+  if(els.content) els.content.style.display="none";
+}
 
 export async function initContactInfo(){
   els.wrap=document.getElementById("contactWrap");
@@ -34,14 +69,22 @@ export async function initContactInfo(){
   els.fExtra=document.getElementById("contactExtra");
 
   if(!els.form) return;
+  if(els.loading && loadingOrigHtml===null) loadingOrigHtml=els.loading.innerHTML;
   els.refreshBtn?.addEventListener("click", ()=>loadContact());
+  document.getElementById("contactEmptyAddBtn")?.addEventListener("click", ()=>{
+    els.fPhone?.scrollIntoView({ behavior:"smooth", block:"center" });
+    els.fPhone?.focus({ preventScroll:true });
+  });
   els.form?.addEventListener("submit", async e=>{ e.preventDefault(); await handleSave(); });
   await loadContact();
 }
 
 async function loadContact(){
   const supa=getSupabase();
-  if(els.loading) els.loading.style.display="grid";
+  if(els.loading){
+    if(loadingOrigHtml!==null) els.loading.innerHTML=loadingOrigHtml;
+    els.loading.style.display="grid";
+  }
   if(els.content) els.content.style.display="none";
   try{
     const { data, error } = await supa.from("contact_info").select("*").eq("singleton_key", true).maybeSingle();
@@ -53,19 +96,39 @@ async function loadContact(){
     } else {
       contactRow=data;
     }
-    if(!contactRow) throw new Error("No contact_info row found (singleton missing)");
+    if(!contactRow){
+      // Empty table — no data added yet, not an error. No toast, no console error.
+      showEmptyState();
+      return;
+    }
     populateForm(contactRow);
     if(els.loading) els.loading.style.display="none";
     if(els.content) els.content.style.display="block";
+    const hint=document.getElementById("contactEmptyHint");
+    if(hint) hint.style.display="none";
   }catch(err){
-    console.error("[TPM contact] load failed",err);
-    toast(err.message||"Failed to load contact info","err");
-    if(els.loading) els.loading.innerHTML=`<div class="admin-empty"><strong>Failed to load</strong><br>${escapeHtml(err.message)}</div>`;
+    // Missing singleton row is an empty state, not a real failure.
+    if(isMissingRowError(err)){
+      showEmptyState();
+      return;
+    }
+    showLoadError(err);
   }
 }
 
 function populateForm(row){
-  if(!row) return;
+  if(!row){
+    els.fPhone.value="";
+    els.fPhoneDisplay.value="";
+    els.fEmail.value="";
+    els.fAddress.value="";
+    els.fAddressDisplay.value="";
+    els.fWhatsapp.value="";
+    els.fMapUrl.value="";
+    els.fExtra.value="[]";
+    clearAllErrors();
+    return;
+  }
   els.fPhone.value=row.phone||"";
   els.fPhoneDisplay.value=row.phone_display||"";
   els.fEmail.value=row.email||"";
@@ -152,12 +215,19 @@ async function handleSave(){
     if(contactRow?.id){
       result=await supa.from("contact_info").update(payload).eq("id", contactRow.id).select().single();
     } else {
-      result=await supa.from("contact_info").update(payload).eq("singleton_key", true).select().single();
+      // No existing row — create first singleton (user-initiated via Save, never auto-created on load)
+      result=await supa.from("contact_info").insert(payload).select().single();
+      if(result.error && result.error.code==="23505"){
+        // Race: singleton already exists, fallback to update
+        result=await supa.from("contact_info").update(payload).eq("singleton_key", true).select().single();
+      }
     }
     if(result.error) throw result.error;
     contactRow=result.data;
     toast("Contact information saved","ok");
     populateForm(contactRow);
+    const hint=document.getElementById("contactEmptyHint");
+    if(hint) hint.style.display="none";
   }catch(err){
     console.error("[TPM contact] save failed",err);
     const msg=err.message||"Save failed";
@@ -168,4 +238,4 @@ async function handleSave(){
   }
 }
 
-export const _test={ isValidEmail, isValidUrl };
+export const _test={ isValidEmail, isValidUrl, isMissingRowError };

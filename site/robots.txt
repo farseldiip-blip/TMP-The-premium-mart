@@ -1,9 +1,24 @@
 # robots.txt for TPM — The Premium Mart
-# When production domain is known, replace sitemap URL with absolute production URL.
-
 User-agent: *
 Allow: /
+Disallow: /admin/__test__/
+Disallow: /admin/login.html
+Disallow: /login.html
 
-# Sitemap — update to production URL when domain is live
-# Example: Sitemap: https://www.example.com/sitemap.xml
-Sitemap: sitemap.xml
+# AI crawler directives
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://tmp-the-premium-mart.vercel.app/sitemap.xml

@@ -49,25 +49,22 @@ async function loadAndRender(){
   let products = [];
   try{
     // Load active categories and active products via RLS (anon)
+    // Use simple select (no !inner join) — same pattern proven working in market.js
     const [catRes, prodRes] = await Promise.all([
       supa.from("categories").select("id,name,slug,description,type,sort_order,is_active,background_image_url,background_image_path").eq("is_active", true).order("sort_order").order("name"),
-      supa.from("products").select("id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path, categories!inner(type)").eq("is_active", true).order("sort_order").order("name")
-        // Note: for products without category, the inner join would exclude them; use left join for products without category
-        // So we do two queries: one for products with category, one without, or just do a single query without inner
+      supa.from("products").select("id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path").eq("is_active", true).order("sort_order").order("name")
     ]);
-    // If the above products query with inner excludes uncategorized, fallback to left join
     if(catRes.error) throw catRes.error;
+    if(prodRes.error) throw prodRes.error;
     categories = catRes.data || [];
-    // For products, do a more permissive query without inner to include uncategorized
-    const prodAll = await supa.from("products").select("id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path").eq("is_active", true).order("sort_order").order("name");
-    if(prodAll.error) throw prodAll.error;
-    products = prodAll.data || [];
-    // Also fetch category types for filtering products by market/cafe via category
+    products = prodRes.data || [];
     // Build map for quick lookup
     const catMap = new Map(categories.map(c=>[c.id, c]));
-    // Filter products to only those whose category (if any) is active and of correct type? For public, we already filtered active products, but we should also ensure their category is active if they have one
-    // For simplicity, keep all active products; filtering by type will use catMap
   }catch(err){
+    const errInfo = err && typeof err === "object"
+      ? `message=${err.message ?? "N/A"} details=${err.details ?? "N/A"} hint=${err.hint ?? "N/A"} code=${err.code ?? "N/A"}`
+      : String(err);
+    console.error("[TPM public] Supabase load FAILED", errInfo);
     console.warn("[TPM public] Supabase load failed, keeping hardcoded fallback", err);
     return; // keep hardcoded HTML, don't break
   }
@@ -110,7 +107,7 @@ async function loadAndRender(){
       if(!imgUrl || !imgUrl.startsWith("http")) imgUrl = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
 
       const productSnippet = productsForCat.length
-        ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${productsForCat.map(p=>`<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:3px 7px;border-radius:999px;color:#fff">${escapeHtml(p.name)}${p.price!=null?` $${Number(p.price).toFixed(2)}`:""}</span>`).join("")}</div>`
+        ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${productsForCat.map(p=>`<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:3px 7px;border-radius:999px;color:#fff">${escapeHtml(p.name)}${p.price!=null?` EGP${Number(p.price).toFixed(2)}`:""}</span>`).join("")}</div>`
         : "";
 
       // Preserve existing card structure and classes for animations

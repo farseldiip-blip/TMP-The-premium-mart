@@ -311,21 +311,25 @@ button{font:inherit}
 /* ===== 3D CAN CLUSTER — premium product-photo composition ===== */
 .tpm-can-stage{
   position:relative;
-  width:min(340px, 100%);
-  height:380px;
+  width:100%;
+  max-width:740px;
+  height:auto;
   margin-inline:auto;
-  display:block;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:1%;
   perspective:1000px;
-  transform-style:preserve-3d;
+  transform-style:flat;
   overflow:visible;
 }
 /* contact shadow beneath cluster */
 .tpm-can-stage::after{
   content:"";
   position:absolute;
-  left:50%; bottom:28px;
+  left:50%; bottom:-10px;
   transform:translateX(-50%);
-  width:62%; height:26px;
+  width:90%; height:26px;
   background:radial-gradient(ellipse at center, rgba(14,26,20,.18) 0%, rgba(14,26,20,.10) 38%, transparent 72%);
   filter:blur(12px);
   z-index:0;
@@ -334,7 +338,7 @@ button{font:inherit}
 }
 /* ---- REAL CAN IMAGES — premium editorial composition ---- */
 .tpm-can{
-   position:absolute;
+   position:relative;
    display:block;
    padding:0;
    background:transparent;
@@ -343,8 +347,8 @@ button{font:inherit}
    overflow:visible;
    isolation:isolate;
    filter: drop-shadow(0 14px 22px rgba(14,26,20,.16)) drop-shadow(0 5px 10px rgba(14,26,20,.10));
-   transform: scale(1.5);
-   transform-origin: center bottom;
+   transform: none;
+   flex: 0 0 auto;
 }
 .tpm-can::before,
 .tpm-can::after{ display:none }
@@ -373,95 +377,100 @@ button{font:inherit}
 .tpm-can--blue::before{ background:radial-gradient(ellipse at center, rgba(42,167,224,.38) 0%, rgba(42,167,224,.16) 36%, transparent 70%) }
 .tpm-can--strawberry::before{ background:radial-gradient(ellipse at center, rgba(233,69,69,.36) 0%, rgba(233,69,69,.14) 36%, transparent 70%) }
 
-/* ===== CAN CLUSTER — right-shifted large product-photo group ===== */
-/* Mango — left supporting can, clearly visible */
+/* ===== CAN CLUSTER — triangular product-photo composition ===== */
 .tpm-can--mango{
-  left:48px; bottom:12px;
-  width:235px; height:310px;
+  width:14%;
   z-index:2;
+  margin-bottom:8%;
 }
-/* Blue — center-front, largest, slightly in front */
-.tpm-can--blue{
-  left:175px; bottom:8px;
-  width:270px; height:356px;
-  margin-left:-135px;
-  filter:drop-shadow(0 20px 30px rgba(14,26,20,.18)) drop-shadow(0 7px 12px rgba(14,26,20,.11));
-  z-index:3;
-}
-/* Strawberry — right, slightly smaller but clearly visible */
 .tpm-can--strawberry{
-  left:175px; bottom:18px;
-  width:200px; height:274px;
-  z-index:2;
+  width:24%;
+  z-index:5;
+  margin:0 -5% 16% -7%;
+  filter:drop-shadow(0 20px 30px rgba(14,26,20,.18)) drop-shadow(0 7px 12px rgba(14,26,20,.11));
+}
+.tpm-can--blue{
+  width:20%;
+  z-index:3;
+  margin:0 -3% 0 -2%;
+}
+.tpm-can--beef{
+  width:20%;
+  z-index:3;
+  margin:0 0 0 -2%;
 }
 
 /* --- Reduced motion fallback --- */
 @media(prefers-reduced-motion: reduce){
   .tpm-can--mango,
   .tpm-can--blue,
-  .tpm-can--strawberry{
+  .tpm-can--strawberry,
+  .tpm-can--beef{
     opacity: 1;
     transition: opacity 0.6s ease;
   }
 }
 
-/* Tablet — centered editorial trio */
+/* Tablet — adjusted composition, taller hero to prevent text overlap */
 @media(min-width:768px) and (max-width:1023px){
-  .tpm-can-stage{ width:min(560px, 100%); height:450px }
-  .tpm-can-stage::after{ left:50%; width:58% }
-  .tpm-can--mango{ left:75px; bottom:4px; width:230px; height:305px }
-  .tpm-can--blue{ left:280px; bottom:0; width:260px; height:340px; margin-left:-130px }
-  .tpm-can--strawberry{ left:280px; bottom:10px; width:190px; height:260px }
+  .tpm-hero-visual{ min-height:420px; display:flex; align-items:center; justify-content:center; }
+  .tpm-can-stage{ max-width:480px; margin-top:40px; }
+  .tpm-can--mango{ width:12%; margin-bottom:8% }
+  .tpm-can--strawberry{ width:20%; margin:0 -4% 16% -5% }
+  .tpm-can--blue{ width:17%; margin:0 -3% 0 -2% }
+  .tpm-can--beef{ width:17%; margin:0 0 0 -2% }
 }
-/* Desktop — balanced hero composition */
+/* Desktop — balanced triangular composition, centered in hero visual */
 @media(min-width:1024px){
-  .tpm-can-stage{ width:min(620px, 100%); height:500px }
-  .tpm-can-stage::after{ left:51%; width:56% }
-  .tpm-can--mango{ left:85px; bottom:6px; width:260px; height:345px }
-  .tpm-can--blue{ left:320px; bottom:0; width:290px; height:385px; margin-left:-145px }
-  .tpm-can--strawberry{ left:320px; bottom:12px; width:220px; height:300px }
+  .tpm-can-stage{ max-width:540px; }
+  .tpm-hero-visual{ display:flex; align-items:center; justify-content:center; }
+  .tpm-can--mango{ width:13%; margin-bottom:8% }
+  .tpm-can--strawberry{ width:22%; margin:0 -4% 16% -6% }
+  .tpm-can--blue{ width:18%; margin:0 -3% 0 -2% }
+  .tpm-can--beef{ width:18%; margin:0 0 0 -2% }
+  .tpm-store-chip{ position:absolute; top:100%; bottom:auto; left:50%; transform:translateX(-50%); margin-top:20px; }
 }
-/* Large desktop — expanded right-shifted cluster */
+/* Large desktop — expanded composition */
 @media(min-width:1440px){
-  .tpm-can-stage{ width:min(680px, 100%); height:540px }
-  .tpm-can-stage::after{ left:52%; width:54% }
-  .tpm-can--mango{ left:100px; bottom:6px; width:290px; height:385px }
-  .tpm-can--blue{ left:360px; bottom:0; width:330px; height:435px; margin-left:-165px }
-  .tpm-can--strawberry{ left:353px; bottom:12px; width:245px; height:335px }
+  .tpm-can-stage{ max-width:600px; }
+  .tpm-can--mango{ width:13%; margin-bottom:8% }
+  .tpm-can--strawberry{ width:22%; margin:0 -4% 16% -6% }
+  .tpm-can--blue{ width:18%; margin:0 -3% 0 -2% }
+  .tpm-can--beef{ width:18%; margin:0 0 0 -2% }
 }
 /* Extra large */
 @media(min-width:1920px){
-  .tpm-can-stage{ width:min(740px, 100%); height:590px }
-  .tpm-can-stage::after{ left:53%; width:52% }
-  .tpm-can--mango{ left:120px; bottom:8px; width:330px; height:435px }
-  .tpm-can--blue{ left:420px; bottom:0; width:365px; height:480px; margin-left:-182.5px }
-  .tpm-can--strawberry{ left:405px; bottom:14px; width:270px; height:370px }
+  .tpm-can-stage{ max-width:680px; }
+  .tpm-can--mango{ width:13%; margin-bottom:8% }
+  .tpm-can--strawberry{ width:22%; margin:0 -4% 16% -6% }
+  .tpm-can--blue{ width:18%; margin:0 -3% 0 -2% }
+  .tpm-can--beef{ width:18%; margin:0 0 0 -2% }
 }
 
-/* Mobile — dedicated compact composition, clear of the location badge — tight vertical, no overlap */
+/* Mobile — dedicated compact composition, clear of the location badge */
 @media(max-width:767px){
   .tpm-hero-inner{ gap:14px; padding:16px 0 8px }
   .tpm-hero-visual{ min-height:248px; padding:2px 0 28px }
-  .tpm-can-stage{ width:min(320px, 88vw); height:215px; transform:translateY(62px) }
-  .tpm-can-stage::after{ left:50%; bottom:14px; width:62% }
-  .tpm-can--mango{ left:calc(26% - 72.5px); bottom:32px; width:145px; height:175px; z-index:2 }
-  .tpm-can--blue{ left:50%; bottom:34px; width:155px; height:190px; margin-left:-77.5px; z-index:3 }
-  .tpm-can--strawberry{ left:calc(72% - 60px); bottom:38px; width:120px; height:150px; z-index:2 }
+  .tpm-can-stage{ width:100%; padding:0 2%; margin-top:10px; }
+  .tpm-can-stage::after{ left:50%; bottom:-15px; width:94% }
   .tpm-store-chip{ bottom:2px; font-size:8px; padding:5px 7px 5px 5px; border:1px solid rgba(14,26,20,.06) }
   .tpm-hero-kicker{ margin:0 0 10px }
   .tpm-hero-desc{ margin:0 0 14px }
   .tpm-hero-meta{ margin-top:10px; gap:8px }
-}
-/* Small mobile — tighter, consistent with 767 fix */
+  .tpm-can--mango{ width:12%; margin-bottom:6% }
+  .tpm-can--strawberry{ width:20%; margin:0 -4% 12% -5% }
+  .tpm-can--blue{ width:17%; margin:0 -3% 0 -2% }
+  .tpm-can--beef{ width:17%; margin:0 0 0 0 }
 @media(max-width:390px){
   .tpm-hero-visual{ min-height:228px; padding:2px 0 26px }
-  .tpm-can-stage{ width:100%; height:195px; transform:translateY(60px) }
-  .tpm-can-stage::after{ bottom:12px; width:68% }
-  .tpm-can--mango{ left:calc(26% - 64px); bottom:28px; width:128px; height:155px }
-  .tpm-can--blue{ left:50%; bottom:30px; width:150px; height:180px; margin-left:-75px }
-  .tpm-can--strawberry{ left:calc(72% - 55px); bottom:34px; width:110px; height:140px }
+  .tpm-can-stage::after{ bottom:-15px; width:96% }
+  .tpm-can--mango{ width:11%; margin-bottom:6% }
+  .tpm-can--strawberry{ width:18%; margin:0 -3% 10% -4% }
+  .tpm-can--blue{ width:15%; margin:0 -2% 0 -1% }
+  .tpm-can--beef{ width:15%; margin:0 0 0 -1% }
 }
 
+}
 .tpm-store-chip{
   position:absolute;
   bottom:8px;left:50%;transform:translateX(-50%);

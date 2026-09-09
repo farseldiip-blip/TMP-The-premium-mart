@@ -23,6 +23,47 @@ function validateSlug(slug) {
   return SLUG_RE.test(slug);
 }
 
+function randomSlugSuffix(len = 6) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let s = "";
+  try {
+    const buf = new Uint32Array(len);
+    crypto.getRandomValues(buf);
+    for (let i = 0; i < len; i++) s += chars[buf[i] % chars.length];
+  } catch {
+    for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return s;
+}
+
+// Internal slug resolution — the Slug field is hidden from the form, and
+// Name accepts any language (Arabic, English, mixed):
+// - English/mixed names → clean lowercase hyphenated slug (unchanged behavior).
+// - Arabic-only names → keep the existing slug on edit (stable URLs);
+//   on add, a safe unique fallback like "category-x7k2q9" that satisfies the
+//   DB format check. The original name is always stored verbatim.
+function resolveSlug(name, kind, existingSlug) {
+  const base = slugify(name || "");
+  if (base) return { slug: base, fallback: false };
+  if (existingSlug && SLUG_RE.test(existingSlug)) return { slug: existingSlug, fallback: false };
+  return { slug: `${kind}-${randomSlugSuffix()}`, fallback: true };
+}
+
+// Ensure a generated fallback slug is unique (re-check, suffix on collision).
+// Only used for random fallbacks — never rejects the user's name.
+async function ensureUniqueSlug(supa, table, slug, editingId) {
+  let candidate = slug;
+  for (let i = 0; i < 5; i++) {
+    let q = supa.from(table).select("id").eq("slug", candidate);
+    if (editingId) q = q.neq("id", editingId);
+    const { data, error } = await q.limit(1);
+    if (error) throw error;
+    if (!data || !data.length) return candidate;
+    candidate = `${slug}-${i + 2}`;
+  }
+  return `${slug}-${Date.now().toString(36)}`;
+}
+
 function escapeHtml(s) {
   return String(s ?? "")
     .replace(/&/g, "&amp;")
@@ -54,7 +95,6 @@ let filtered = [];
 let editingId = null; // null = add, else id
 let searchTerm = "";
 let typeFilter = "all";
-let slugManuallyEdited = false;
 let pendingBgFile = null;
 let pendingBgPreviewUrl = null;
 let bgRemoved = false;
@@ -81,9 +121,7 @@ export async function initCategories() {
   els.modalTitle = document.getElementById("catModalTitle");
   els.form = document.getElementById("catForm");
   els.fName = document.getElementById("catName");
-  els.fSlug = document.getElementById("catSlug");
   els.fType = document.getElementById("catType");
-  els.fSort = document.getElementById("catSort");
   els.fActive = document.getElementById("catActive");
   els.fDesc = document.getElementById("catDesc");
   els.fBgPath = document.getElementById("catBgPath");
@@ -124,14 +162,7 @@ export async function initCategories() {
   els.deleteOverlay?.addEventListener("click", closeDeleteModal);
   els.deleteConfirm?.addEventListener("click", confirmDelete);
 
-  // slug auto-generate from name when adding, but not overwriting if user edited
-  els.fSlug?.addEventListener("input", () => { slugManuallyEdited = true; });
-  els.fName?.addEventListener("input", () => {
-    if (editingId === null && !slugManuallyEdited) {
-      els.fSlug.value = slugify(els.fName.value);
-      clearFieldError("slug");
-    }
-  });
+  // background file picker + remove button; slug auto-generates from name on save
   els.fBgFile?.addEventListener("change", handleBgFileSelect);
   els.fBgRemove?.addEventListener("click", handleBgRemove);
 
@@ -220,6 +251,9 @@ function render() {
       <span>${filtered.length} shown</span>
     `;
   }
+  // Overview counter uses the same already-loaded data (no extra query).
+  const ovStat = document.getElementById("statCategories");
+  if (ovStat) ovStat.textContent = categories.length;
 
   if (!filtered.length) {
     if (els.tbody) els.tbody.innerHTML = `<tr><td colspan="6" class="admin-empty"><strong>No categories</strong>${searchTerm || typeFilter !== "all" ? "<br>Try adjusting search or filter." : "<br>Click “Add Category” to create the first one."}</td></tr>`;
@@ -369,21 +403,15 @@ function openModal(cat) {
   // reset errors
   clearAllErrors();
   if (cat) {
-    slugManuallyEdited = true;
     els.fName.value = cat.name || "";
-    els.fSlug.value = cat.slug || "";
     els.fType.value = cat.type || "market";
-    els.fSort.value = cat.sort_order ?? 0;
     els.fActive.checked = !!cat.is_active;
     els.fDesc.value = cat.description || "";
   } else {
     els.fName.value = "";
-    els.fSlug.value = "";
     els.fType.value = "market";
-    els.fSort.value = 0;
     els.fActive.checked = true;
     els.fDesc.value = "";
-    slugManuallyEdited = false;
   }
   updateBgPreview();
   els.modal?.classList.add("open");
@@ -434,44 +462,55 @@ function clearAllErrors() {
 
 async function handleSubmit() {
   const name = els.fName.value.trim();
-  const rawSlug = els.fSlug.value.trim().toLowerCase();
-  const slug = slugify(rawSlug || name);
   const type = els.fType.value;
-  const sort_order = parseInt(els.fSort.value, 10);
   const is_active = !!els.fActive.checked;
   const description = els.fDesc.value.trim() || null;
-  const background_image_path = els.fBgPath.value.trim() || null;
-  const background_image_url = els.fBgUrl.value.trim() || null;
 
   clearAllErrors();
   let hasError = false;
   if (!name) { setFieldError("name", "Name is required."); hasError = true; }
   if (charLength(name) === 0) { setFieldError("name", "Name cannot be empty."); hasError = true; }
-  if (!slug) { setFieldError("slug", "Slug is required."); hasError = true; }
-  else if (!validateSlug(slug)) { setFieldError("slug", "Slug must be lowercase a-z, 0-9, hyphens only (e.g., my-category)."); hasError = true; }
   if (!["market", "cafe"].includes(type)) { setFieldError("type", "Type must be market or cafe."); hasError = true; }
-  if (isNaN(sort_order) || sort_order < 0) { setFieldError("sort", "Sort order must be 0 or greater."); hasError = true; }
-
-  // reflect corrected slug back to input
-  if (els.fSlug.value !== slug) els.fSlug.value = slug;
 
   if (hasError) return;
 
-  // duplicate slug check (case-sensitive as DB unique is case-sensitive but we use lower)
-  try {
-    const supabase = getSupabase();
-    let q = supabase.from("categories").select("id").eq("slug", slug);
-    if (editingId) q = q.neq("id", editingId);
-    const { data: dup, error: dupErr } = await q.limit(1);
-    if (dupErr) throw dupErr;
-    if (dup && dup.length) {
-      setFieldError("slug", "Slug already exists — choose another.");
-      toast("Slug already exists", "err");
-      return;
+  // Internal slug: hidden from the form, accepts any language in Name.
+  const existing = editingId ? categories.find((c) => c.id === editingId) : null;
+  let { slug, fallback } = resolveSlug(name, "category", existing ? existing.slug : null);
+  const supaForSlug = getSupabase();
+  if (fallback) {
+    try {
+      slug = await ensureUniqueSlug(supaForSlug, "categories", slug, editingId);
+    } catch (err) {
+      console.error("[TPM categories] fallback slug check failed", err);
+      // proceed — DB unique index is the backstop
     }
-  } catch (err) {
-    console.error("[TPM categories] dup check failed", err);
-    // allow to proceed to let DB unique handle it, but show toast
+  } else {
+    // duplicate slug check (English/mixed names keep existing reject behavior)
+    try {
+      const supabase = supaForSlug;
+      let q = supabase.from("categories").select("id").eq("slug", slug);
+      if (editingId) q = q.neq("id", editingId);
+      const { data: dup, error: dupErr } = await q.limit(1);
+      if (dupErr) throw dupErr;
+      if (dup && dup.length) {
+        setFieldError("name", "A category with this name already exists.");
+        toast("A category with this name already exists", "err");
+        return;
+      }
+    } catch (err) {
+      console.error("[TPM categories] dup check failed", err);
+      // allow to proceed to let DB unique handle it, but show toast
+    }
+  }
+
+  // sort_order is handled internally: keep existing on edit, append at end on add
+  let sort_order = 0;
+  if (editingId) {
+    const existing = categories.find((c) => c.id === editingId);
+    sort_order = existing ? (Number(existing.sort_order) || 0) : 0;
+  } else {
+    sort_order = categories.reduce((m, c) => Math.max(m, Number(c.sort_order) || 0), 0) + 1;
   }
 
   const submitBtn = els.form.querySelector('button[type="submit"]');
@@ -528,7 +567,7 @@ async function handleSubmit() {
     console.error("[TPM categories] save failed", err);
     const msg = err.message || "Save failed";
     if (msg.toLowerCase().includes("duplicate") || msg.toLowerCase().includes("slug") && msg.toLowerCase().includes("unique")) {
-      setFieldError("slug", "Slug already exists.");
+      setFieldError("name", "A category with this name already exists.");
     } else if (msg.toLowerCase().includes("type") && msg.toLowerCase().includes("check")) {
       setFieldError("type", "Type must be market or cafe.");
     }
@@ -571,4 +610,4 @@ async function toggleActive(cat) {
 }
 
 // expose for testing
-export const _test = { slugify, validateSlug };
+export const _test = { slugify, validateSlug, resolveSlug, ensureUniqueSlug, randomSlugSuffix };

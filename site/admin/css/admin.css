@@ -108,8 +108,8 @@ button{font:inherit}
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .admin-sidebar-head .mark{
-  width:30px;height:30px;display:grid;place-items:center;
-  background:#fff;color:var(--tpm-green);border-radius:8px;font-weight:800;font-size:13px;
+  width:30px;height:30px;display:block;flex:none;
+  background:#fff;object-fit:contain;border-radius:8px;
 }
 .admin-sidebar-head .word{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.02em;font-size:13px}
 .admin-sidebar-head .word span{opacity:.7;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:10px;display:block;line-height:1}
@@ -167,6 +167,45 @@ button{font:inherit}
 }
 .admin-stat strong{font-family:'Space Grotesk',sans-serif;font-size:22px;display:block}
 .admin-stat span{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Overview stats (overview only): compact 2-col mobile, clickable cards */
+[data-view="overview"] .ov-kicker{margin:2px 2px 10px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+[data-view="overview"] .admin-grid--stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+[data-view="overview"] .admin-grid--stats .admin-stat{padding:12px 14px}
+[data-view="overview"] .admin-stat--wide{grid-column:1/-1}
+[data-view="overview"] .admin-stat strong{font-size:24px;letter-spacing:-.01em}
+[data-view="overview"] .ov-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+[data-view="overview"] .ov-ico{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(0,78,54,.08);color:var(--tpm-green)}
+[data-view="overview"] .ov-ico svg{width:18px;height:18px;display:block}
+[data-view="overview"] .ov-go{display:grid;place-items:center;color:var(--muted);opacity:.65;transition:transform .18s ease,opacity .18s ease}
+[data-view="overview"] .ov-go svg{width:16px;height:16px;display:block}
+/* Showcase Video: distinct media treatment */
+[data-view="overview"] .admin-stat--media{background:var(--tpm-green-dark);border-color:rgba(255,255,255,.1)}
+[data-view="overview"] .admin-stat--media strong{color:#fff}
+[data-view="overview"] .admin-stat--media span{color:rgba(255,255,255,.72)}
+[data-view="overview"] .admin-stat--media .ov-ico{background:rgba(255,255,255,.12);color:#fff}
+[data-view="overview"] .admin-stat--media .ov-go{color:#fff;opacity:.8}
+/* Welcome: main introduction, subtle brand glow (existing palette only) */
+[data-view="overview"] .ov-welcome{position:relative;overflow:hidden;padding:20px 18px;background:linear-gradient(135deg,var(--surface) 55%,var(--cream-2) 135%)}
+[data-view="overview"] .ov-welcome::before{content:"";position:absolute;width:230px;height:230px;right:-75px;top:-75px;border-radius:50%;background:radial-gradient(circle,rgba(0,78,54,.1),transparent 65%);pointer-events:none}
+[data-view="overview"] .ov-welcome h3{position:relative;font-size:19px;margin-bottom:6px}
+[data-view="overview"] .ov-welcome p{position:relative;max-width:60ch}
+a.admin-stat{color:inherit;text-decoration:none;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+a.admin-stat:hover{transform:translateY(-2px);border-color:var(--line-strong);box-shadow:var(--shadow-lg)}
+a.admin-stat:hover .ov-go{transform:translateX(3px);opacity:1}
+a.admin-stat:active{transform:translateY(0) scale(.99)}
+a.admin-stat:focus-visible{outline:3px solid var(--tpm-green);outline-offset:2px}
+[data-view="overview"] .admin-stat--media:hover{border-color:rgba(255,255,255,.25)}
+[data-view="overview"] .admin-stat--media:focus-visible{outline-color:var(--tpm-green-strong)}
+@media(prefers-reduced-motion:reduce){ a.admin-stat{transition:none} a.admin-stat:hover,a.admin-stat:active{transform:none} a.admin-stat:hover .ov-go{transform:none} }
+@media(min-width:768px){
+  [data-view="overview"] .admin-grid--stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  [data-view="overview"] .admin-grid--stats .admin-stat{padding:16px}
+  [data-view="overview"] .admin-stat--wide{grid-column:auto}
+  [data-view="overview"] .admin-stat strong{font-size:26px}
+  [data-view="overview"] .ov-welcome{padding:24px}
+  [data-view="overview"] .ov-welcome h3{font-size:21px}
+}
 .admin-panel{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);
 }
@@ -292,6 +331,10 @@ button{font:inherit}
 .cat-card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .cat-card-row{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;padding:4px 0;border-top:1px dashed var(--line)}
 .cat-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+/* Social link items (social section only): brand icon + name, clean URL */
+.soc-name{display:flex;align-items:center;gap:8px;min-width:0}
+.soc-ico{width:28px;height:28px;flex:none;border-radius:8px;display:grid;place-items:center;background:rgba(0,78,54,.08);color:var(--tpm-green)}
+.soc-url{font-size:12px;word-break:break-all;margin-bottom:2px}
 
 @media(max-width:767px){
   .admin-table-wrap table{display:none}
@@ -299,6 +342,26 @@ button{font:inherit}
   .admin-toolbar{flex-direction:column;align-items:stretch}
   .admin-toolbar .admin-search{max-width:none}
   #catSearch.admin-search{
+    height:44px;
+    padding:0 16px;
+    font-size:14.5px;
+    border-radius:999px;
+    width:100%;
+    max-width:100%;
+    flex:0 0 auto;
+    box-sizing:border-box;
+  }
+  #prodSearch.admin-search{
+    height:44px;
+    padding:0 16px;
+    font-size:14.5px;
+    border-radius:999px;
+    width:100%;
+    max-width:100%;
+    flex:0 0 auto;
+    box-sizing:border-box;
+  }
+  #socialSearch.admin-search{
     height:44px;
     padding:0 16px;
     font-size:14.5px;
@@ -356,17 +419,40 @@ button{font:inherit}
 }
 .admin-modal-actions .admin-btn{width:auto;min-width:110px}
 
-/* Toggle switch */
-.admin-toggle{
-  appearance:none;width:36px;height:22px;border-radius:999px;background:rgba(14,26,20,.12);
-  position:relative;cursor:pointer;transition:background .2s;
+/* Toggle switch — one reusable component (Categories, Products, Social Links).
+   Native checkbox kept as-is; custom track + thumb rendered purely with CSS.
+   NOTE: scoped as `.admin-field input.admin-toggle` (0-2-1) so the component
+   strictly beats the generic `.admin-field input` rule (0-1-1) on height /
+   padding / radius / background / border — never dependent on source order. */
+.admin-field input.admin-toggle{
+  appearance:none;-webkit-appearance:none;
+  flex:0 0 auto;
+  width:48px;height:28px;margin:0;padding:0;
+  border-radius:999px;
+  background:#D9DFDA;
+  border:1px solid rgba(14,26,20,.12);
+  position:relative;cursor:pointer;
+  transition:background-color .22s ease,border-color .22s ease;
 }
-.admin-toggle:checked{background:var(--tpm-green)}
-.admin-toggle::after{
-  content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;
-  box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s;
+/* 44px-min tap target while the visual stays compact */
+.admin-field input.admin-toggle::before{
+  content:"";position:absolute;inset:-9px -8px;border-radius:999px;
 }
-.admin-toggle:checked::after{transform:translateX(14px)}
+.admin-field input.admin-toggle::after{
+  content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 2px rgba(14,26,20,.25);transition:transform .22s cubic-bezier(.32,.72,0,1);
+}
+.admin-field input.admin-toggle:checked{background:var(--tpm-green);border-color:var(--tpm-green)}
+.admin-field input.admin-toggle:checked::after{transform:translateX(20px)}
+@media(hover:hover){
+  .admin-field input.admin-toggle:hover{background:#CBD2CC;border-color:rgba(14,26,20,.18)}
+  .admin-field input.admin-toggle:checked:hover{background:var(--tpm-green-strong);border-color:var(--tpm-green-strong)}
+}
+.admin-field input.admin-toggle:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,78,54,.32)}
+.admin-field input.admin-toggle:disabled{opacity:.55;cursor:not-allowed}
+@media(prefers-reduced-motion:reduce){
+  .admin-field input.admin-toggle,.admin-field input.admin-toggle::after{transition:none}
+}
 
 /* Toast */
 .admin-toast-stack{

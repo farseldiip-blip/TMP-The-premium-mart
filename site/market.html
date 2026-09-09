@@ -4,25 +4,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light" />
-  <title>The Market | TPM — The Premium Mart</title>
-  <meta name="description" content="Explore the TPM — The Premium Mart market. View our original market pages — heritage coffee, botanical teas, cold infusions, artisanal pastries and weekend brunch. Tap to view fullscreen." />
+  <title>Market &amp; Café | TPM — The Premium Mart</title>
+  <meta name="description" content="Explore TPM — The Premium Mart market in Mansoura. Fresh finds, signature drinks, groceries, and café items — all in one place at Geziret El Ward Sporting Club." />
   <meta name="theme-color" content="#004e36" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://tmp-the-premium-mart.vercel.app/market.html" />
   <link rel="icon" href="assets/logo.jpg" />
   <link rel="apple-touch-icon" href="assets/logo.jpg" />
-  <!-- Canonical — replace with production domain when available -->
-  <!-- <link rel="canonical" href="https://www.example.com/market.html" /> -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
   <meta property="og:site_name" content="TPM — The Premium Mart" />
-  <meta property="og:title" content="The Market | TPM — The Premium Mart" />
-  <meta property="og:description" content="Explore the original TPM market — coffee, cold infusions, pastries and weekend brunch. Tap to view fullscreen." />
-  <!-- <meta property="og:url" content="https://www.example.com/market.html" /> -->
-  <meta property="og:image" content="assets/menu/market-01.svg" />
+  <meta property="og:title" content="Market &amp; Café | TPM — The Premium Mart" />
+  <meta property="og:description" content="Explore TPM — The Premium Mart market in Mansoura. Fresh finds, signature drinks, groceries, and café items at Geziret El Ward Sporting Club." />
+  <meta property="og:url" content="https://tmp-the-premium-mart.vercel.app/market.html" />
+  <meta property="og:image" content="https://tmp-the-premium-mart.vercel.app/assets/menu/market-01.svg" />
+  <meta property="og:image:width" content="800" />
+  <meta property="og:image:height" content="1100" />
+  <meta property="og:image:alt" content="TPM — The Premium Mart Market" />
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="The Market | TPM — The Premium Mart" />
-  <meta name="twitter:description" content="Explore the original TPM market — coffee, cold infusions, pastries and weekend brunch." />
+  <meta name="twitter:title" content="Market &amp; Café | TPM — The Premium Mart" />
+  <meta name="twitter:description" content="Explore TPM — The Premium Mart market in Mansoura. Fresh finds, signature drinks, groceries, and café items." />
+  <meta name="twitter:image" content="https://tmp-the-premium-mart.vercel.app/assets/menu/market-01.svg" />
+  <meta name="twitter:image:alt" content="TPM — The Premium Mart Market" />
   <link rel="stylesheet" href="css/style.css?v=20260515q" />
-  <link rel="preconnect" href="https://images.unsplash.com" />
 </head>
 <body data-page="market">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -64,7 +70,7 @@
       <a href="index.html#contact">Contact <span aria-hidden="true">→</span></a>
     </nav>
     <div class="drawer-foot">
-      <p><strong>TPM — The Premium Mart</strong><br>123 Heritage Lane, City Center<br><a href="tel:+15551234567" style="color:var(--primary);font-weight:700">+1 (555) 123-4567</a></p>
+      <p><strong>TPM — The Premium Mart</strong><br>123 Heritage Lane, City Center<br><a href="tel:0248813993" style="color:var(--primary);font-weight:700">0248813993</a></p>
     </div>
   </aside>
 
@@ -167,5 +173,36 @@
 
   <script src="js/app.js" defer></script>
   <script type="module" src="js/market.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["CafeOrCoffeeShop", "GroceryStore", "FoodEstablishment"],
+    "name": "TPM — The Premium Mart",
+    "alternateName": "TPM",
+    "description": "Explore TPM — The Premium Mart market in Mansoura. Fresh finds, signature drinks, groceries, and café items at Geziret El Ward Sporting Club.",
+    "url": "https://tmp-the-premium-mart.vercel.app/market.html",
+    "telephone": "0248813993",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Geziret El Ward Sporting Club",
+      "addressLocality": "Mansoura",
+      "addressRegion": "Dakahlia",
+      "addressCountry": "EG"
+    },
+    "openingHoursSpecification": [
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"07:00","closes":"19:00"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"08:00","closes":"20:00"}
+    ],
+    "servesCuisine": ["Coffee","Tea","Bakery","Brunch","Fresh Juice","Smoothies"],
+    "sameAs": [
+      "https://www.instagram.com/tpm_thepremiummart",
+      "https://www.facebook.com/thepremiummart.eg/directory_intro",
+      "https://www.tiktok.com/@tpm_thepremiummart"
+    ],
+    "image": "https://tmp-the-premium-mart.vercel.app/assets/menu/market-01.svg"
+  }
+  </script>
 </body>
 </html>

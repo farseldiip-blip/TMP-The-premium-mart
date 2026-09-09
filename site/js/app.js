@@ -223,8 +223,9 @@ function initHeroAnimations() {
   const stage = $('#tpmCanStage');
   const cans = {
     mango: $('.tpm-can--mango'),
+    strawberry: $('.tpm-can--strawberry'),
     blue: $('.tpm-can--blue'),
-    strawberry: $('.tpm-can--strawberry')
+    beef: $('.tpm-can--beef')
   };
   const storeChip = $('.tpm-store-chip');
   const phoneMockup = null; // No phone in current hero
@@ -238,7 +239,7 @@ function initHeroAnimations() {
   const ctaGhost = $('.tpm-hero-actions .tpm-btn-ghost');
   const metaPills = $$('.tpm-hero-meta .meta-pill');
 
-if (!hero || !stage || !cans.blue) {
+if (!hero || !stage || !cans.strawberry) {
   return;
 }
 
@@ -258,11 +259,11 @@ heroVisual.style.visibility = 'visible';
 heroVisual.style.transform = 'none';
 
 // Set z-index depth hierarchy for the can composition.
-// Blue is the visual anchor (z-index:3); side cans support (z-index:2).
-// This creates intentional depth perception without CSS transform conflicts.
-if (cans.blue) cans.blue.style.zIndex = '3';
-if (cans.mango) cans.mango.style.zIndex = '2';
-if (cans.strawberry) cans.strawberry.style.zIndex = '2';
+// Strawberry is the visual anchor (z-index:4); Mango next (z-index:3); Blue (2); Beef (1).
+if (cans.strawberry) cans.strawberry.style.zIndex = '4';
+if (cans.mango) cans.mango.style.zIndex = '3';
+if (cans.blue) cans.blue.style.zIndex = '2';
+if (cans.beef) cans.beef.style.zIndex = '1';
 
 // Helper: get final transform values from CSS
   const getFinalTransform = (el) => {
@@ -302,14 +303,16 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
 
   // Cans start tightly grouped below the center, slightly lower than final position
   // so the entrance can play as: rise → center establishes → spread outward → rotate → settle
-  gsap.set([cans.mango, cans.blue, cans.strawberry], {
+  gsap.set([cans.mango, cans.blue, cans.strawberry, cans.beef], {
     opacity: 1,
     y: isMobile ? 130 : 150,
     x: 0,
     scale: 1.5,
     rotation: (el) => {
-      if (el === cans.mango) return -3;
-      if (el === cans.strawberry) return 3;
+      if (el === cans.strawberry) return 0;
+      if (el === cans.mango) return -4;
+      if (el === cans.blue) return -3;
+      if (el === cans.beef) return 3;
       return 0;
     }
   });
@@ -324,16 +327,17 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     .to(storeChip, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.55);
 
   // === 1. COMPACT RISE ===
-  // All three cans rise together from the grouped position
-  entranceTL.to([cans.mango, cans.blue, cans.strawberry], {
-    y: isMobile ? 60 : 80,
+  // All four cans rise together from the grouped position to their final
+  // grounded spots (shared y=0 rest keeps the bouquet tight and level)
+  entranceTL.to([cans.mango, cans.blue, cans.strawberry, cans.beef], {
+    y: 0,
     scale: 1.425,
     ease: 'power2.out'
   }, 0.00);
 
   // === 2. CENTER ESTABLISHES FIRST ===
-  // Blue (center) rises to its final position, scales up
-  entranceTL.to(cans.blue, {
+  // Strawberry (center hero) rises to its final position, scales up
+  entranceTL.to(cans.strawberry, {
     y: 0,
     scale: 1.5,
     rotation: 0,
@@ -341,31 +345,33 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
   }, 0.20);
 
   // === 3. BOUQUET OPEN ===
-  // Blue establishes itself first as the center anchor.
-  // Mango and Strawberry gently move outward to frame Blue.
-  // The movement is controlled — the cans stay close enough to read as one group.
-  // (Blue's y/scale final state was set in Phase 2 above.)
+  // Strawberry establishes itself first as the center anchor.
+  // Mango (left) moves outward left. Blue and Beef (right) separate right.
+  // Desktop drift is ±8px so the far-right Beef stays inside the stage.
   entranceTL.to(cans.mango, {
-    x: isMobile ? -6 : -8,
-    rotation: isMobile ? -6 : -8,
+    x: -8,
+    rotation: isMobile ? -6 : -10,
     scale: 1.38,
     ease: 'power3.out'
   }, 0.40);
 
-  // Strawberry (right): moves gently right + rotates into final angle
-  entranceTL.to(cans.strawberry, {
-    x: isMobile ? 6 : 8,
-    rotation: isMobile ? 6 : 8,
+  entranceTL.to(cans.blue, {
+    x: 8,
+    rotation: isMobile ? 4 : 6,
+    scale: 1.38,
+    ease: 'power3.out'
+  }, 0.40);
+
+  entranceTL.to(cans.beef, {
+    x: 8,
+    rotation: isMobile ? -4 : -6,
     scale: 1.38,
     ease: 'power3.out'
   }, 0.40);
 
   // === 4. GENTLE SETTLE ===
   // All cans settle into their final positioned state
-  // Blue already at final y/scale/rotation from step 2;
-  // Mango/strawberry now at their final x/rotation from step 3.
-  // This last tweak ensures perfect alignment.
-  entranceTL.to([cans.mango, cans.blue, cans.strawberry], {
+  entranceTL.to([cans.mango, cans.blue, cans.strawberry, cans.beef], {
     scale: 1.5,
     ease: 'power2.out'
   }, 0.80);
@@ -380,22 +386,35 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
 
     floatingTL = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: 'sine.inOut' } });
 
-    floatingTL.to(cans.blue, {
+    // Strawberry (center hero): subtle gentle float
+    floatingTL.to(cans.strawberry, {
       y: isMobile ? -4 : -6,
       duration: 4.5
     }, 0);
 
+    // NOTE: GSAP .to() y endpoints are absolute. The entrance grounds every
+    // can at a shared y=0 rest, so small negative endpoints give each can
+    // the same gentle float around its own resting spot.
+    // Mango (left): gentle counter-orbit around rest
     floatingTL.to(cans.mango, {
       y: isMobile ? -3 : -5,
       rotation: isMobile ? -5 : -8,
       duration: 5.2
     }, 0.3);
 
-    floatingTL.to(cans.strawberry, {
+    // Blue (right): gentle counter-orbit around rest
+    floatingTL.to(cans.blue, {
       y: isMobile ? -3 : -5,
-      rotation: isMobile ? 5 : 8,
+      rotation: isMobile ? 3 : 5,
       duration: 4.8
-    }, 0.6);
+    }, 0.5);
+
+    // Beef (far right): gentle gentle float around rest, delayed
+    floatingTL.to(cans.beef, {
+      y: isMobile ? -2 : -4,
+      rotation: isMobile ? 2 : 3,
+      duration: 5.5
+    }, 0.7);
 
     // Mobile: pause floating when hero off-screen
     if (isMobile && hero && 'IntersectionObserver' in window) {
@@ -443,13 +462,49 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
     moveStageY?.(0);
   }
 
-  function stopMouseParallax() {
+function stopMouseParallax() {
     hero?.removeEventListener('mousemove', onMouseMove);
     hero?.removeEventListener('mouseleave', onMouseLeave);
     gsap.killTweensOf(stage);
     gsap.set(stage, { x: 0, y: 0 });
     moveStageX = null;
     moveStageY = null;
+  }
+
+  // ============================================================
+  // 3b. CAN HOVER PARALLAX
+  // ============================================================
+  const cansEls = [cans.strawberry, cans.mango, cans.blue, cans.beef].filter(Boolean);
+
+  function startCanHover() {
+    if (isMobile || !stage || cansEls.length === 0) return;
+    stage.addEventListener('mousemove', onCanHoverMove);
+    stage.addEventListener('mouseleave', onCanHoverLeave);
+  }
+
+  function onCanHoverMove(e) {
+    const rect = stage.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    const tiltX = dy * -6;
+    const tiltY = dx * 6;
+    cansEls.forEach((can, i) => {
+      const offset = i === 0 ? 0 : i === 1 ? -1 : i === 2 ? 1 : 2;
+      const factor = 0.85 + Math.abs(offset) * 0.12;
+      gsap.to(can, { rotateY: tiltY * factor, rotateX: tiltX * factor, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+    });
+  }
+
+  function onCanHoverLeave() {
+    cansEls.forEach(can => {
+      gsap.to(can, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
+    });
+  }
+
+  if (!isTouch && !isMobile) {
+    startCanHover();
   }
 
   // ============================================================
@@ -473,7 +528,7 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
           const yOffset = -progress * (isMobile ? 30 : 50);
            const scaleReduce = 1.5 * (1 - progress * 0.03);
 
-          gsap.set([cans.mango, cans.blue, cans.strawberry], {
+          gsap.set([cans.mango, cans.blue, cans.strawberry, cans.beef], {
             y: yOffset,
             scale: scaleReduce,
             overwrite: 'auto'
@@ -530,31 +585,31 @@ if (cans.strawberry) cans.strawberry.style.zIndex = '2';
       floatingTL?.kill();
       stopMouseParallax();
       ScrollTrigger.getAll().forEach(st => st.kill());
-gsap.set([cans.mango, cans.blue, cans.strawberry], {
+gsap.set([cans.mango, cans.blue, cans.strawberry, cans.beef], {
       opacity: 1,
       y: 0,
       x: 0,
-       scale: 1.5,
-       rotation: (el) => el === cans.mango ? -8 : el === cans.strawberry ? 8 : 0,
-       clearProps: 'transform'
-     });
-       gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
-         opacity: 1,
-         y: 0,
-         clearProps: 'transform'
-       });
-     } else {
-       // Reduced motion re-enabled — re-apply final positioned state
-       // without reloading the page. The entrance timeline and
-       // floating/parallax will be re-created on the next page visit.
-       gsap.set([cans.mango, cans.blue, cans.strawberry], {
-         opacity: 1,
-         y: 0,
-         x: 0,
-         scale: 1.5,
-         rotation: (el) => el === cans.mango ? -8 : el === cans.strawberry ? 8 : 0,
-         clearProps: 'transform'
-       });
+      scale: 1.5,
+      rotation: (el) => el === cans.strawberry ? 0 : el === cans.mango ? -8 : el === cans.blue ? -8 : el === cans.beef ? 8 : 0,
+      clearProps: 'transform'
+    });
+        gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
+          opacity: 1,
+          y: 0,
+          clearProps: 'transform'
+        });
+      } else {
+        // Reduced motion re-enabled — re-apply final positioned state
+        // without reloading the page. The entrance timeline and
+        // floating/parallax will be re-created on the next page visit.
+        gsap.set([cans.mango, cans.blue, cans.strawberry, cans.beef], {
+          opacity: 1,
+          y: 0,
+          x: 0,
+          scale: 1.5,
+          rotation: (el) => el === cans.strawberry ? 0 : el === cans.mango ? -8 : el === cans.blue ? -8 : el === cans.beef ? 8 : 0,
+          clearProps: 'transform'
+        });
       gsap.set([kicker, ...titleLines, desc, ctaPrimary, ctaGhost, ...metaPills, storeChip], {
         opacity: 1,
         y: 0,
@@ -574,12 +629,12 @@ gsap.set([cans.mango, cans.blue, cans.strawberry], {
     const reducedCanTL = gsap.timeline({
       defaults: { ease: 'power2.out' }
     });
-    reducedCanTL.to([cans.mango, cans.blue, cans.strawberry], {
-      y: 0,
-      scale: 1.5,
-      rotation: (el) => el === cans.mango ? -5 : el === cans.strawberry ? 5 : 0,
-      duration: 0.6
-    });
+reducedCanTL.to([cans.mango, cans.blue, cans.strawberry, cans.beef], {
+       y: 0,
+       scale: 1.5,
+       rotation: (el) => el === cans.strawberry ? 0 : el === cans.mango ? -5 : el === cans.blue ? -5 : el === cans.beef ? 5 : 0,
+       duration: 0.6
+     });
 
     // Reduced motion hero entrance: subtle fade + minimal movement
     // Animate from initial GSAP-set positions (opacity:0, y:30) to visible over 500ms

@@ -41,7 +41,7 @@ function renderCategoryHeader(cat, count){
 }
 
 function renderProductRow(p, idx){
-  const priceHtml = p.price!=null && !isNaN(Number(p.price)) ? `<span class="market-row-price">$${Number(p.price).toFixed(2)}</span>` : '';
+  const priceHtml = p.price!=null && !isNaN(Number(p.price)) ? `<span class="market-row-price">EGP${Number(p.price).toFixed(2)}</span>` : '';
   const nameVal = safeDisplay(p.name);
   const nameHtml = nameVal ? `<span class="market-row-name">${escapeHtml(nameVal)}</span>` : '';
   const badgeVal = safeDisplay(p.badge);
@@ -49,8 +49,9 @@ function renderProductRow(p, idx){
   const descVal = safeDisplay(p.description);
   const descHtml = descVal ? `<p class="market-row-desc">${escapeHtml(descVal)}</p>` : '';
   const indexHtml = typeof idx === 'number' ? `<span class="market-row-index">${String(idx+1).padStart(2,'0')}</span>` : '';
+  const imgVal = safeDisplay(p.image_url);
   return `
-    <article class="market-row" tabindex="0" role="button" aria-label="${escapeHtml(nameVal)} ${p.price!=null?'$'+Number(p.price).toFixed(2):''}">
+    <article class="market-row" tabindex="0" role="button" data-img="${escapeHtml(imgVal)}" aria-label="${escapeHtml(nameVal)} ${p.price!=null?'EGP'+Number(p.price).toFixed(2):''}">
       ${indexHtml}
       <div class="market-row-content">
         <div class="market-row-head">
@@ -175,7 +176,8 @@ function render(){
       const desc = row.querySelector('.market-row-desc')?.textContent || '';
       const price = row.querySelector('.market-row-price')?.textContent || '';
       const badge = row.querySelector('.market-row-badge')?.textContent || '';
-      if(window.openLightbox) window.openLightbox({src:'', title:name, desc, price, badge});
+      const img = row.getAttribute('data-img') || '';
+      if(window.openLightbox) window.openLightbox({src:img, title:name, desc, price, badge});
     });
     row.addEventListener('keydown', (e)=>{
       if(e.key==='Enter'||e.key===' '){ e.preventDefault(); row.click(); }
@@ -314,6 +316,10 @@ async function loadMarket(){
     if(allCategories.length) selectedSlug = safeDisplay(allCategories[0].slug);
     render();
   }catch(err){
+    const errInfo = err && typeof err === "object"
+      ? `message=${err.message ?? "N/A"} details=${err.details ?? "N/A"} hint=${err.hint ?? "N/A"} code=${err.code ?? "N/A"}`
+      : String(err);
+    console.error("[TPM market] load FAILED", errInfo);
     console.warn('[TPM market] load failed', err);
     wrap.innerHTML = `<div class="market-empty-state"><h2>Market unavailable</h2><p>Please try again later.</p></div>`;
   }

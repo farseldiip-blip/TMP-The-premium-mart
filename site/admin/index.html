@@ -39,7 +39,7 @@
 
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
       <div class="admin-sidebar-head">
-        <span class="mark" aria-hidden="true">TPM</span>
+        <img class="mark" src="../assets/logo.jpg" alt="TPM logo" width="30" height="30" />
         <div class="word">TPM — Admin <span>The Premium Mart</span></div>
       </div>
       <nav class="admin-nav" aria-label="Primary">
@@ -100,22 +100,33 @@
       <main class="admin-content" id="adminContent">
         <!-- Overview -->
         <section data-view="overview" class="admin-view">
-          <div class="admin-grid" style="margin-bottom:14px">
-            <div class="admin-stat"><strong>—</strong><span>Products</span></div>
-            <div class="admin-stat"><strong>—</strong><span>Categories</span></div>
-            <div class="admin-stat"><strong>One</strong><span>Showcase video · 15s max</span></div>
+          <p class="ov-kicker">Quick access</p>
+          <div class="admin-grid admin-grid--stats" style="margin-bottom:14px">
+            <a class="admin-stat" href="#products">
+              <span class="ov-top" aria-hidden="true">
+                <span class="ov-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 7h10v10H7z"/><path d="M7 11h10"/><path d="M11 7v10"/></svg></span>
+                <span class="ov-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </span>
+              <strong id="statProducts">—</strong><span>Products</span>
+            </a>
+            <a class="admin-stat" href="#categories">
+              <span class="ov-top" aria-hidden="true">
+                <span class="ov-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></span>
+                <span class="ov-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </span>
+              <strong id="statCategories">—</strong><span>Categories</span>
+            </a>
+            <a class="admin-stat admin-stat--wide admin-stat--media" href="#video">
+              <span class="ov-top" aria-hidden="true">
+                <span class="ov-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 8l6 4-6 4V8Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg></span>
+                <span class="ov-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </span>
+              <strong>One</strong><span>Showcase video · 15s max</span>
+            </a>
           </div>
-          <div class="admin-panel">
+          <div class="admin-panel ov-welcome">
             <h3>Welcome to TPM Admin</h3>
-            <p>Dashboard shell only — no CRUD yet. Navigation placeholders are wired; management for Products, Categories, Store Information, Contact, Social Links and Showcase Video will be added in the next step. Auth uses existing Supabase Auth; authorization uses existing <code>admin_users</code> + <code>is_admin()</code> (RLS enforced).</p>
-            <div class="admin-placeholder" style="margin-top:14px">
-              <strong style="font-size:13px">Next steps (not implemented yet):</strong>
-              <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--muted)">
-                <li>Products / Categories CRUD (reads filtered by <code>is_active</code>, writes gated by RLS)</li>
-                <li>Store & Contact singletons (one row)</li>
-                <li>Social Links + Storage buckets (<code>product-images</code>, <code>category-backgrounds</code>, <code>store-logo</code>, <code>showcase-video</code>)</li>
-              </ul>
-            </div>
+            <p>Manage your products, categories, store information, contact details, social links, and showcase video from one place.</p>
           </div>
         </section>
 
@@ -149,7 +160,7 @@
               </table>
               <div id="prodCards" class="cat-cards"></div>
             </div>
-            <p class="admin-muted" style="margin-top:10px;font-size:11px">Bucket <code>product-images</code> — image optional, preserved on edit. RLS: public reads active only, admin writes via <code>is_admin()</code>.</p>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Product images are optional and kept when editing unless replaced or removed.</p>
           </div>
 
           <!-- Add/Edit Product Modal -->
@@ -168,25 +179,12 @@
                     <span class="error"></span>
                   </div>
                   <div class="admin-field" id="field-prod-category">
-                    <label for="prodCategory">Category</label>
-                    <select id="prodCategory">
-                      <option value="">— No category —</option>
+                    <label for="prodCategory">Category *</label>
+                    <select id="prodCategory" required>
+                      <option value="">— Select a category —</option>
                     </select>
                     <span class="error"></span>
                     <span class="hint">Shows Market/Café via category type.</span>
-                  </div>
-                </div>
-                <div class="admin-form-grid cols-2">
-                  <div class="admin-field" id="field-prod-slug">
-                    <label for="prodSlug">Slug *</label>
-                    <input id="prodSlug" type="text" placeholder="e.g., heritage-flat-white" required maxlength="120" />
-                    <span class="hint">a-z, 0-9, hyphens. Auto from name.</span>
-                    <span class="error"></span>
-                  </div>
-                  <div class="admin-field" id="field-prod-sort">
-                    <label for="prodSort">Sort order *</label>
-                    <input id="prodSort" type="number" min="0" step="1" value="0" required />
-                    <span class="error"></span>
                   </div>
                 </div>
                 <div class="admin-field" id="field-prod-desc">
@@ -217,17 +215,10 @@
                   <label>Product image (optional)</label>
                   <div style="display:grid;gap:8px">
                     <input id="prodImgFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" />
-                    <span class="hint">≤5 MiB, jpeg/png/webp/avif/svg → uploads to <code>product-images</code> bucket.</span>
+                    <span class="hint">≤5 MiB, JPG / PNG / WebP / AVIF / SVG. Will upload on Save.</span>
                     <div id="prodImgPreview" class="hint">No image</div>
-                    <div class="admin-form-grid cols-2">
-                      <div class="admin-field">
-                        <label for="prodImgPath">Image path</label>
-                        <input id="prodImgPath" type="text" placeholder="product-images/..." />
-                      </div>
-                      <div class="admin-field">
-                        <label for="prodImgUrl">Image URL</label>
-                        <input id="prodImgUrl" type="text" placeholder="https://..." />
-                      </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <button id="prodImgRemove" type="button" class="admin-btn admin-btn-ghost admin-btn--sm">Remove image</button>
                     </div>
                   </div>
                 </div>
@@ -287,7 +278,7 @@
               <div id="catCards" class="cat-cards"></div>
               <div id="catEmpty" class="admin-empty" style="display:none"></div>
             </div>
-            <p class="admin-muted" style="margin-top:10px;font-size:11px">Bucket <code>category-backgrounds</code> — background fields preserved on edit. RLS: public reads active only, admin writes via <code>is_admin()</code>.</p>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Backgrounds are optional and kept when editing unless replaced or removed.</p>
           </div>
 
           <!-- Add/Edit Modal -->
@@ -302,29 +293,16 @@
                 <input type="hidden" id="catId" />
                 <div class="admin-form-grid cols-2">
                   <div class="admin-field" id="field-name">
-                    <label for="catName">Name *</label>
+                    <label for="catName">Category Name *</label>
                     <input id="catName" type="text" placeholder="e.g., Fresh Favorites" required maxlength="80" />
                     <span class="error"></span>
                   </div>
                   <div class="admin-field" id="field-type">
-                    <label for="catType">Type *</label>
+                    <label for="catType">Type (Market / Café) *</label>
                     <select id="catType" required>
                       <option value="market">Market</option>
                       <option value="cafe">Café</option>
                     </select>
-                    <span class="error"></span>
-                  </div>
-                </div>
-                <div class="admin-form-grid cols-2">
-                  <div class="admin-field" id="field-slug">
-                    <label for="catSlug">Slug *</label>
-                    <input id="catSlug" type="text" placeholder="e.g., fresh-favorites" required maxlength="80" />
-                    <span class="hint">Lowercase a-z, 0-9, hyphens. Auto-generated from name.</span>
-                    <span class="error"></span>
-                  </div>
-                  <div class="admin-field" id="field-sort">
-                    <label for="catSort">Sort order *</label>
-                    <input id="catSort" type="number" min="0" step="1" value="0" required />
                     <span class="error"></span>
                   </div>
                 </div>
@@ -340,10 +318,10 @@
                   </label>
                 </div>
                 <div class="admin-field" style="margin-top:10px">
-                  <label>Category background image</label>
+                  <label>Category Background (optional)</label>
                   <div style="display:grid;gap:8px">
                     <input id="catBgFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" />
-                    <span class="hint">Image ≤5 MiB, jpeg/png/webp/avif/svg → uploads to <code>category-backgrounds</code> bucket. Will upload on Save.</span>
+                    <span class="hint">≤5 MiB, JPG / PNG / WebP / AVIF / SVG. Will upload on Save.</span>
                     <div id="catBgPreview" class="hint">No image</div>
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                       <button id="catBgRemove" type="button" class="admin-btn admin-btn-ghost admin-btn--sm">Remove image</button>
@@ -390,6 +368,11 @@
               <span class="admin-spinner"></span> Loading store info…
             </div>
             <div id="storeContent" style="display:none">
+              <div id="storeEmptyHint" class="admin-panel" style="display:none;margin-bottom:14px;background:var(--surface-2);border-style:dashed">
+                <p style="margin:0 0 4px;font-size:14px;color:var(--ink);font-weight:700">No store information yet</p>
+                <p style="margin:0 0 12px;font-size:13px;color:var(--muted)">No data has been added yet. Fill the form below and save to create the store profile.</p>
+                <button id="storeEmptyAddBtn" type="button" class="admin-btn admin-btn-primary" style="min-height:44px">Add store information</button>
+              </div>
               <form id="storeForm" novalidate>
                 <div class="admin-panel" style="margin-bottom:14px">
                   <h3 style="margin:0 0 12px">Brand</h3>
@@ -535,6 +518,11 @@
               <span class="admin-spinner"></span> Loading contact info…
             </div>
             <div id="contactContent" style="display:none">
+              <div id="contactEmptyHint" class="admin-panel" style="display:none;margin-bottom:14px;background:var(--surface-2);border-style:dashed">
+                <p style="margin:0 0 4px;font-size:14px;color:var(--ink);font-weight:700">No contact information yet</p>
+                <p style="margin:0 0 12px;font-size:13px;color:var(--muted)">No data has been added yet. Fill the form below and save to create the contact profile.</p>
+                <button id="contactEmptyAddBtn" type="button" class="admin-btn admin-btn-primary" style="min-height:44px">Add contact information</button>
+              </div>
               <form id="contactForm" novalidate>
                 <div class="admin-panel" style="margin-bottom:14px">
                   <h3 style="margin:0 0 12px">Primary contact</h3>
@@ -614,7 +602,6 @@
                   <tr>
                     <th>Platform</th>
                     <th>URL</th>
-                    <th>Order</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -623,7 +610,7 @@
               </table>
               <div id="socialCards" class="cat-cards"></div>
             </div>
-            <p class="admin-muted" style="margin-top:10px;font-size:11px">Sort by <code>sort_order</code> ascending. RLS: public reads active only, admin writes via <code>is_admin()</code>.</p>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Only active links appear on the public site.</p>
           </div>
 
           <!-- Add/Edit Modal -->
@@ -637,7 +624,11 @@
               <form id="socialForm" novalidate>
                 <div class="admin-field" id="field-social-platform">
                   <label for="socialPlatform">Platform *</label>
-                  <input id="socialPlatform" type="text" placeholder="e.g., instagram, tiktok, facebook" required maxlength="40" />
+                  <select id="socialPlatform" required>
+                    <option value="instagram">Instagram</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="facebook">Facebook</option>
+                  </select>
                   <span class="error"></span>
                 </div>
                 <div class="admin-field" id="field-social-url">
@@ -646,30 +637,11 @@
                   <span class="hint">Must be http/https.</span>
                   <span class="error"></span>
                 </div>
-                <div class="admin-form-grid cols-2">
-                  <div class="admin-field" id="field-social-handle">
-                    <label for="socialHandle">Handle</label>
-                    <input id="socialHandle" type="text" placeholder="@tpm_thepremiummart" />
-                    <span class="error"></span>
-                  </div>
-                  <div class="admin-field" id="field-social-icon">
-                    <label for="socialIcon">Icon</label>
-                    <input id="socialIcon" type="text" placeholder="e.g., instagram" />
-                    <span class="error"></span>
-                  </div>
-                </div>
-                <div class="admin-form-grid cols-2">
-                  <div class="admin-field" id="field-social-sort">
-                    <label for="socialSort">Sort order *</label>
-                    <input id="socialSort" type="number" min="0" step="1" value="0" required />
-                    <span class="error"></span>
-                  </div>
-                  <div class="admin-field" style="display:flex;align-items:center;gap:8px;padding-top:22px">
-                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-                      <input id="socialActive" type="checkbox" class="admin-toggle" checked />
-                      <span>Active</span>
-                    </label>
-                  </div>
+                <div class="admin-field">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input id="socialActive" type="checkbox" class="admin-toggle" checked />
+                    <span>Active</span>
+                  </label>
                 </div>
                 <div class="admin-modal-actions">
                   <button id="socialModalCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
@@ -709,7 +681,7 @@
                 <h3 style="margin:0 0 8px">Current video</h3>
                 <div id="videoInfo" class="hint" style="margin-bottom:10px"></div>
                 <div id="videoEmpty" class="admin-empty" style="display:none">
-                  <strong>No showcase video</strong><br>Upload one video — 15s max, 50 MiB, mp4/webm/mov.
+                  <strong>No showcase video uploaded yet</strong><br><span>No showcase video has been uploaded yet. Upload one video below to add your first showcase — 15s max, 50 MiB, mp4/webm/mov.</span><br><br><button id="videoEmptyAddBtn" type="button" class="admin-btn admin-btn-primary" style="min-height:44px">Select video</button>
                 </div>
                 <div id="videoPreviewWrap" style="display:none;margin-bottom:12px">
                   <div id="videoPreview"></div>
