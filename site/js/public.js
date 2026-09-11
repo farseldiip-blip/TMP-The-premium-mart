@@ -2,6 +2,7 @@
 // Loads active categories/products via RLS (anon), respects market/cafe type, preserves design.
 
 import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
+import { readCatalogCache, writeCatalogCache, isCatalogChanged } from "./catalog-cache.js";
 
 const FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=900&q=80&auto=format&fit=crop",
@@ -47,17 +48,61 @@ async function loadAndRender(){
 
   let categories = [];
   let products = [];
+  // 15s timeout + exactly one retry: a transient stall must not leave the
+  // static fallback in place with no recovery. Same query/client on retry.
+  const withTimeout = (p, ms=15000) => Promise.race([p, new Promise((_, rej)=> setTimeout(()=> rej(new Error("Supabase request timed out")), ms))]);
+  const delay = (ms) => new Promise((res)=> setTimeout(res, ms));
+  const fetchCatalog = () => Promise.all([
+    withTimeout(supa.from("categories").select("id,name,slug,description,type,sort_order,is_active,background_image_url,background_image_path").eq("is_active", true).order("sort_order").order("name")),
+    withTimeout(supa.from("products").select("id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path").eq("is_active", true).order("sort_order").order("name"))
+  ]);
+  const loadCatalogWithRetry = async () => {
+    try {
+      return await fetchCatalog();
+    } catch (firstErr) {
+      await delay(1500);
+      return await fetchCatalog();
+    }
+  };
+  const applyCatalog = (cats, prods) => {
+    categories = cats || [];
+    products = prods || [];
+    window._tpmCategories = categories;
+    window._tpmProducts = products;
+  };
+  const currentFilter = () => {
+    const active = head ? head.querySelector("button[data-filter].active") : null;
+    return active ? active.dataset.filter : "all";
+  };
+  // Fresh cache → render instantly, revalidate in background with the same
+  // timeout+retry stack; re-render only when data actually changed.
+  try {
+    const cached = readCatalogCache();
+    if (cached && cached.fresh && cached.categories.length) {
+      applyCatalog(cached.categories, cached.products);
+      renderFiltered("all");
+      loadCatalogWithRetry().then(([catRes, prodRes]) => {
+        if (catRes.error || prodRes.error) return;
+        const freshCats = catRes.data || [];
+        const freshProds = prodRes.data || [];
+        if (isCatalogChanged({ categories, products }, { categories: freshCats, products: freshProds })) {
+          applyCatalog(freshCats, freshProds);
+          writeCatalogCache(freshCats, freshProds);
+          renderFiltered(currentFilter());
+        }
+      }).catch((e) => console.warn("[TPM public] background refresh failed", e));
+      return;
+    }
+  } catch (_) { /* fall through to network path */ }
   try{
     // Load active categories and active products via RLS (anon)
     // Use simple select (no !inner join) — same pattern proven working in market.js
-    const [catRes, prodRes] = await Promise.all([
-      supa.from("categories").select("id,name,slug,description,type,sort_order,is_active,background_image_url,background_image_path").eq("is_active", true).order("sort_order").order("name"),
-      supa.from("products").select("id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path").eq("is_active", true).order("sort_order").order("name")
-    ]);
+    const [catRes, prodRes] = await loadCatalogWithRetry();
     if(catRes.error) throw catRes.error;
     if(prodRes.error) throw prodRes.error;
     categories = catRes.data || [];
     products = prodRes.data || [];
+    writeCatalogCache(categories, products);
     // Build map for quick lookup
     const catMap = new Map(categories.map(c=>[c.id, c]));
   }catch(err){
@@ -66,6 +111,12 @@ async function loadAndRender(){
       : String(err);
     console.error("[TPM public] Supabase load FAILED", errInfo);
     console.warn("[TPM public] Supabase load failed, keeping hardcoded fallback", err);
+    // Last resort: render expired-but-present cache instead of static fallback.
+    const stale = readCatalogCache();
+    if (stale && stale.categories.length) {
+      applyCatalog(stale.categories, stale.products);
+      renderFiltered("all");
+    }
     return; // keep hardcoded HTML, don't break
   }
 

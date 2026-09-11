@@ -24,7 +24,14 @@ let _anonClient = null;
 export function getAnonSupabase() {
   if (_anonClient) return _anonClient;
   _anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      // Isolate from the session-aware client (auth.js): a distinct storage
+      // key so the two GoTrue instances never share auth state under one key.
+      storageKey: "tpm-public-anon-readonly",
+    },
   });
   return _anonClient;
 }

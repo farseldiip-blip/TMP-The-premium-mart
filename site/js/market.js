@@ -2,6 +2,7 @@
 // Loads active categories and active products, renders ONE selected category at a time.
 
 import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
+import { readCatalogCache, writeCatalogCache, isCatalogChanged } from "./catalog-cache.js";
 
 function escapeHtml(s){
   return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -300,18 +301,61 @@ async function loadMarket(){
     });
   }
 
+  const supa = getPublicSupabase();
+  // Fail visibly instead of spinning forever: without a timeout a stalled
+  // request leaves the static "Loading market…" placeholder on screen.
+  const withTimeout = (p, ms=15000) => Promise.race([p, new Promise((_, rej)=> setTimeout(()=> rej(new Error("Supabase request timed out")), ms))]);
+  // Exactly one retry after 1.5s on transient failure; same query/client.
+  const delay = (ms) => new Promise((res)=> setTimeout(res, ms));
+  const fetchCatalog = () => Promise.all([
+    withTimeout(supa.from('categories').select('id,name,slug,description,type,sort_order,is_active,background_image_url,background_image_path').eq('is_active',true).order('sort_order').order('name')),
+    withTimeout(supa.from('products').select('id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path').eq('is_active',true).order('sort_order').order('name'))
+  ]);
+  const loadCatalogWithRetry = async () => {
+    try {
+      return await fetchCatalog();
+    } catch (firstErr) {
+      await delay(1500);
+      return await fetchCatalog();
+    }
+  };
+  const applyCatalog = (cats, prods) => {
+    allCategories = cats || [];
+    allProducts = prods || [];
+    if(allCategories.length && (!selectedSlug || !allCategories.some(c=> safeDisplay(c.slug)===selectedSlug))){
+      selectedSlug = safeDisplay(allCategories[0].slug);
+    }
+  };
+  // Fresh cache → render instantly, revalidate in background with the same
+  // timeout+retry stack; re-render only when data actually changed.
+  try {
+    const cached = readCatalogCache();
+    if (cached && cached.fresh && cached.categories.length) {
+      applyCatalog(cached.categories, cached.products);
+      render();
+      loadCatalogWithRetry().then(([catRes, prodRes]) => {
+        if (catRes.error || prodRes.error) return;
+        const freshCats = catRes.data || [];
+        const freshProds = prodRes.data || [];
+        if (isCatalogChanged({ categories: allCategories, products: allProducts }, { categories: freshCats, products: freshProds })) {
+          applyCatalog(freshCats, freshProds);
+          writeCatalogCache(freshCats, freshProds);
+          render();
+        }
+      }).catch((e) => console.warn("[TPM market] background refresh failed", e));
+      return;
+    }
+  } catch (_) { /* fall through to network path */ }
+
   wrap.innerHTML = `<div class="admin-loading" style="min-height:120px"><span class="admin-spinner"></span> Loading market…</div>`;
 
-  const supa = getPublicSupabase();
   try{
-    const [catRes, prodRes] = await Promise.all([
-      supa.from('categories').select('id,name,slug,description,type,sort_order,is_active,background_image_url,background_image_path').eq('is_active',true).order('sort_order').order('name'),
-      supa.from('products').select('id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path').eq('is_active',true).order('sort_order').order('name')
-    ]);
+    const [catRes, prodRes] = await loadCatalogWithRetry();
     if(catRes.error) throw catRes.error;
     if(prodRes.error) throw prodRes.error;
     allCategories = catRes.data||[];
     allProducts = prodRes.data||[];
+    writeCatalogCache(allCategories, allProducts);
     // select first category by default
     if(allCategories.length) selectedSlug = safeDisplay(allCategories[0].slug);
     render();
@@ -321,6 +365,13 @@ async function loadMarket(){
       : String(err);
     console.error("[TPM market] load FAILED", errInfo);
     console.warn('[TPM market] load failed', err);
+    // Last resort: render expired-but-present cache instead of an error.
+    const stale = readCatalogCache();
+    if (stale && stale.categories.length) {
+      applyCatalog(stale.categories, stale.products);
+      render();
+      return;
+    }
     wrap.innerHTML = `<div class="market-empty-state"><h2>Market unavailable</h2><p>Please try again later.</p></div>`;
   }
 }
