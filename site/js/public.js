@@ -1,7 +1,7 @@
 // site/js/public.js — Public Website Supabase Integration (Part 1: Categories & Products)
 // Loads active categories/products via RLS (anon), respects market/cafe type, preserves design.
 
-import { getPublicSupabase } from "./supabase.js";
+import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
 
 const FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=900&q=80&auto=format&fit=crop",

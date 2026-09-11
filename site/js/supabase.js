@@ -15,3 +15,16 @@ export function getPublicSupabase() {
   });
   return _client;
 }
+
+let _anonClient = null;
+
+// Anon-only client for public data reads: never restores a stored session,
+// so a stale/expired admin login in localStorage (same origin, same project)
+// can't replace the anon key and fail RLS on desktop. Always uses anon key.
+export function getAnonSupabase() {
+  if (_anonClient) return _anonClient;
+  _anonClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+  return _anonClient;
+}

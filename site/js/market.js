@@ -1,7 +1,7 @@
 // site/js/market.js — Dynamic Market + Café Market (single-category view)
 // Loads active categories and active products, renders ONE selected category at a time.
 
-import { getPublicSupabase } from "./supabase.js";
+import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
 
 function escapeHtml(s){
   return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");

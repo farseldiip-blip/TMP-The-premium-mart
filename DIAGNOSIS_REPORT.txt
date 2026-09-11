@@ -1,0 +1,45 @@
+READ-ONLY DIAGNOSIS: Why Fruits Category & 40 Products Are Not Visible
+
+==================================================
+DIAGNOSIS SUMMARY
+==================================================
+
+ROOT CAUSE (2 issues):
+1. SQL file was NOT executed against the cloud Supabase project
+   - File: supabase/add_fruits.sql exists on filesystem
+   - Never run via psql or Supabase SQL editor against https://zxgnrccralodllqqcsup.supabase.co
+   - Original seed.sql only has 9 categories + 19 products; add_fruits.sql was an addition NOT applied
+
+2. Arabic name encoding is BROKEN in the SQL file
+   - Non-ASCII Arabic characters display as replacement characters (�) in the file
+   - Even if executed, the names would store incorrectly or not display in the UI
+   - The original seed.sql uses English-only product names; Arabic names in new format may violate expectations
+
+EVIDENCE:
+- Both admin dashboard AND public website use the SAME cloud project:
+  URL: https://zxgnrccralodllqqcsup.supabase.co
+  (confirmed in site/js/supabase.js and site/admin/js/config.js)
+- supabase/config.toml is for LOCAL Supabase (localhost ports); NOT the cloud project
+- supabase/seed.sql has 9 categories, 19 products — NO fruits category, NO 40 fruit products
+- supabase/add_fruits.sql has 1 category + 40 products WITH Arabic names — but file encoding issues
+- The SQL file has not been confirmed executed against the cloud project
+
+WHAT NEEDS TO BE DONE (beyond read-only diagnosis):
+1. Execute the SQL against the cloud Supabase project (or fix encoding and re-execute)
+2. Fix Arabic name encoding in the SQL file so names store and display correctly
+3. Verify the products appear in both Admin Dashboard and public Market page
+
+==================================================
+FILE STATUS
+==================================================
+- supabase/add_fruits.sql — Present but NOT executed; Arabic encoding broken
+- supabase/seed.sql — Original data (9 categories, 19 products — no fruits)
+- site/js/supabase.js — Uses cloud URL: zxgnrccralodllqqcsup.supabase.co
+- site/admin/js/config.js — Uses same cloud URL
+
+==================================================
+NEXT STEPS (user to perform):
+1. Fix Arabic encoding in supabase/add_fruits.sql (ensure UTF-8 properly)
+2. Run the SQL against the cloud Supabase project via Supabase SQL Editor
+3. Verify Admin Dashboard → Products shows 40 fruit products
+4. Verify public Market page shows the new fruits category/products
