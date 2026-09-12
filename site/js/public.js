@@ -157,20 +157,18 @@ async function loadAndRender(){
       // If still no valid URL (maybe relative path), use fallback
       if(!imgUrl || !imgUrl.startsWith("http")) imgUrl = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
 
-      const productSnippet = productsForCat.length
-        ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${productsForCat.map(p=>`<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:3px 7px;border-radius:999px;color:#fff">${escapeHtml(p.name)}${p.price!=null?` EGP${Number(p.price).toFixed(2)}`:""}</span>`).join("")}</div>`
-        : "";
+      // Editorial teaser only: short supporting line, no product details.
+      const rawDesc = (cat.description||"").trim();
+      const shortDesc = rawDesc.length > 90 ? rawDesc.slice(0, 90).trimEnd() + "…" : rawDesc;
 
       // Preserve existing card structure and classes for animations
       return `
         <a class="tpm-card tpm-card--${cardClass} reveal ${idx===0?'in':''}" role="listitem" href="market.html" aria-label="${escapeHtml(cat.name)} — View market" style="transition-delay:${(0.04+idx*0.04).toFixed(2)}s">
           <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(cat.name)}" width="900" height="675" loading="${idx<2?'eager':'lazy'}" decoding="async" fetchpriority="${idx<2?'high':'low'}" onerror="this.src='${FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length]}'" />
           <div class="tpm-card-content">
-            <span class="tpm-card-kicker ${kickerClass}">${escapeHtml(cat.type==="cafe"?"Café":"Market")} • ${escapeHtml(cat.name)}</span>
+            <span class="tpm-card-kicker ${kickerClass}">${escapeHtml(cat.type==="cafe"?"Café":"Market")}</span>
             <h3>${escapeHtml(cat.name)}</h3>
-            <p>${escapeHtml(cat.description||"")}</p>
-            ${productSnippet}
-            <div class="tpm-card-meta"><span>View in market →</span></div>
+            ${shortDesc?`<p>${escapeHtml(shortDesc)}</p>`:""}
           </div>
         </a>
       `;
@@ -257,7 +255,8 @@ async function loadStoreInfo(){
       }
     }
     // Address - visit card and footer and drawer
-    const fullAddress = [data.address_line1, data.address_line2, data.city].filter(Boolean).join(", ") || null;
+    // Public address: location, city, governorate/region, country
+    const fullAddress = [data.address_line1, data.city, data.address_line2, data.country].filter(Boolean).join(", ") || null;
     const shortAddress = [data.address_line1, data.city].filter(Boolean).join(", ") || null;
     if(fullAddress){
       // Visit address
@@ -306,17 +305,6 @@ async function loadStoreInfo(){
       const ldJson3=document.querySelector('script[type="application/ld+json"]');
       if(ldJson3){
         try{ const ld=JSON.parse(ldJson3.textContent); ld.telephone=data.phone; ldJson3.textContent=JSON.stringify(ld, null, 2); }catch(e){}
-      }
-    }
-    // Email
-    if(data.email){
-      document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{
-        a.href=`mailto:${data.email}`;
-        a.textContent=data.email;
-      });
-      const ldJson4=document.querySelector('script[type="application/ld+json"]');
-      if(ldJson4){
-        try{ const ld=JSON.parse(ldJson4.textContent); ld.email=data.email; ldJson4.textContent=JSON.stringify(ld, null, 2); }catch(e){}
       }
     }
     // Map URL - update Get directions and Open Maps

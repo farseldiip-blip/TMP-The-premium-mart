@@ -80,7 +80,6 @@ export async function initStoreInfo(){
   els.fPostal=document.getElementById("storePostal");
   els.fPhone=document.getElementById("storePhone");
   els.fPhoneDisplay=document.getElementById("storePhoneDisplay");
-  els.fEmail=document.getElementById("storeEmail");
   els.fMapUrl=document.getElementById("storeMapUrl");
   els.fLogoPath=document.getElementById("storeLogoPath");
   els.fLogoUrl=document.getElementById("storeLogoUrl");
@@ -180,7 +179,6 @@ function populateForm(row){
     els.fPostal.value="";
     els.fPhone.value="";
     els.fPhoneDisplay.value="";
-    els.fEmail.value="";
     els.fMapUrl.value="";
     els.fLogoPath.value="";
     els.fLogoUrl.value="";
@@ -202,7 +200,6 @@ function populateForm(row){
   els.fPostal.value=row.postal_code||"";
   els.fPhone.value=row.phone||"";
   els.fPhoneDisplay.value=row.phone_display||"";
-  els.fEmail.value=row.email||"";
   els.fMapUrl.value=row.map_url||"";
   els.fLogoPath.value=row.logo_path||"";
   els.fLogoUrl.value=row.logo_url||"";
@@ -253,7 +250,6 @@ async function handleSave(){
   const postal_code=els.fPostal.value.trim()||null;
   const phone=els.fPhone.value.trim()||null;
   const phone_display=els.fPhoneDisplay.value.trim()||null;
-  const email=els.fEmail.value.trim()||null;
   const map_url=els.fMapUrl.value.trim()||null;
   let logo_path=els.fLogoPath.value.trim()||null;
   let logo_url=els.fLogoUrl.value.trim()||null;
@@ -265,7 +261,6 @@ async function handleSave(){
   let hasError=false;
   if(!name || name.length===0){ setFieldError("name","Name is required."); hasError=true; }
   if(!country){ setFieldError("country","Country is required."); hasError=true; }
-  if(!isValidEmail(email)){ setFieldError("email","Invalid email format."); hasError=true; }
   if(!isValidUrl(map_url)){ setFieldError("mapurl","Invalid URL (must be http/https)."); hasError=true; }
   if(!isValidUrl(logo_url)){ setFieldError("logourl","Invalid URL."); hasError=true; }
   // opening_hours JSON validation
@@ -313,7 +308,7 @@ async function handleSave(){
       postal_code,
       phone,
       phone_display,
-      email,
+      email: null, // store has no email — always clear any old value
       map_url,
       logo_path,
       logo_url,
@@ -345,8 +340,7 @@ async function handleSave(){
   }catch(err){
     console.error("[TPM store] save failed",err);
     const msg=err.message||"Save failed";
-    if(msg.toLowerCase().includes("email") && msg.toLowerCase().includes("check")) setFieldError("email","Invalid email.");
-    else if(msg.toLowerCase().includes("name")) setFieldError("name",msg);
+    if(msg.toLowerCase().includes("name")) setFieldError("name",msg);
     toast(msg,"err");
   }finally{
     if(els.saveBtn){ els.saveBtn.disabled=false; els.saveBtn.textContent="Save changes"; }

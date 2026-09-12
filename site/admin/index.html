@@ -71,6 +71,10 @@
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 8l6 4-6 4V8Z"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
           Showcase Video
         </a>
+        <a href="#recs" data-nav="recs">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-4.5 7-10a7 7 0 0 0-14 0c0 5.5 7 10 7 10Z"/><circle cx="12" cy="11" r="2.2"/></svg>
+          Recommendations
+        </a>
       </nav>
       <div class="admin-sidebar-foot">
         <div class="user" title="">
@@ -438,11 +442,6 @@
                       <span class="error"></span>
                     </div>
                   </div>
-                  <div class="admin-field" id="field-store-email">
-                    <label for="storeEmail">Email</label>
-                    <input id="storeEmail" type="email" placeholder="hello@tpm.cafe" />
-                    <span class="error"></span>
-                  </div>
                   <div class="admin-field" id="field-store-mapurl">
                     <label for="storeMapUrl">Map URL</label>
                     <input id="storeMapUrl" type="url" placeholder="https://maps.google.com/..." />
@@ -710,6 +709,33 @@
             </div>
           </div>
         </section>
+        <!-- Product Recommendations moderation -->
+        <section data-view="recs" class="admin-view" hidden>
+          <div id="recWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Product Recommendations</h3>
+              <span class="spacer"></span>
+              <button id="recRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+            </div>
+            <div id="recStats" class="cat-stats"></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" aria-label="Product recommendations">
+                <thead>
+                  <tr>
+                    <th>Recommendation</th>
+                    <th>Image</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recTbody"></tbody>
+              </table>
+              <div id="recCards" class="cat-cards"></div>
+            </div>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Only approved recommendations appear on the public site. Approving copies the image into <code>product-images</code>; rejected and pending files stay private. Rows are kept for history.</p>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -723,6 +749,7 @@
     import { initContactInfo } from "./js/contact_info.js";
     import { initSocialLinks } from "./js/social_links.js";
     import { initShowcaseVideo } from "./js/showcase_video.js";
+    import { initRecommendations } from "./js/recommendations.js";
 
     const gateLoading = document.getElementById("gateLoading");
     const gateBlocked = document.getElementById("gateBlocked");
@@ -760,6 +787,7 @@
         try { await initContactInfo(); } catch (e) { console.error("[TPM contact] init failed", e); }
         try { await initSocialLinks(); } catch (e) { console.error("[TPM social] init failed", e); }
         try { await initShowcaseVideo(); } catch (e) { console.error("[TPM video] init failed", e); }
+        try { await initRecommendations(); } catch (e) { console.error("[TPM recs] init failed", e); }
         // Watch for sign-out in other tab
         getSupabase().auth.onAuthStateChange((event) => {
           if (event === "SIGNED_OUT") window.location.replace("./login.html");
@@ -804,13 +832,13 @@
         a.classList.toggle("active", active);
         if (active) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
       });
-      const titles = { overview:"Overview", products:"Products", categories:"Categories", store:"Store Information", contact:"Contact", social:"Social Links", video:"Showcase Video" };
+      const titles = { overview:"Overview", products:"Products", categories:"Categories", store:"Store Information", contact:"Contact", social:"Social Links", video:"Showcase Video", recs:"Product Recommendations" };
       document.getElementById("pageTitle").textContent = titles[name] || "Overview";
       closeSidebar();
     }
     function currentViewFromHash(){
       const h = (location.hash || "#overview").replace("#","").trim() || "overview";
-      return ["overview","products","categories","store","contact","social","video"].includes(h) ? h : "overview";
+      return ["overview","products","categories","store","contact","social","video","recs"].includes(h) ? h : "overview";
     }
     navLinks.forEach(a => a.addEventListener("click", (e) => {
       e.preventDefault();

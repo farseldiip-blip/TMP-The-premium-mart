@@ -10,7 +10,7 @@ let _client = null;
 export function getSupabase() {
   if (_client) return _client;
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("placeholder")) {
-    console.warn("[TPM admin] Supabase config is placeholder — set real anon key in site/admin/js/config.js (see config.example.js)");
+    console.warn("[TPM admin] Supabase config is placeholder — set real anon key in site/admin/js/config.js");
   }
   _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {

@@ -66,10 +66,10 @@ insert into public.store_info (
 values (
   true,
   'TPM — The Premium Mart',
-  'More Than Your Everyday Stop.',
+  'Fresh Every Day',
   'Signature drinks, fresh bites & curated finds — all under one roof. A premium mart and lifestyle destination you''ll want to come back to.',
-  '123 Heritage Lane', 'City Center', 'City Center', 'US', null,
-  '+15551234567', '+1 (555) 123-4567', 'hello@tpm.cafe', 'https://maps.google.com/?q=123+Heritage+Lane',
+  'Geziret El Ward Sporting Club', 'Dakahlia', 'Mansoura', 'Egypt', null,
+  '+15551234567', '+1 (555) 123-4567', NULL, 'https://maps.google.com/?q=123+Heritage+Lane',
   '{
     "mon_fri": "7:00 AM — 7:00 PM",
     "sat_sun": "8:00 AM — 8:00 PM",
