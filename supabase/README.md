@@ -10,7 +10,6 @@ Backend foundation. **No frontend files were touched.** The static site in `site
 - `migrations/20250902000003_rls.sql` — Row Level Security (public read / admin write)
 - `migrations/20250902000004_auth.sql` — auth hardening + `promote_admin_by_email()`
 - `seed.sql` — idempotent sample data (9 categories, 14 products, singletons)
-- `client.example.js` — sample JS client (not wired to site)
 - `README.md` — this file
 
 ## Tables
