@@ -192,6 +192,10 @@ async function loadAndRender(){
     grid.innerHTML = toShow.map((cat, idx)=>{
       const cardClass = ["a","b","c","d"][idx] || "a";
       const kickerClass = cat.type==="cafe" ? "mint" : idx===2 ? "orange" : idx===3 ? "blue" : "";
+      // Deep-link via the Market page's existing #cat-<slug> mechanism, so the
+      // card lands on this exact category (department is derived from data there).
+      const catSlug = String(cat.slug ?? "").trim();
+      const targetHref = catSlug ? `market.html#cat-${escapeHtml(catSlug)}` : "market.html";
       const productsForCat = products.filter(p=>p.category_id===cat.id).slice(0,2);
       const hasBg = cat.background_image_url || cat.background_image_path;
       const bgUrl = cat.background_image_url || cat.background_image_path || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
@@ -209,7 +213,7 @@ async function loadAndRender(){
 
       // Preserve existing card structure and classes for animations
       return `
-        <a class="tpm-card tpm-card--${cardClass} reveal ${idx===0?'in':''}" role="listitem" href="market.html" aria-label="${escapeHtml(cat.name)} — View market" style="transition-delay:${(0.04+idx*0.04).toFixed(2)}s">
+        <a class="tpm-card tpm-card--${cardClass} reveal ${idx===0?'in':''}" role="listitem" href="${targetHref}" aria-label="${escapeHtml(cat.name)} — View market" style="transition-delay:${(0.04+idx*0.04).toFixed(2)}s">
           ${cardImg(imgUrl, cat.name, idx, FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length])}
           <div class="tpm-card-content">
             <span class="tpm-card-kicker ${kickerClass}">${escapeHtml(cat.type==="cafe"?"Café":"Market")}</span>
