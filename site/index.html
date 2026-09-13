@@ -29,6 +29,7 @@
   <meta name="twitter:description" content="The Premium Mart (TPM) is a fresh Market &amp; Café in Mansoura at Geziret El Ward Sporting Club, offering fresh products, fruits, groceries, and café drinks." />
   <meta name="twitter:image" content="https://tmp-the-premium-mart.vercel.app/assets/logo.jpg" />
   <meta name="twitter:image:alt" content="TPM — The Premium Mart logo in deep green on cream" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Libre+Caslon+Text:wght@400;700&family=Space+Grotesk:wght@500;600;700&display=swap" />
   <link rel="stylesheet" href="css/style.css?v=20260515q" />
   <link rel="preconnect" href="https://images.unsplash.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -54,6 +55,7 @@
         <a href="index.html" aria-current="page">Home</a>
         <a href="#our-story">Our Story</a>
         <a href="market.html">Market</a>
+        <a href="#recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 8v.01M16 8v.01M8 8v.01" stroke-width="2"/><path d="M17.5 2l1.5 3-3 1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/></svg> Recommend</a>
         <a href="#visit">Location</a>
       </nav>
 
@@ -78,8 +80,8 @@
       <a href="index.html" aria-current="page">Home <span aria-hidden="true">→</span></a>
       <a href="#our-story">Our Story <span aria-hidden="true">→</span></a>
       <a href="market.html">Market <span aria-hidden="true">→</span></a>
+      <a href="#recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 8v.01M16 8v.01M8 8v.01" stroke-width="2"/><path d="M17.5 2l1.5 3-3 1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/></svg> Recommend <span aria-hidden="true">→</span></a>
       <a href="#visit">Find Us <span aria-hidden="true">→</span></a>
-      <a href="#contact">Contact <span aria-hidden="true">→</span></a>
     </nav>
     <div class="drawer-foot">
       <p><strong>TPM — The Premium Mart</strong><br/>Geziret El Ward Sporting Club, Mansoura<br/><a href="tel:0248813993" style="color:var(--primary);font-weight:700">0248813993</a></p>
@@ -245,6 +247,54 @@
       </div>
     </section>
 
+    <!-- Recommendations -->
+    <section class="section" id="recommendations" aria-label="Community Recommendations">
+      <div class="container">
+        <div class="visit-card tpm-rec reveal" style="transition-delay:.14s">
+          <p class="tpm-rec-eyebrow">Community shelf</p>
+          <h3 style="margin-bottom:8px">Recommend</h3>
+          <p class="prose" style="margin:0 0 4px">Loved by our visitors, stocked by TPM — recent community picks.</p>
+
+          <div class="tpm-rec-stage" id="recStage" hidden>
+            <button class="tpm-rec-nav" id="recPrev" type="button" aria-label="Previous recommendation"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <div class="tpm-rec-viewport" id="recViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Community recommendations">
+              <div class="tpm-rec-track" id="recTrack"></div>
+            </div>
+            <button class="tpm-rec-nav" id="recNext" type="button" aria-label="Next recommendation"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+          <p class="tpm-rec-counter" id="recCounter" hidden></p>
+
+          <div class="tpm-rec-empty" id="recEmpty" hidden>
+            <p class="prose" style="margin:0">Nothing showcased yet — be the first to put something on our shelf.</p>
+          </div>
+
+          <div class="tpm-rec-cta">
+            <p class="prose" style="margin:0 0 12px">Want to recommend something?</p>
+            <button class="btn tpm-btn-primary" id="recOpen" type="button">RECOMMEND A PRODUCT <span aria-hidden="true">→</span></button>
+          </div>
+
+          <div class="tpm-rec-formwrap" id="recFormWrap" hidden>
+            <form id="recommendForm" novalidate>
+              <div style="display:grid;gap:12px">
+                <div class="field" style="margin:0"><label for="rec-text">Your recommendation *</label><textarea id="rec-text" name="recommendation" rows="3" maxlength="500" required placeholder="e.g. Pistachio halawa, oat milk, sourdough…"></textarea><span class="hint tpm-rec-count" id="recCount">0 / 500</span></div>
+                <div class="field" style="margin:0"><label for="rec-image">Product image (optional)</label><input id="rec-image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" /><span class="hint">JPG, PNG, WebP, AVIF or SVG — max 2 MiB.</span></div>
+              </div>
+              <div class="tpm-rec-error" id="recError" role="alert" hidden></div>
+              <div class="form-actions" style="margin-top:14px">
+                <button type="submit" class="btn btn-primary" id="recSubmit" style="flex:1">Recommend a Product</button>
+                <button type="button" class="btn btn-secondary" id="recClose">Close</button>
+              </div>
+            </form>
+            <div class="tpm-rec-success" id="recSuccess" hidden>
+              <strong>Thanks — recommendation received.</strong>
+              <p class="prose" style="margin:6px 0 12px">Our team reviews every suggestion. Approved picks appear above.</p>
+              <button type="button" class="btn btn-secondary" id="recAgain">Recommend another</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Visit -->
     <section class="section visit" id="visit" aria-labelledby="visit-heading">
       <div class="container visit-grid">
@@ -294,53 +344,8 @@
           </div>
         </div>
       </div>
-
-      <!-- Product recommendations -->
-      <div class="container" id="contact" style="margin-top:24px">
-        <div class="visit-card tpm-rec reveal" style="transition-delay:.14s">
-          <p class="tpm-rec-eyebrow">Community shelf</p>
-          <h3 style="margin-bottom:8px">Recommend</h3>
-          <p class="prose" style="margin:0 0 4px">Loved by our visitors, stocked by TPM — recent community picks.</p>
-
-          <div class="tpm-rec-stage" id="recStage" hidden>
-            <button class="tpm-rec-nav" id="recPrev" type="button" aria-label="Previous recommendation"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-            <div class="tpm-rec-viewport" id="recViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Community recommendations">
-              <div class="tpm-rec-track" id="recTrack"></div>
-            </div>
-            <button class="tpm-rec-nav" id="recNext" type="button" aria-label="Next recommendation"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-          </div>
-          <p class="tpm-rec-counter" id="recCounter" hidden></p>
-
-          <div class="tpm-rec-empty" id="recEmpty" hidden>
-            <p class="prose" style="margin:0">Nothing showcased yet — be the first to put something on our shelf.</p>
-          </div>
-
-          <div class="tpm-rec-cta">
-            <p class="prose" style="margin:0 0 12px">Want to recommend something?</p>
-            <button class="btn tpm-btn-primary" id="recOpen" type="button">RECOMMEND A PRODUCT <span aria-hidden="true">→</span></button>
-          </div>
-
-          <div class="tpm-rec-formwrap" id="recFormWrap" hidden>
-            <form id="recommendForm" novalidate>
-              <div style="display:grid;gap:12px">
-                <div class="field" style="margin:0"><label for="rec-text">Your recommendation *</label><textarea id="rec-text" name="recommendation" rows="3" maxlength="500" required placeholder="e.g. Pistachio halawa, oat milk, sourdough…"></textarea><span class="hint tpm-rec-count" id="recCount">0 / 500</span></div>
-                <div class="field" style="margin:0"><label for="rec-image">Product image (optional)</label><input id="rec-image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" /><span class="hint">JPG, PNG, WebP, AVIF or SVG — max 2 MiB.</span></div>
-              </div>
-              <div class="tpm-rec-error" id="recError" role="alert" hidden></div>
-              <div class="form-actions" style="margin-top:14px">
-                <button type="submit" class="btn btn-primary" id="recSubmit" style="flex:1">Recommend a Product</button>
-                <button type="button" class="btn btn-secondary" id="recClose">Close</button>
-              </div>
-            </form>
-            <div class="tpm-rec-success" id="recSuccess" hidden>
-              <strong>Thanks — recommendation received.</strong>
-              <p class="prose" style="margin:6px 0 12px">Our team reviews every suggestion. Approved picks appear above.</p>
-              <button type="button" class="btn btn-secondary" id="recAgain">Recommend another</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
+
   </main>
 
   <footer class="site-footer" role="contentinfo">
@@ -362,8 +367,8 @@
   <nav class="bottom-nav" aria-label="Mobile navigation">
     <a href="index.html" aria-current="page" class="home-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg>Home</a>
     <a href="market.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>Market</a>
+    <a href="#recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 8v.01M16 8v.01M8 8v.01" stroke-width="2"/><path d="M17.5 2l1.5 3-3 1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/></svg>Recommend</a>
     <a href="#visit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 21s7-4.5 7-10a7 7 0 0 0-14 0c0 5.5 7 10 7 10Z"/><circle cx="12" cy="11" r="2.2"/></svg>Find Us</a>
-    <a href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="M4 7l8 7 8-7"/></svg>Contact</a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>

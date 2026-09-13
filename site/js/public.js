@@ -19,6 +19,19 @@ function slugify(s){
   return String(s).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\s_]+/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-+/g,"-").replace(/^-|-$/g,"");
 }
 
+// Single shared store_info row between loadStoreInfo and loadShowcaseVideo
+// Ensures exactly one Supabase request for this singleton row.
+let storeInfoRow = null;
+
+// Single shared initializer: fetch store_info once and make the row available
+// to both loadStoreInfo() and loadShowcaseVideo().
+async function initStoreInfoRow(supa){
+  if(!storeInfoRow){
+    storeInfoRow = supa.from("store_info").select("*").eq("singleton_key", true).maybeSingle().then(r => r);
+  }
+  return storeInfoRow;
+}
+
 // Keep existing HTML structure, replace only data inside .tpm-preview-grid
 async function loadAndRender(){
   const supa = getPublicSupabase();
@@ -129,8 +142,41 @@ async function loadAndRender(){
   window._tpmCategories = categories;
   window._tpmProducts = products;
 
+  // Responsive image markup mirroring the static cards in index.html
+  // (srcset/sizes + lazy/low for all). The static grid already carries the
+  // right hints; re-rendered cards must not downgrade to single-src or force
+  // eager/high, which caused duplicate downloads at different resolutions.
+  const CARD_SIZES = [
+    "(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px",
+    "(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px",
+    "(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px",
+    "(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px",
+  ];
+  const CARD_DIMS = [[900,675],[800,800],[800,800],[900,560]];
   // Initial render with 'all'
   renderFiltered("all");
+
+  function unsplashVariants(url, wide){
+    const m = /^https:\/\/images\.unsplash\.com\/(photo-[\w-]+)\?/.exec(url || "");
+    if(!m) return null;
+    const base = `https://images.unsplash.com/${m[1]}`;
+    const widths = wide ? [400,800,900] : [400,800];
+    const w = wide ? 900 : 800;
+    return {
+      src: `${base}?w=${w}&q=80&auto=format&fit=crop`,
+      srcset: widths.map(x=>`${base}?w=${x}&q=80&auto=format&fit=crop ${x}w`).join(", "),
+    };
+  }
+  function cardImg(imgUrl, alt, idx, fallback){
+    const dims = CARD_DIMS[idx] || CARD_DIMS[0];
+    const wide = idx === 0 || idx === 3;
+    const v = unsplashVariants(imgUrl, wide);
+    const common = `alt="${escapeHtml(alt)}" width="${dims[0]}" height="${dims[1]}" loading="lazy" decoding="async" fetchpriority="low" onerror="this.onerror=null;this.src='${fallback}'"`;
+    if(v){
+      return `<img src="${escapeHtml(v.src)}" srcset="${escapeHtml(v.srcset)}" sizes="${CARD_SIZES[idx]||CARD_SIZES[0]}" ${common} />`;
+    }
+    return `<img src="${escapeHtml(imgUrl)}" ${common} />`;
+  }
 
   function renderFiltered(typeFilter){
     const filteredCats = typeFilter==="all" ? categories : categories.filter(c=>c.type===typeFilter);
@@ -164,7 +210,7 @@ async function loadAndRender(){
       // Preserve existing card structure and classes for animations
       return `
         <a class="tpm-card tpm-card--${cardClass} reveal ${idx===0?'in':''}" role="listitem" href="market.html" aria-label="${escapeHtml(cat.name)} — View market" style="transition-delay:${(0.04+idx*0.04).toFixed(2)}s">
-          <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(cat.name)}" width="900" height="675" loading="${idx<2?'eager':'lazy'}" decoding="async" fetchpriority="${idx<2?'high':'low'}" onerror="this.src='${FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length]}'" />
+          ${cardImg(imgUrl, cat.name, idx, FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length])}
           <div class="tpm-card-content">
             <span class="tpm-card-kicker ${kickerClass}">${escapeHtml(cat.type==="cafe"?"Café":"Market")}</span>
             <h3>${escapeHtml(cat.name)}</h3>
@@ -201,10 +247,10 @@ async function loadAndRender(){
 async function loadStoreInfo(){
   const supa = getPublicSupabase();
   try{
-    const { data, error } = await supa.from("store_info").select("*").eq("singleton_key", true).maybeSingle();
+    const { data, error } = await initStoreInfoRow(supa);
     if(error) throw error;
     if(!data) return;
-    // Helper to update text if value exists
+    // Helper to update text if value exists (store_info)
     const setText = (sel, val) => {
       if(val==null || val==="") return;
       const el=document.querySelector(sel);
@@ -660,7 +706,8 @@ async function loadShowcaseVideo(){
   const grid = document.querySelector('.gallery-grid');
   if(!section || !grid) return;
   try{
-    const { data, error } = await supa.from("store_info").select("showcase_video_path,showcase_video_url").eq("singleton_key", true).maybeSingle();
+    // Reuses the singleton row already fetched by loadStoreInfo (one request).
+    const { data, error } = await initStoreInfoRow(supa);
     if(error) throw error;
     if(!data || !data.showcase_video_url){
       // No video - keep fallback without broken UI
