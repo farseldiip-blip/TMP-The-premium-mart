@@ -1439,6 +1439,14 @@ button {
   .tpm-card--c {
     display: none;
   }
+  /* JS-rendered preview (max 2 cards): the 2nd card uses --b positionally, so
+     reveal it full-width on mobile without touching the static fallback. */
+  .tpm-preview-grid[data-source="dynamic"] .tpm-card--b {
+    display: flex;
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+    min-height: 185px;
+  }
   .tpm-card--b {
     grid-column: 1;
   }

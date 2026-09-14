@@ -87,6 +87,18 @@ async function loadAndRender(){
     const active = head ? head.querySelector("button[data-filter].active") : null;
     return active ? active.dataset.filter : "all";
   };
+  // Responsive image markup mirroring the static cards in index.html
+  // (srcset/sizes + lazy/low for all). The static grid already carries the
+  // right hints; re-rendered cards must not downgrade to single-src or force
+  // eager/high, which caused duplicate downloads at different resolutions.
+  // Declared up-front: the cache paths below call renderFiltered() first.
+  const CARD_SIZES = [
+    "(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px",
+    "(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px",
+    "(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px",
+    "(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px",
+  ];
+  const CARD_DIMS = [[900,675],[800,800],[800,800],[900,560]];
   // Fresh cache → render instantly, revalidate in background with the same
   // timeout+retry stack; re-render only when data actually changed.
   try {
@@ -142,17 +154,6 @@ async function loadAndRender(){
   window._tpmCategories = categories;
   window._tpmProducts = products;
 
-  // Responsive image markup mirroring the static cards in index.html
-  // (srcset/sizes + lazy/low for all). The static grid already carries the
-  // right hints; re-rendered cards must not downgrade to single-src or force
-  // eager/high, which caused duplicate downloads at different resolutions.
-  const CARD_SIZES = [
-    "(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px",
-    "(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px",
-    "(max-width: 767px) 44vw, (max-width: 1024px) 30vw, 400px",
-    "(max-width: 767px) 92vw, (max-width: 1024px) 50vw, 600px",
-  ];
-  const CARD_DIMS = [[900,675],[800,800],[800,800],[900,560]];
   // Initial render with 'all'
   renderFiltered("all");
 
@@ -212,6 +213,9 @@ async function loadAndRender(){
     }
     // Group products by category for display
     const catMap = new Map(categories.map(c=>[c.id, c]));
+    // Mark JS-rendered grids so the mobile override only affects dynamic cards,
+    // never the static fallback's A+D compact layout.
+    grid.dataset.source = "dynamic";
     grid.innerHTML = toShow.map((cat, idx)=>{
       const cardClass = ["a","b","c","d"][idx] || "a";
       const kickerClass = cat.type==="cafe" ? "mint" : idx===2 ? "orange" : idx===3 ? "blue" : "";
