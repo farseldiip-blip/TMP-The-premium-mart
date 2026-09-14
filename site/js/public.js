@@ -66,7 +66,7 @@ async function loadAndRender(){
   const withTimeout = (p, ms=15000) => Promise.race([p, new Promise((_, rej)=> setTimeout(()=> rej(new Error("Supabase request timed out")), ms))]);
   const delay = (ms) => new Promise((res)=> setTimeout(res, ms));
   const fetchCatalog = () => Promise.all([
-    withTimeout(supa.from("categories").select("id,name,slug,description,type,sort_order,is_active,background_image_url,background_image_path").eq("is_active", true).order("sort_order").order("name")),
+    withTimeout(supa.from("categories").select("id,name,slug,description,type,sort_order,homepage_order,is_active,background_image_url,background_image_path").eq("is_active", true).order("sort_order").order("name")),
     withTimeout(supa.from("products").select("id,name,slug,description,price,badge,sort_order,is_active,category_id,image_url,image_path").eq("is_active", true).order("sort_order").order("name"))
   ]);
   const loadCatalogWithRetry = async () => {
@@ -178,15 +178,38 @@ async function loadAndRender(){
     return `<img src="${escapeHtml(imgUrl)}" ${common} />`;
   }
 
+  // Homepage preview priority comes ONLY from homepage_order (NULL = excluded).
+  // Number("") and Number(null) are both 0, so null/undefined/"" are excluded
+  // explicitly before coercion. Ties fall back to the existing sort_order,
+  // then to the incoming (sort_order, name) order for a stable result.
+  function homepageRank(c){
+    const v = c.homepage_order;
+    if (v === null || v === undefined || v === "") return null;
+    const n = Number(v);
+    return Number.isInteger(n) ? n : null;
+  }
+
   function renderFiltered(typeFilter){
-    const filteredCats = typeFilter==="all" ? categories : categories.filter(c=>c.type===typeFilter);
-    // If no cats for filter, show empty state but keep grid
-    if(!filteredCats.length){
+    const pool = typeFilter==="all" ? categories : categories.filter(c=>c.type===typeFilter);
+    const toShow = pool
+      .map((c, i) => ({ c, i }))
+      .filter(({ c }) => homepageRank(c) !== null)
+      .sort((a, b) => {
+        const byHome = homepageRank(a.c) - homepageRank(b.c);
+        if (byHome !== 0) return byHome;
+        const sa = Number(a.c.sort_order), sb = Number(b.c.sort_order);
+        const soA = Number.isFinite(sa) ? sa : Number.MAX_SAFE_INTEGER;
+        const soB = Number.isFinite(sb) ? sb : Number.MAX_SAFE_INTEGER;
+        if (soA !== soB) return soA - soB;
+        return a.i - b.i;
+      })
+      .map(({ c }) => c)
+      .slice(0, 2);
+    // If no eligible cats for this tab, show empty state but keep grid
+    if(!toShow.length){
       grid.innerHTML = `<div class="admin-empty" style="grid-column:1/-1;text-align:center;padding:32px;background:var(--surface);border:1px solid var(--line);border-radius:22px"><strong>No ${escapeHtml(typeFilter)} categories</strong><br><span style="font-size:12px;color:var(--muted)">Try All.</span></div>`;
       return;
     }
-    // Show up to 4 categories (preserve 4-card layout); if more, show first 4
-    const toShow = filteredCats.slice(0,4);
     // Group products by category for display
     const catMap = new Map(categories.map(c=>[c.id, c]));
     grid.innerHTML = toShow.map((cat, idx)=>{

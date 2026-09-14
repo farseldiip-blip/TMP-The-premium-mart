@@ -7,7 +7,9 @@
 // request with its 15s timeout + single retry, and call writeCatalogCache
 // only after a successful fetch.
 
-const KEY = "tpm-catalog-v1";
+// Bumped to v2 when categories gained homepage_order, so cached entries saved
+// without the field are ignored instead of rendering an empty homepage preview.
+const KEY = "tpm-catalog-v2";
 const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 // In-memory mirror for this page only. Falls back to this automatically

@@ -315,6 +315,12 @@
                   <textarea id="catDesc" placeholder="Optional short description" rows="2"></textarea>
                   <span class="error"></span>
                 </div>
+                <div class="admin-field" id="field-homepage-order">
+                  <label for="catHomepageOrder">Homepage Order</label>
+                  <input id="catHomepageOrder" type="number" min="1" step="1" placeholder="Empty = excluded" />
+                  <span class="hint">Lower numbers appear first. Leave empty to exclude this category from the homepage preview.</span>
+                  <span class="error"></span>
+                </div>
                 <div class="admin-field">
                   <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
                     <input id="catActive" type="checkbox" class="admin-toggle" checked />

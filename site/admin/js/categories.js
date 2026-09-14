@@ -124,6 +124,7 @@ export async function initCategories() {
   els.fType = document.getElementById("catType");
   els.fActive = document.getElementById("catActive");
   els.fDesc = document.getElementById("catDesc");
+  els.fHomepageOrder = document.getElementById("catHomepageOrder");
   els.fBgPath = document.getElementById("catBgPath");
   els.fBgUrl = document.getElementById("catBgUrl");
   els.fBgFile = document.getElementById("catBgFile");
@@ -407,11 +408,13 @@ function openModal(cat) {
     els.fType.value = cat.type || "market";
     els.fActive.checked = !!cat.is_active;
     els.fDesc.value = cat.description || "";
+    if (els.fHomepageOrder) els.fHomepageOrder.value = cat.homepage_order ?? "";
   } else {
     els.fName.value = "";
     els.fType.value = "market";
     els.fActive.checked = true;
     els.fDesc.value = "";
+    if (els.fHomepageOrder) els.fHomepageOrder.value = "";
   }
   updateBgPreview();
   els.modal?.classList.add("open");
@@ -471,6 +474,20 @@ async function handleSubmit() {
   if (!name) { setFieldError("name", "Name is required."); hasError = true; }
   if (charLength(name) === 0) { setFieldError("name", "Name cannot be empty."); hasError = true; }
   if (!["market", "cafe"].includes(type)) { setFieldError("type", "Type must be market or cafe."); hasError = true; }
+
+  // Homepage Order is optional: empty/null excludes the category from the
+  // homepage preview. Otherwise a positive whole number (lower = first).
+  const homepageRaw = els.fHomepageOrder ? els.fHomepageOrder.value.trim() : "";
+  let homepage_order = null;
+  if (homepageRaw !== "") {
+    const n = Number(homepageRaw);
+    if (!Number.isInteger(n) || n < 1) {
+      setFieldError("homepage-order", "Homepage Order must be a positive whole number, or empty.");
+      hasError = true;
+    } else {
+      homepage_order = n;
+    }
+  }
 
   if (hasError) return;
 
@@ -547,6 +564,7 @@ async function handleSubmit() {
       slug,
       type,
       sort_order,
+      homepage_order,
       is_active,
       description,
       background_image_path,
