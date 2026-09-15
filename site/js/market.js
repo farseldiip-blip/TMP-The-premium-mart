@@ -588,7 +588,7 @@ function renderSearchResults(){
     wrap.innerHTML = `
       <div class="market-empty-state">
         <h2>No results for “${escapeHtml(q)}”</h2>
-        <p>Nothing in ${escapeHtml(dLabel)} matches. Try the other department or a different spelling.</p>
+        <p>Nothing in ${escapeHtml(dLabel)} matches. Try another word or department.</p>
         <p style="margin-top:14px"><button type="button" class="btn btn-secondary" data-clear-search style="min-height:44px">Clear search</button></p>
       </div>
     `;

@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light" />
   <!-- Primary SEO -->
   <title>TPM — The Premium Mart | Market &amp; Café in Mansoura</title>
-  <meta name="description" content="The Premium Mart (TPM) is a fresh Market &amp; Café in Mansoura at Geziret El Ward Sporting Club, offering fresh products, fruits, groceries, and café drinks. Fresh Every Day." />
+  <meta name="description" content="TPM — The Premium Mart: Market &amp; Café in Mansoura at Geziret El Ward Sporting Club. Fresh products, fruits, groceries, and café drinks." />
   <meta name="theme-color" content="#004e36" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://tmp-the-premium-mart.vercel.app/" />
@@ -17,7 +17,7 @@
   <meta property="og:locale" content="en_US" />
   <meta property="og:site_name" content="TPM — The Premium Mart" />
   <meta property="og:title" content="TPM — The Premium Mart | Market &amp; Café in Mansoura" />
-  <meta property="og:description" content="The Premium Mart (TPM) is a fresh Market &amp; Café in Mansoura at Geziret El Ward Sporting Club, offering fresh products, fruits, groceries, and café drinks. Fresh Every Day." />
+  <meta property="og:description" content="TPM — The Premium Mart: Market &amp; Café in Mansoura at Geziret El Ward Sporting Club. Fresh products, fruits, groceries, and café drinks." />
   <meta property="og:url" content="https://tmp-the-premium-mart.vercel.app/" />
   <meta property="og:image" content="https://tmp-the-premium-mart.vercel.app/assets/logo.jpg" />
   <meta property="og:image:width" content="1080" />
@@ -55,6 +55,7 @@
         <a href="index.html" aria-current="page">Home</a>
         <a href="#our-story">Our Story</a>
         <a href="market.html">Market</a>
+        <a href="offers.html">Offers</a>
         <a href="#recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 8v.01M16 8v.01M8 8v.01" stroke-width="2"/><path d="M17.5 2l1.5 3-3 1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/></svg> Recommend</a>
         <a href="#visit">Location</a>
       </nav>
@@ -80,6 +81,7 @@
       <a href="index.html" aria-current="page">Home <span aria-hidden="true">→</span></a>
       <a href="#our-story">Our Story <span aria-hidden="true">→</span></a>
       <a href="market.html">Market <span aria-hidden="true">→</span></a>
+      <a href="offers.html">Offers <span aria-hidden="true">→</span></a>
       <a href="#recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 8v.01M16 8v.01M8 8v.01" stroke-width="2"/><path d="M17.5 2l1.5 3-3 1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/></svg> Recommend <span aria-hidden="true">→</span></a>
       <a href="#visit">Find Us <span aria-hidden="true">→</span></a>
     </nav>
@@ -99,7 +101,7 @@
             <span class="line accent">Your Everyday</span>
             <span class="line">Stop.</span>
           </h1>
-          <p class="tpm-hero-desc">Signature drinks, fresh bites &amp; curated finds — all under one roof. A premium mart and lifestyle destination you’ll want to come back to.</p>
+          <p class="tpm-hero-desc">Signature drinks, fresh bites, and everyday finds — all under one roof.</p>
           <div class="tpm-hero-actions">
             <a class="btn tpm-btn-primary" href="market.html">Explore the Market <span aria-hidden="true">→</span></a>
             <a class="btn tpm-btn-ghost" href="#visit">Visit TPM</a>
@@ -144,13 +146,39 @@
       </div>
     </section>
 
+    <!-- HOMEPAGE OFFERS — compact editorial teaser rail -->
+    <section class="section tpm-offers-home" id="homeOffersSection" aria-label="Current offers">
+      <div class="container">
+        <div class="section-head">
+          <span class="tpm-offers-home-eyebrow">Special offers</span>
+          <h2><span class="tpm-offers-accent">Offers</span></h2>
+        </div>
+        <div class="tpm-offers-home-rail-wrap">
+          <button type="button" class="tpm-offers-nav tpm-offers-nav--prev" id="homeOffersPrev" aria-label="Previous offers">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="tpm-offers-home-rail" id="homeOffersRail">
+            <div class="tpm-offers-home-grid" id="homeOffersGrid">
+              <div class="tpm-offers-loading" style="padding:24px 0;text-align:center">Loading offers…</div>
+            </div>
+          </div>
+          <button type="button" class="tpm-offers-nav tpm-offers-nav--next" id="homeOffersNext" aria-label="Next offers">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+        <div class="tpm-offers-home-cta">
+          <a href="offers.html" class="tpm-offers-all-link">View All Offers →</a>
+        </div>
+      </div>
+    </section>
+
     <!-- TPM PREVIEW — editorial, 4 blocks -->
     <section class="section tpm-preview" aria-labelledby="tpm-preview-heading">
       <div class="container">
         <div class="tpm-preview-head reveal">
           <span class="tpm-preview-eyebrow">A taste of TPM</span>
           <h2 id="tpm-preview-heading">Drinks. Bites.<br/><em>Everything Better.</em></h2>
-          <p>A quick look at what makes TPM different — vibrant drinks, fresh daily bakes and the mart experience you’ll want to share.</p>
+          <p>Vibrant drinks, fresh daily bakes, and the mart — a quick look.</p>
         </div>
 
         <div class="tpm-preview-grid" role="list">
@@ -159,7 +187,7 @@
             <div class="tpm-card-content">
               <span class="tpm-card-kicker">Signature Drinks</span>
               <h3>Color, served cold</h3>
-              <p>Our most photographed sips — bright, fresh and unmistakably TPM.</p>
+              <p>Bright, fresh signature sips.</p>
             </div>
           </a>
 
@@ -186,7 +214,7 @@
             <div class="tpm-card-content">
               <span class="tpm-card-kicker blue">The TPM Pick</span>
               <h3>Come see the mart</h3>
-              <p>Curated products, lifestyle finds and your new everyday stop.</p>
+              <p>Curated products and everyday finds.</p>
             </div>
           </a>
         </div>
@@ -215,7 +243,7 @@
         </div>
         <div class="story-content reveal" style="transition-delay:.12s">
           <h2 id="story-heading" class="story-kicker">A premium mart.<br/>A lifestyle stop.</h2>
-          <p class="story-text">TPM was built for the way you live now — fast, social, and design-aware. More than a café, it’s a curated mart where signature drinks, fresh bites and everyday finds come together in one vibrant space.</p>
+          <p class="story-text">TPM is a premium mart and lifestyle stop in Mansoura. Signature drinks, fresh bites, and everyday finds — in one place.</p>
           <p class="story-text" style="display:none;">We pair heritage roasting with playful, modern presentation. Think Tall TPM cans, colorful infusions, bakery made daily and a storefront you’ll spot from down the block. Come for coffee, stay for the experience.</p>
           <style>@media(min-width:1024px){ .story-content p + p{display:block!important} }</style>
           <div class="tpm-about-stats" aria-hidden="true">
@@ -232,8 +260,8 @@
     <section class="section" aria-labelledby="gallery-heading" style="background:var(--surface-bright);border-top:1px solid var(--line)">
       <div class="container">
         <div class="section-head reveal" style="text-align:left;margin:0 0 18px;max-width:640px">
-          <h2 id="gallery-heading" style="font-family:'Space Grotesk',sans-serif;letter-spacing:-.03em">A sanctuary that<br/>feels like TPM</h2>
-          <p style="text-align:left;color:var(--muted)">Sun-lit shelves, colorful cans, plants and people — the energy is part of the menu. One video, the full experience: Market + Café.</p>
+          <h2 id="gallery-heading" style="font-family:'Space Grotesk',sans-serif;letter-spacing:-.03em">TPM,<br/>in motion</h2>
+          <p style="text-align:left;color:var(--muted)">Market + Café in one short video.</p>
         </div>
         <div class="gallery-grid reveal showcase-video-grid" style="transition-delay:.08s">
           <!-- Showcase video injected by js/public.js from store_info.showcase_video_url; fallback below -->
@@ -253,7 +281,7 @@
         <div class="visit-card tpm-rec reveal" style="transition-delay:.14s">
           <p class="tpm-rec-eyebrow">Community shelf</p>
           <h3 style="margin-bottom:8px">Recommend</h3>
-          <p class="prose" style="margin:0 0 4px">Loved by our visitors, stocked by TPM — recent community picks.</p>
+          <p class="prose" style="margin:0 0 4px">Picked by visitors, stocked by TPM.</p>
 
           <div class="tpm-rec-stage" id="recStage" hidden>
             <button class="tpm-rec-nav" id="recPrev" type="button" aria-label="Previous recommendation"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -265,7 +293,7 @@
           <p class="tpm-rec-counter" id="recCounter" hidden></p>
 
           <div class="tpm-rec-empty" id="recEmpty" hidden>
-            <p class="prose" style="margin:0">Nothing showcased yet — be the first to put something on our shelf.</p>
+            <p class="prose" style="margin:0">Nothing here yet — recommend the first pick.</p>
           </div>
 
           <div class="tpm-rec-cta">
@@ -287,7 +315,7 @@
             </form>
             <div class="tpm-rec-success" id="recSuccess" hidden>
               <strong>Thanks — recommendation received.</strong>
-              <p class="prose" style="margin:6px 0 12px">Our team reviews every suggestion. Approved picks appear above.</p>
+              <p class="prose" style="margin:6px 0 12px">We review every suggestion. Approved picks appear here.</p>
               <button type="button" class="btn btn-secondary" id="recAgain">Recommend another</button>
             </div>
           </div>
@@ -367,16 +395,17 @@
   <nav class="bottom-nav" aria-label="Mobile navigation">
     <a href="index.html" aria-current="page" class="home-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 10L12 4l8 6v8a1 1 0 0 1-1 1h-3v-5H8v5H5a1 1 0 0 1-1-1v-8Z"/></svg>Home</a>
     <a href="market.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>Market</a>
+    <a href="offers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Offers</a>
     <a href="#recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 8v.01M16 8v.01M8 8v.01" stroke-width="2"/><path d="M17.5 2l1.5 3-3 1.5" fill="currentColor" stroke="currentColor" stroke-width="1"/></svg>Recommend</a>
     <a href="#visit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 21s7-4.5 7-10a7 7 0 0 0-14 0c0 5.5 7 10 7 10Z"/><circle cx="12" cy="11" r="2.2"/></svg>Find Us</a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
-  <script src="js/app.js" defer></script>
-  <script type="module" src="js/public.js"></script>
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/recommendations.js"></script>
+  <script src="js/app.js?v=2" defer></script>
+  <script type="module" src="js/public.js?v=4"></script>
+  <script type="module" src="js/auth.js?v=2"></script>
+  <script type="module" src="js/recommendations.js?v=2"></script>
   <!-- LocalBusiness Structured Data -->
   <script type="application/ld+json">
   {
@@ -384,7 +413,7 @@
     "@type": ["CafeOrCoffeeShop", "GroceryStore", "FoodEstablishment"],
     "name": "TPM — The Premium Mart",
     "alternateName": "TPM",
-    "description": "The Premium Mart (TPM) is a fresh Market & Café in Mansoura at Geziret El Ward Sporting Club, offering fresh products, fruits, groceries, and café drinks. Fresh Every Day.",
+    "description": "The Premium Mart (TPM) is a Market & Café in Mansoura at Geziret El Ward Sporting Club, offering fresh products, fruits, groceries, and café drinks.",
     "url": "https://tmp-the-premium-mart.vercel.app/",
     "telephone": "0248813993",
     "address": {

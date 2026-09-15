@@ -55,6 +55,10 @@
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
           Categories
         </a>
+        <a href="#offers" data-nav="offers">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12V7a2 2 0 0 1 2-2h5l9 9-7 7-9-9Z"/><circle cx="8.5" cy="9.5" r="1.2"/></svg>
+          Offers
+        </a>
         <a href="#store" data-nav="store">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10h16L12 4 4 10Z"/><path d="M6 10v8h12v-8"/><path d="M9 18v-5h6v5"/></svg>
           Store Information
@@ -363,6 +367,157 @@
                 <button id="catDeleteConfirm" class="admin-btn admin-btn--danger" type="button">Delete</button>
               </div>
               <button id="catDeleteClose" class="admin-modal-close" type="button" aria-label="Close" style="position:absolute;top:12px;right:12px">×</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Offers Management (promotional layer, independent of departments) -->
+        <section data-view="offers" class="admin-view" hidden>
+          <div id="offerWrap">
+            <div class="admin-toolbar">
+              <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Offers</h3>
+              <span class="spacer"></span>
+              <input id="offerSearch" class="admin-search" type="search" placeholder="Search title…" aria-label="Search offers" />
+              <select id="offerStatusFilter" class="admin-filter" aria-label="Filter by status">
+                <option value="all">All statuses</option>
+                <option value="live">Live</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="expired">Expired</option>
+                <option value="off">Off</option>
+              </select>
+              <button id="offerRefreshBtn" class="admin-btn admin-btn-ghost admin-btn--sm" type="button">Refresh</button>
+              <button id="offerAddBtn" class="admin-btn admin-btn-primary admin-btn--sm" type="button">Add Offer</button>
+            </div>
+            <div id="offerStats" class="cat-stats"></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" aria-label="Offers">
+                <thead>
+                  <tr>
+                    <th>Offer</th>
+                    <th>Discount</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Sort</th>
+                    <th>Products</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="offerTbody"></tbody>
+              </table>
+              <div id="offerCards" class="cat-cards"></div>
+            </div>
+            <p class="admin-muted" style="margin-top:10px;font-size:11px">Offers never change a product's category or department. Deleting an offer removes its product links automatically.</p>
+          </div>
+
+          <!-- Add/Edit Modal -->
+          <div id="offerModal" class="admin-modal" role="dialog" aria-modal="true" aria-labelledby="offerModalTitle">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card">
+              <div class="admin-modal-head">
+                <h3 id="offerModalTitle">Add Offer</h3>
+                <button id="offerModalClose" class="admin-modal-close" type="button" aria-label="Close">×</button>
+              </div>
+              <form id="offerForm" novalidate>
+                <input type="hidden" id="offerId" />
+                <div class="admin-field" id="field-offer-title">
+                  <label for="offerTitle">Offer Name *</label>
+                  <input id="offerTitle" type="text" placeholder="e.g., Weekend Deal" required maxlength="120" />
+                  <span class="error"></span>
+                </div>
+                <div class="admin-field" id="field-offer-desc">
+                  <label for="offerDesc">Description</label>
+                  <textarea id="offerDesc" placeholder="Optional short description" rows="2"></textarea>
+                  <span class="error"></span>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-offer-discount-type">
+                    <label for="offerDiscountType">Discount Type</label>
+                    <select id="offerDiscountType">
+                      <option value="">None</option>
+                      <option value="percent">Percentage</option>
+                      <option value="fixed">Fixed EGP</option>
+                      <option value="price">Special Price</option>
+                      <option value="badge">Badge only</option>
+                    </select>
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-offer-value" style="display:none">
+                    <label for="offerDiscountValue">Discount Value</label>
+                    <input id="offerDiscountValue" type="number" min="0" step="0.01" placeholder="e.g., 20" />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-offer-badge" style="display:none">
+                    <label for="offerBadge">Badge Text</label>
+                    <input id="offerBadge" type="text" placeholder="e.g., Weekend Deal" maxlength="40" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-offer-sort">
+                    <label for="offerSortOrder">Sort Order</label>
+                    <input id="offerSortOrder" type="number" min="0" step="1" placeholder="0" />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-form-grid cols-2">
+                  <div class="admin-field" id="field-offer-starts">
+                    <label for="offerStartsAt">Starts At (optional)</label>
+                    <input id="offerStartsAt" type="datetime-local" />
+                    <span class="error"></span>
+                  </div>
+                  <div class="admin-field" id="field-offer-ends">
+                    <label for="offerEndsAt">Ends At (optional)</label>
+                    <input id="offerEndsAt" type="datetime-local" />
+                    <span class="error"></span>
+                  </div>
+                </div>
+                <div class="admin-field">
+                  <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input id="offerActive" type="checkbox" class="admin-toggle" checked />
+                    <span>Active</span>
+                  </label>
+                </div>
+                <div class="admin-field" style="margin-top:10px">
+                  <label>Offer Image (optional)</label>
+                  <div style="display:grid;gap:8px">
+                    <input id="offerImgFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml" />
+                    <span class="hint">≤5 MiB, JPG / PNG / WebP / AVIF / SVG. Uploads on Save.</span>
+                    <div id="offerImgPreview" class="hint">No image</div>
+                    <button id="offerImgRemove" type="button" class="admin-btn admin-btn-ghost admin-btn--sm">Remove image</button>
+                  </div>
+                </div>
+                <div class="admin-field" style="margin-top:10px">
+                  <label>Products in this offer</label>
+                  <div style="display:grid;gap:8px">
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <input id="offerProductSearch" class="admin-search" type="search" placeholder="Search existing products…" aria-label="Search products" style="flex:1" />
+                      <button id="offerAddSelected" type="button" class="admin-btn admin-btn-primary admin-btn--sm">Add Selected</button>
+                    </div>
+                    <div id="offerProductPool" style="max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 10px"></div>
+                    <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Selected</div>
+                    <div id="offerProductSelected" style="border:1px solid var(--line);border-radius:10px;padding:4px 10px;min-height:44px"></div>
+                  </div>
+                </div>
+                <div class="admin-modal-actions">
+                  <button id="offerModalCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                  <button type="submit" class="admin-btn admin-btn-primary">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Delete Confirm Modal -->
+          <div id="offerDeleteModal" class="admin-modal" role="dialog" aria-modal="true" aria-label="Confirm delete">
+            <div class="admin-modal-overlay"></div>
+            <div class="admin-modal-card" style="max-width:420px">
+              <h3 style="margin:0 0 8px">Delete offer?</h3>
+              <p class="admin-muted" style="margin:0 0 6px">This will permanently delete <strong id="offerDeleteName"></strong>.</p>
+              <p class="admin-muted" style="font-size:11px">Linked products keep their category and department; only the offer and its product links are removed. This cannot be undone.</p>
+              <div class="admin-modal-actions">
+                <button id="offerDeleteCancel" class="admin-btn admin-btn-ghost" type="button">Cancel</button>
+                <button id="offerDeleteConfirm" class="admin-btn admin-btn--danger" type="button">Delete</button>
+              </div>
+              <button id="offerDeleteClose" class="admin-modal-close" type="button" aria-label="Close" style="position:absolute;top:12px;right:12px">×</button>
             </div>
           </div>
         </section>
@@ -750,6 +905,7 @@
     import { requireAdmin, signOutAndRedirect } from "./js/auth.js";
     import { getSupabase } from "./js/supabase.js";
     import { initCategories } from "./js/categories.js";
+    import { initOffers } from "./js/offers.js";
     import { initProducts } from "./js/products.js";
     import { initStoreInfo } from "./js/store_info.js";
     import { initContactInfo } from "./js/contact_info.js";
@@ -788,6 +944,7 @@
         sidebarEmail.parentElement.parentElement.title = state.user.email || "";
         // Init Categories (3A) + Products (3B) + Store/Contact/Social/Video — uses RLS, no service_role
         try { await initCategories(); } catch (e) { console.error("[TPM categories] init failed", e); }
+        try { await initOffers(); } catch (e) { console.error("[TPM offers] init failed", e); }
         try { await initProducts(); } catch (e) { console.error("[TPM products] init failed", e); }
         try { await initStoreInfo(); } catch (e) { console.error("[TPM store] init failed", e); }
         try { await initContactInfo(); } catch (e) { console.error("[TPM contact] init failed", e); }
@@ -838,13 +995,13 @@
         a.classList.toggle("active", active);
         if (active) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
       });
-      const titles = { overview:"Overview", products:"Products", categories:"Categories", store:"Store Information", contact:"Contact", social:"Social Links", video:"Showcase Video", recs:"Product Recommendations" };
+      const titles = { overview:"Overview", products:"Products", categories:"Categories", offers:"Offers", store:"Store Information", contact:"Contact", social:"Social Links", video:"Showcase Video", recs:"Product Recommendations" };
       document.getElementById("pageTitle").textContent = titles[name] || "Overview";
       closeSidebar();
     }
     function currentViewFromHash(){
       const h = (location.hash || "#overview").replace("#","").trim() || "overview";
-      return ["overview","products","categories","store","contact","social","video","recs"].includes(h) ? h : "overview";
+      return ["overview","products","categories","offers","store","contact","social","video","recs"].includes(h) ? h : "overview";
     }
     navLinks.forEach(a => a.addEventListener("click", (e) => {
       e.preventDefault();
