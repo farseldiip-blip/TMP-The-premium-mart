@@ -30,6 +30,14 @@ function fmtPct(n) {
   return Number.isInteger(v) ? String(v) : String(parseFloat(v.toFixed(2)));
 }
 
+// Display label for a percentage discount (e.g. "20% OFF").
+// Reads the existing offer discount data; performs no pricing math.
+// Returns "" when the offer has no percentage discount.
+export function discountSeal(offer) {
+  if (!offer || (offer.discount_type || null) !== "percent" || offer.discount_value == null) return "";
+  return `${fmtPct(offer.discount_value)}% OFF`;
+}
+
 export function priceOffer(offer) {
   const isPercent = (offer.discount_type || null) === "percent";
   const d = num(offer.discount_value);

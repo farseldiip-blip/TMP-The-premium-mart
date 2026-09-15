@@ -3,7 +3,7 @@
 // Shows max 4 currently valid active offers as a horizontal editorial rail.
 
 import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
-import { escapeHtml } from "./offer-pricing.js";
+import { escapeHtml, discountSeal } from "./offer-pricing.js";
 
 const CACHE_KEY = "tpm-offers-v2";
 const CACHE_TTL = 10 * 60 * 1000;
@@ -105,13 +105,13 @@ function renderRail(offers) {
   const cards = offers.map((o) => {
     const slug = o.slug || slugify(o.title);
     const img = imageUrl(o);
-    const badge = o.badge && String(o.badge).trim() ? String(o.badge).trim() : "";
+    const seal = discountSeal(o);
     return `
       <a href="offers.html#offer-${slug}" class="home-offer-teaser" data-slug="${escapeHtmlAttr(slug)}">
         ${img
           ? `<img class="home-offer-teaser-img" src="${escapeHtml(img)}" alt="${escapeHtml(o.title)}" width="600" height="400" loading="lazy" decoding="async" />`
           : `<span class="home-offer-teaser-blank" aria-hidden="true"></span>`}
-        ${badge ? `<span class="home-offer-teaser-badge">${escapeHtml(badge)}</span>` : ""}
+        ${seal ? `<span class="home-offer-teaser-discount">${escapeHtml(seal)}</span>` : ""}
         <h3 class="home-offer-teaser-title">${escapeHtml(o.title)}</h3>
       </a>`;
   }).join("");
