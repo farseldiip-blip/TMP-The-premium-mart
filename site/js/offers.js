@@ -105,20 +105,26 @@ function closeOfferModal() {
 
 function openOfferBySlug(slug, push) {
   const o = (offers || []).find(x => (x.slug || slugify(x.title)) === slug);
-  if (!o) return;
+  if (!o) return false;
   if (push) { try { history.pushState(null, "", `#offer-${slug}`); } catch (_) {} }
   openOfferModal(o);
+  return true;
 }
 
 const HIGHLIGHT_FLAG = "tpm-offer-highlight-only";
 
 function spotlightCard(slug) {
   const card = document.querySelector(`.offer-card[data-slug="${slug}"]`);
-  if (!card) return;
+  if (!card) return false;
   card.scrollIntoView({ behavior: "smooth", block: "center" });
   card.classList.add("offer-card--spotlight");
   try { card.focus({ preventScroll: true }); } catch (_) { try { card.focus(); } catch (_) {} }
   setTimeout(() => card.classList.remove("offer-card--spotlight"), 2600);
+  return true;
+}
+
+function clearOfferHash() {
+  try { history.replaceState(null, "", window.location.pathname + window.location.search); } catch (_) {}
 }
 
 function openHashOffer() {
@@ -135,10 +141,10 @@ function openHashOffer() {
     }
   } catch (_) {}
   if (highlightOnly) {
-    spotlightCard(slug);
+    if (spotlightCard(slug)) clearOfferHash();
     return;
   }
-  openOfferBySlug(slug, false);
+  if (openOfferBySlug(slug, false)) clearOfferHash();
 }
 
 function fmtDiscount(o) {
