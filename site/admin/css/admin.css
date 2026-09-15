@@ -383,13 +383,10 @@ a.admin-stat:focus-visible{outline:3px solid var(--tpm-green);outline-offset:2px
   .cat-cards{display:grid}
   .admin-toolbar{flex-direction:column;align-items:stretch}
   .admin-toolbar .admin-search{max-width:none}
-  #catSearch.admin-search{
-    height:44px;padding:0 16px;font-size:14.5px;border-radius:999px;width:100%;max-width:100%;flex:0 0 auto;box-sizing:border-box;
-  }
-  #prodSearch.admin-search{
-    height:44px;padding:0 16px;font-size:14.5px;border-radius:999px;width:100%;max-width:100%;flex:0 0 auto;box-sizing:border-box;
-  }
-  #socialSearch.admin-search{
+  #catSearch.admin-search,
+  #prodSearch.admin-search,
+  #socialSearch.admin-search,
+  #offerSearch.admin-search{
     height:44px;padding:0 16px;font-size:14.5px;border-radius:999px;width:100%;max-width:100%;flex:0 0 auto;box-sizing:border-box;
   }
   .picker-search-row{flex-direction:column}
