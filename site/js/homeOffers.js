@@ -141,6 +141,18 @@ function setupPrevNext() {
   setTimeout(() => observer.disconnect(), 2000);
 }
 
+function setupTeaserClicks() {
+  const grid = document.getElementById("homeOffersGrid");
+  if (!grid || grid.dataset.hlBound) return;
+  grid.dataset.hlBound = "1";
+  grid.addEventListener("click", (e) => {
+    if (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const card = e.target.closest(".home-offer-teaser");
+    if (!card || !card.dataset.slug) return;
+    try { sessionStorage.setItem("tpm-offer-highlight-only", card.dataset.slug); } catch (_) {}
+  });
+}
+
 export async function init() {
   try {
     const offers = await loadValidOffers();
@@ -154,6 +166,7 @@ export async function init() {
 
     renderRail(offers);
     setupPrevNext();
+    setupTeaserClicks();
   } catch (err) {
     console.error("[TPM homeOffers] Failed", err?.message || String(err));
     const section = document.getElementById("homeOffersSection");

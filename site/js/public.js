@@ -3,7 +3,7 @@
 
 import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
 import { readCatalogCache, writeCatalogCache, isCatalogChanged } from "./catalog-cache.js";
-import { init as initHomeOffers } from "./homeOffers.js?v=4";
+import { init as initHomeOffers } from "./homeOffers.js?v=5";
 
 const FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=900&q=80&auto=format&fit=crop",

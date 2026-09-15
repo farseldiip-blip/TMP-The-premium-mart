@@ -3,7 +3,7 @@
 // Uses getAnonSupabase() from supabase.js and sessionStorage caching.
 
 import { getAnonSupabase as getPublicSupabase } from "./supabase.js";
-import { formatMoney, escapeHtml, priceOffer, cardPriceHtml, modalSummaryHtml, productRowsHtml } from "./offer-pricing.js";
+import { escapeHtml, priceOffer, cardPriceHtml, modalSummaryHtml, productRowsHtml } from "./offer-pricing.js";
 
 const CACHE_KEY = "tpm-offers-v2";
 const CACHE_TTL = 10 * 60 * 1000;
@@ -64,7 +64,7 @@ function openOfferModal(o) {
     ${discount ? `<span class="offer-seal">${discount}</span>` : ""}
     ${statusCls !== "live" ? `<span class="offer-status offer-status--${statusCls}">${status}</span>` : ""}`;
   els.body.innerHTML = `
-    ${o.badge && o.discount_type !== "badge" ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : ""}
+    ${o.badge ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : ""}
     <h3 class="offer-modal-title" id="offerModalTitle">${escapeHtml(o.title)}</h3>
     ${cardPriceHtml(pricing)}
     ${o.description ? `<p class="offer-modal-desc">${escapeHtml(o.description)}</p>` : ""}
@@ -110,20 +110,40 @@ function openOfferBySlug(slug, push) {
   openOfferModal(o);
 }
 
+const HIGHLIGHT_FLAG = "tpm-offer-highlight-only";
+
+function spotlightCard(slug) {
+  const card = document.querySelector(`.offer-card[data-slug="${slug}"]`);
+  if (!card) return;
+  card.scrollIntoView({ behavior: "smooth", block: "center" });
+  card.classList.add("offer-card--spotlight");
+  try { card.focus({ preventScroll: true }); } catch (_) { try { card.focus(); } catch (_) {} }
+  setTimeout(() => card.classList.remove("offer-card--spotlight"), 2600);
+}
+
 function openHashOffer() {
   const hash = window.location.hash;
   if (!hash) return;
   const match = hash.match(/^#offer-(.+)$/);
   if (!match) return;
-  openOfferBySlug(decodeURIComponent(match[1]), false);
+  const slug = decodeURIComponent(match[1]);
+  let highlightOnly = false;
+  try {
+    if (sessionStorage.getItem(HIGHLIGHT_FLAG) === slug) {
+      sessionStorage.removeItem(HIGHLIGHT_FLAG);
+      highlightOnly = true;
+    }
+  } catch (_) {}
+  if (highlightOnly) {
+    spotlightCard(slug);
+    return;
+  }
+  openOfferBySlug(slug, false);
 }
 
 function fmtDiscount(o) {
   if (!o) return "";
   if (o.discount_type === "percent" && o.discount_value != null) return `${trimNum(o.discount_value)}% OFF`;
-  if (o.discount_type === "fixed" && o.discount_value != null) return `${formatMoney(o.discount_value)} OFF`;
-  if (o.discount_type === "price" && o.discount_value != null) return formatMoney(o.discount_value);
-  if (o.discount_type === "badge") return o.badge ? escapeHtml(o.badge) : "Offer";
   return "";
 }
 
@@ -198,22 +218,20 @@ function revalidateOffers(offersList) {
 
 let offers = [];
 let products = [];
-let filtered = [];
-let searchTerm = "";
 
 function renderOffers() {
   const grid = document.getElementById("offersGrid");
   const empty = document.getElementById("offersEmpty");
   if (!grid) return;
 
-  if (!filtered.length) {
+  if (!offers.length) {
     grid.innerHTML = "";
     if (empty) empty.style.display = "";
     return;
   }
   if (empty) empty.style.display = "none";
 
-  grid.innerHTML = filtered.map((o) => {
+  grid.innerHTML = offers.map((o) => {
     const slug = o.slug || slugify(o.title);
     const status = statusLabel(o);
     const statusCls = statusClass(o);
@@ -238,7 +256,7 @@ function renderOffers() {
           ${statusCls !== "live" ? `<span class="offer-status offer-status--${statusCls}">${status}</span>` : ""}
         </div>
         <div class="offer-card-body">
-          ${o.badge && o.discount_type !== "badge" ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : ""}
+          ${o.badge ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : ""}
           <h3 class="offer-card-title">${escapeHtml(o.title)}</h3>
           ${cardPriceHtml(pricing)}
           ${fullDesc ? `<p class="offer-card-desc">${escapeHtml(fullDesc)}</p>` : ""}
@@ -251,19 +269,6 @@ function renderOffers() {
         </div>
       </a>`;
   }).join("");
-}
-
-function applyFilter() {
-  const q = searchTerm.toLowerCase().trim();
-  filtered = offers.filter((o) => {
-    if (!q) return true;
-    const slug = o.slug || slugify(o.title);
-    return o.title.toLowerCase().includes(q) ||
-      slug.includes(q) ||
-      (o.description || "").toLowerCase().includes(q) ||
-      (o.badge || "").toLowerCase().includes(q);
-  });
-  renderOffers();
 }
 
 function setupDeepLink() {
@@ -285,28 +290,6 @@ function setupCardClicks() {
     e.preventDefault();
     openOfferBySlug(card.dataset.slug, true);
   });
-}
-
-function setupSearch() {
-  const input = document.getElementById("offersSearch");
-  const clear = document.getElementById("offersSearchClear");
-  if (!input) return;
-
-  input.addEventListener("input", (e) => {
-    searchTerm = e.target.value.trim();
-    applyFilter();
-    if (clear) clear.hidden = !searchTerm;
-  });
-
-  if (clear) {
-    clear.addEventListener("click", () => {
-      input.value = "";
-      searchTerm = "";
-      applyFilter();
-      clear.hidden = true;
-      input.focus();
-    });
-  }
 }
 
 async function loadOffers() {
@@ -365,7 +348,7 @@ supa.from("offers")
       });
     });
 
-    applyFilter();
+    renderOffers();
     setupDeepLink();
   } catch (err) {
     console.error("[TPM offers] Load failed", err);
@@ -375,7 +358,6 @@ supa.from("offers")
 }
 
 async function init() {
-  setupSearch();
   setupCardClicks();
   await loadOffers();
 }

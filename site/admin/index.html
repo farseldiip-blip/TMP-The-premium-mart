@@ -430,25 +430,14 @@
                   <span class="error"></span>
                 </div>
                 <div class="admin-form-grid cols-2">
-                  <div class="admin-field" id="field-offer-discount-type">
-                    <label for="offerDiscountType">Discount Type</label>
-                    <select id="offerDiscountType">
-                      <option value="">None</option>
-                      <option value="percent">Percentage</option>
-                      <option value="fixed">Fixed EGP</option>
-                      <option value="price">Special Price</option>
-                      <option value="badge">Badge only</option>
-                    </select>
-                    <span class="error"></span>
-                  </div>
-                  <div class="admin-field" id="field-offer-value" style="display:none">
-                    <label for="offerDiscountValue">Discount Value</label>
-                    <input id="offerDiscountValue" type="number" min="0" step="0.01" placeholder="e.g., 20" />
+                  <div class="admin-field" id="field-offer-value">
+                    <label for="offerDiscountValue">Discount (%)</label>
+                    <input id="offerDiscountValue" type="number" min="0" max="100" step="0.01" placeholder="e.g., 20" />
                     <span class="error"></span>
                   </div>
                 </div>
                 <div class="admin-form-grid cols-2">
-                  <div class="admin-field" id="field-offer-badge" style="display:none">
+                  <div class="admin-field" id="field-offer-badge">
                     <label for="offerBadge">Badge Text</label>
                     <input id="offerBadge" type="text" placeholder="e.g., Weekend Deal" maxlength="40" />
                     <span class="error"></span>

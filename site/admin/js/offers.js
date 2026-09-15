@@ -82,10 +82,6 @@ function toast(msg, kind = "ok") {
   setTimeout(() => { if (t.parentNode) t.remove(); }, 4200);
 }
 
-function formatMoney(n) {
-  return `EGP${Number(n).toFixed(2)}`;
-}
-
 function trimNum(n) {
   const v = Number(n);
   return Number.isInteger(v) ? String(v) : String(v);
@@ -94,9 +90,6 @@ function trimNum(n) {
 function fmtDiscount(o) {
   if (!o) return "—";
   if (o.discount_type === "percent" && o.discount_value != null) return `${trimNum(o.discount_value)}% OFF`;
-  if (o.discount_type === "fixed" && o.discount_value != null) return `−${formatMoney(o.discount_value)}`;
-  if (o.discount_type === "price" && o.discount_value != null) return formatMoney(o.discount_value);
-  if (o.discount_type === "badge") return o.badge ? escapeHtml(o.badge) : "Badge";
   return "—";
 }
 
@@ -168,7 +161,6 @@ export async function initOffers() {
   els.form = document.getElementById("offerForm");
   els.fTitle = document.getElementById("offerTitle");
   els.fDesc = document.getElementById("offerDesc");
-  els.fType = document.getElementById("offerDiscountType");
   els.fBadge = document.getElementById("offerBadge");
   els.fValue = document.getElementById("offerDiscountValue");
   els.fStarts = document.getElementById("offerStartsAt");
@@ -218,11 +210,6 @@ export async function initOffers() {
   els.form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     await handleSubmit();
-  });
-
-  els.fType?.addEventListener("change", (e) => {
-    updateDiscountValueVisibility();
-    updateBadgeVisibility();
   });
 
   els.fImgFile?.addEventListener("change", handleFileSelect);
@@ -431,24 +418,6 @@ function updateImgPreview() {
   }
 }
 
-// ---------- Discount type UI helpers ----------
-
-function updateDiscountValueVisibility() {
-  const type = els.fType?.value || "";
-  const valWrap = els.fValue ? els.fValue.closest(".admin-field") : null;
-  if (valWrap) {
-    valWrap.style.display = (type === "percent" || type === "fixed" || type === "price") ? "" : "none";
-  }
-}
-
-function updateBadgeVisibility() {
-  const type = els.fType?.value || "";
-  const badgeWrap = els.fBadge ? els.fBadge.closest(".admin-field") : null;
-  if (badgeWrap) {
-    badgeWrap.style.display = type === "badge" ? "" : "none";
-  }
-}
-
 // ---------- Product picker (simple: search existing products, add selected) ----------
 
 function pickerPool() {
@@ -534,7 +503,6 @@ function openModal(offer) {
     els.fTitle.value = offer.title || "";
     els.fDesc.value = offer.description || "";
     els.fBadge.value = offer.badge || "";
-    els.fType.value = offer.discount_type || "";
     els.fValue.value = offer.discount_value ?? "";
     els.fStarts.value = toLocalInput(offer.starts_at);
     els.fEnds.value = toLocalInput(offer.ends_at);
@@ -551,7 +519,6 @@ function openModal(offer) {
     els.fTitle.value = "";
     els.fDesc.value = "";
     els.fBadge.value = "";
-    els.fType.value = "";
     els.fValue.value = "";
     els.fStarts.value = "";
     els.fEnds.value = "";
@@ -559,8 +526,6 @@ function openModal(offer) {
     els.fSort.value = offers.reduce((m, o) => Math.max(m, Number(o.sort_order) || 0), 0) + 1;
     pickerSelected = [];
   }
-  updateDiscountValueVisibility();
-  updateBadgeVisibility();
   updateImgPreview();
   renderPicker();
   els.modal?.classList.add("open");
@@ -608,7 +573,9 @@ async function handleSubmit() {
   const title = els.fTitle.value.trim();
   const description = els.fDesc.value.trim() || null;
   const badge = els.fBadge.value.trim() || null;
-  const discount_type = els.fType.value || null;
+  const discount_type = "percent";
+
+  // Discount value: percentage 0–100 (mirrors DB CHECK constraint)
   const valueRaw = els.fValue.value.trim();
   const startsRaw = els.fStarts.value;
   const endsRaw = els.fEnds.value;
@@ -619,27 +586,16 @@ async function handleSubmit() {
   let hasError = false;
   if (!title || charLength(title) === 0) { setFieldError("title", "Title is required."); hasError = true; }
 
-  // Discount type must be one of the valid options
-  if (discount_type && !["percent", "fixed", "price", "badge"].includes(discount_type)) {
-    setFieldError("type", "Please select a discount type.");
-    hasError = true;
-  }
-
+  // Discount is always a percentage (0–100), mirroring the DB CHECK constraint.
   // Discount value mirrors DB CHECK constraints
   let discount_value = null;
-  if (discount_type === null) {
-    discount_value = null;
-  } else if (discount_type === "badge") {
-    if (valueRaw !== "") { setFieldError("value", "Badge-only offers must not have a discount value."); hasError = true; }
-    discount_value = null;
+  if (valueRaw === "") {
+    setFieldError("value", "Discount (%) is required.");
+    hasError = true;
   } else {
-    if (valueRaw === "") { setFieldError("value", "Discount value is required for this type."); hasError = true; }
-    else {
-      const n = Number(valueRaw);
-      if (!Number.isFinite(n) || n < 0) { setFieldError("value", "Discount value must be 0 or higher."); hasError = true; }
-      else if (discount_type === "percent" && n > 100) { setFieldError("value", "Percent must be between 0 and 100."); hasError = true; }
-      else discount_value = n;
-    }
+    const n = Number(valueRaw);
+    if (!Number.isFinite(n) || n < 0 || n > 100) { setFieldError("value", "Discount must be between 0 and 100."); hasError = true; }
+    else discount_value = n;
   }
 
   // Dates
