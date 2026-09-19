@@ -377,7 +377,7 @@
             <div class="admin-toolbar">
               <h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px">Offers</h3>
               <span class="spacer"></span>
-              <input id="offerSearch" class="admin-search" type="search" placeholder="Search title…" aria-label="Search offers" />
+              <input id="offerSearch" class="admin-search" type="search" placeholder="Search offers…" aria-label="Search offers" />
               <select id="offerStatusFilter" class="admin-filter" aria-label="Filter by status">
                 <option value="all">All statuses</option>
                 <option value="live">Live</option>
@@ -419,26 +419,27 @@
               </div>
               <form id="offerForm" novalidate>
                 <input type="hidden" id="offerId" />
+                <p class="admin-muted" style="margin:0 0 12px;font-size:12px">All fields are optional. An image-only offer is allowed — add at least a title, description, badge, discount, image, or product.</p>
                 <div class="admin-field" id="field-offer-title">
-                  <label for="offerTitle">Offer Name *</label>
-                  <input id="offerTitle" type="text" placeholder="e.g., Weekend Deal" required maxlength="120" />
+                  <label for="offerTitle">Offer Name (optional)</label>
+                  <input id="offerTitle" type="text" placeholder="e.g., Weekend Deal" maxlength="120" />
                   <span class="error"></span>
                 </div>
                 <div class="admin-field" id="field-offer-desc">
-                  <label for="offerDesc">Description</label>
+                  <label for="offerDesc">Description (optional)</label>
                   <textarea id="offerDesc" placeholder="Optional short description" rows="2"></textarea>
                   <span class="error"></span>
                 </div>
                 <div class="admin-form-grid cols-2">
                   <div class="admin-field" id="field-offer-value">
-                    <label for="offerDiscountValue">Discount (%)</label>
+                    <label for="offerDiscountValue">Discount (%) (optional)</label>
                     <input id="offerDiscountValue" type="number" min="0" max="100" step="0.01" placeholder="e.g., 20" />
                     <span class="error"></span>
                   </div>
                 </div>
                 <div class="admin-form-grid cols-2">
                   <div class="admin-field" id="field-offer-badge">
-                    <label for="offerBadge">Badge Text</label>
+                    <label for="offerBadge">Badge Text (optional)</label>
                     <input id="offerBadge" type="text" placeholder="e.g., Weekend Deal" maxlength="40" />
                     <span class="error"></span>
                   </div>
@@ -476,7 +477,7 @@
                   </div>
                 </div>
                 <div class="admin-field" style="margin-top:10px">
-                  <label>Products in this offer</label>
+                  <label>Products in this offer (optional)</label>
                   <div style="display:grid;gap:8px">
                     <div style="display:flex;gap:8px;align-items:center">
                       <input id="offerProductSearch" class="admin-search" type="search" placeholder="Search existing products…" aria-label="Search products" style="flex:1" />

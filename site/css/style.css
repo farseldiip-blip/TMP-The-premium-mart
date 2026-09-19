@@ -4346,6 +4346,48 @@ img {
     box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.35), var(--shadow-lift);
     transform: translateY(-4px) scale(1.01);
   }
+  /* Image-only offer: NOT a card. Same grid flow, but the wrapper
+     visually disappears (no background, border, shadow, body, or fixed
+     height). The image itself — natural ratio, full available width — IS
+     the offer; the card radius clips its corners. Normal cards untouched.
+     Mobile: full-width editorial poster (both columns). Desktop: single
+     grid item. */
+  .offer-card--image-only {
+    align-self: start;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+  @media (max-width: 767px) {
+    .offer-card--image-only {
+      grid-column: 1 / -1;
+    }
+  }
+  .offer-card--image-only:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .offer-card--image-only .offer-card-media {
+    aspect-ratio: auto;
+    background: transparent;
+  }
+   .offer-card--image-only .offer-card-media img {
+     position: static;
+     display: block;
+     width: 100%;
+     height: auto;
+     transition: none;
+   }
+   .offer-card--image-only .offer-seal,
+   .offer-card--image-only .offer-status {
+     display: none;
+   }
+   .offer-card--image-only:hover .offer-card-media img {
+     transform: none;
+   }
+   .offer-card--image-only .offer-card-body {
+     display: none;
+   }
 
   /* Offer card media */
   .offer-card-media {
@@ -4599,6 +4641,13 @@ img {
   }
   .offer-modal .offer-card-products { margin-top: 2px; }
   .offer-modal-media .offer-seal { right: auto; left: 12px; }
+  /* Image-only offer modal: no text body, show image full-width */
+  .offer-modal--image-only .offer-modal-media { max-height: 70vh; }
+  @media (min-width: 768px) {
+    .offer-modal--image-only { max-width: min(640px, 90vw); }
+    .offer-modal--image-only .offer-modal-media { width: 100%; min-height: 320px; }
+    .offer-modal--image-only .offer-modal-media img { position: relative; }
+  }
   .offer-card-desc {
     font-size: 0.9rem;
     color: var(--muted);

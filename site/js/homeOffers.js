@@ -13,7 +13,20 @@ function escapeHtmlAttr(s) {
 }
 
 function slugify(s) {
-  return String(s).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s_]+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  return String(s ?? "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s_]+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+}
+
+function offerTitle(o) {
+  const t = typeof o?.title === "string" ? o.title.trim() : "";
+  return t;
+}
+
+function offerAlt(o) {
+  const t = offerTitle(o);
+  if (t) return t;
+  const b = typeof o?.badge === "string" ? o.badge.trim() : "";
+  if (b) return b;
+  return "Offer";
 }
 
 function imageUrl(o) {
@@ -103,16 +116,18 @@ function renderRail(offers) {
   }
 
   const cards = offers.map((o) => {
-    const slug = o.slug || slugify(o.title);
+    const slug = o.slug || slugify(o.title) || `offer-${o.id || "untitled"}`;
+    const title = offerTitle(o);
+    const alt = offerAlt(o);
     const img = imageUrl(o);
     const seal = discountSeal(o);
     return `
-      <a href="offers.html#offer-${slug}" class="home-offer-teaser" data-slug="${escapeHtmlAttr(slug)}">
+      <a href="offers.html#offer-${slug}" class="home-offer-teaser" data-slug="${escapeHtmlAttr(slug)}"${title ? "" : ` aria-label="${escapeHtmlAttr(alt)}"`}>
         ${img
-          ? `<img class="home-offer-teaser-img" src="${escapeHtml(img)}" alt="${escapeHtml(o.title)}" width="600" height="400" loading="lazy" decoding="async" />`
+          ? `<img class="home-offer-teaser-img" src="${escapeHtml(img)}" alt="${escapeHtml(alt)}" width="600" height="400" loading="lazy" decoding="async" />`
           : `<span class="home-offer-teaser-blank" aria-hidden="true"></span>`}
         ${seal ? `<span class="home-offer-teaser-discount">${escapeHtml(seal)}</span>` : ""}
-        <h3 class="home-offer-teaser-title">${escapeHtml(o.title)}</h3>
+        ${title ? `<h3 class="home-offer-teaser-title">${escapeHtml(title)}</h3>` : ""}
       </a>`;
   }).join("");
 

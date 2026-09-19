@@ -285,10 +285,12 @@ function memberCount(id) {
 
 function applyFilter() {
   filtered = offers.filter((o) => {
+    const title = (o.title || "").toLowerCase();
+    const slug = (o.slug || "").toLowerCase();
     const matchesSearch =
       !searchTerm ||
-      o.title.toLowerCase().includes(searchTerm) ||
-      o.slug.toLowerCase().includes(searchTerm) ||
+      title.includes(searchTerm) ||
+      slug.includes(searchTerm) ||
       (o.description || "").toLowerCase().includes(searchTerm) ||
       (o.badge || "").toLowerCase().includes(searchTerm);
     const matchesStatus = statusFilter === "all" || offerStatus(o).key === statusFilter;
@@ -326,12 +328,15 @@ function render() {
       .map((o) => {
         const n = memberCount(o.id);
         const imgHtml = o.image_url ? `<img src="${escapeHtml(o.image_url)}" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--line)" />` : `<span style="color:var(--muted);font-size:18px">—</span>`;
+        const titleHtml = o.title
+          ? escapeHtml(o.title)
+          : `<span style="color:var(--muted);font-weight:400">No title</span>`;
         return `
           <tr>
             <td style="display:flex;align-items:center;gap:10px">
               <div style="width:36px;height:36px;border-radius:6px;overflow:hidden;border:1px solid var(--line);display:grid;place-items:center;background:var(--surface-2);flex:none">${imgHtml}</div>
               <div>
-                <div style="font-weight:700">${escapeHtml(o.title)}</div>
+                <div style="font-weight:700">${titleHtml}</div>
                 ${o.description ? `<div style="font-size:11px;color:var(--muted);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(o.description)}</div>` : ""}
               </div>
             </td>
@@ -357,11 +362,14 @@ function render() {
       .map((o) => {
         const n = memberCount(o.id);
         const imgHtml = o.image_url ? `<img src="${escapeHtml(o.image_url)}" alt="" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:8px" />` : "";
+        const cardTitle = o.title
+          ? escapeHtml(o.title)
+          : `<span style="color:var(--muted);font-weight:400">No title</span>`;
         return `
           <div class="cat-card">
             ${imgHtml ? `<div style="margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid var(--line)">${imgHtml}</div>` : ""}
             <div class="cat-card-head">
-              <strong>${escapeHtml(o.title)}</strong>
+              <strong>${cardTitle}</strong>
               <span style="display:flex;gap:6px">${statusBadge(o)}</span>
             </div>
             <div class="cat-card-meta">
@@ -543,7 +551,8 @@ function closeModal() {
 let pendingDeleteId = null;
 function openDeleteModal(offer) {
   pendingDeleteId = offer.id;
-  if (els.deleteName) els.deleteName.textContent = `${offer.title} (${memberCount(offer.id)} products)`;
+  const label = offer.title || offer.slug || "this offer";
+  if (els.deleteName) els.deleteName.textContent = `${label} (${memberCount(offer.id)} products)`;
   els.deleteModal?.classList.add("open");
 }
 function closeDeleteModal() {
@@ -570,12 +579,13 @@ function setFieldError(field, msg) {
 function charLength(s) { return String(s).trim().length; }
 
 async function handleSubmit() {
-  const title = els.fTitle.value.trim();
+  const titleRaw = els.fTitle.value.trim();
+  const title = titleRaw || null;
   const description = els.fDesc.value.trim() || null;
   const badge = els.fBadge.value.trim() || null;
-  const discount_type = "percent";
 
-  // Discount value: percentage 0–100 (mirrors DB CHECK constraint)
+  // Discount is optional. When provided it is always a percentage 0–100
+  // (mirrors DB CHECK constraint). When empty, no discount is stored.
   const valueRaw = els.fValue.value.trim();
   const startsRaw = els.fStarts.value;
   const endsRaw = els.fEnds.value;
@@ -584,18 +594,17 @@ async function handleSubmit() {
 
   clearAllErrors();
   let hasError = false;
-  if (!title || charLength(title) === 0) { setFieldError("title", "Title is required."); hasError = true; }
 
-  // Discount is always a percentage (0–100), mirroring the DB CHECK constraint.
-  // Discount value mirrors DB CHECK constraints
+  // Discount value mirrors DB CHECK constraints (optional)
+  let discount_type = null;
   let discount_value = null;
   if (valueRaw === "") {
-    setFieldError("value", "Discount (%) is required.");
-    hasError = true;
+    discount_type = null;
+    discount_value = null;
   } else {
     const n = Number(valueRaw);
     if (!Number.isFinite(n) || n < 0 || n > 100) { setFieldError("value", "Discount must be between 0 and 100."); hasError = true; }
-    else discount_value = n;
+    else { discount_type = "percent"; discount_value = n; }
   }
 
   // Dates
@@ -627,9 +636,22 @@ async function handleSubmit() {
 
   if (hasError) return;
 
-  // Internal slug
+  // Prevent a completely empty offer: require at least a title, description,
+  // badge, discount, image, or product. Dates/sort alone do not count.
+  const hasNewImage = !!(els.fImgFile?.files?.[0]);
+  const hasExistingImage = !imgRemoved && !!(originalImgPath || originalImgUrl);
+  const hasContent = !!title || !!description || !!badge || discount_value != null
+    || hasNewImage || hasExistingImage || pickerSelected.length > 0;
+  if (!hasContent) {
+    setFieldError("title", "Add at least a title, description, badge, discount, image, or product.");
+    toast("Add at least a title, discount, image, or product for the offer", "err");
+    return;
+  }
+
+  // Internal slug (title may be null for image-only offers; then a fallback
+  // slug such as offer-xxxxxx is generated and kept stable on edit)
   const existing = editingId ? offers.find((o) => o.id === editingId) : null;
-  let { slug, fallback } = resolveSlug(title, "offer", existing ? existing.slug : null);
+  let { slug, fallback } = resolveSlug(titleRaw, "offer", existing ? existing.slug : null);
   const supaForSlug = getSupabase();
   if (fallback) {
     try { slug = await ensureUniqueSlug(supaForSlug, "offers", slug, editingId); }
@@ -656,7 +678,7 @@ async function handleSubmit() {
     if (file) {
       try {
         const supa = getSupabase();
-        const safeSlug = slugify(title) || "offer";
+        const safeSlug = slug || slugify(titleRaw) || "offer";
         const ext = file.name.split(".").pop() || "jpg";
         const path = `${Date.now()}-${safeSlug}.${ext}`;
         toast("Uploading offer image…", "ok");
@@ -734,7 +756,7 @@ async function deleteOffer(id) {
     const supabase = getSupabase();
     const { error } = await supabase.from("offers").delete().eq("id", id);
     if (error) throw error;
-    toast(`Deleted ${offer.title}`, "ok");
+    toast(`Deleted ${offer.title || offer.slug || "offer"}`, "ok");
     await loadAll();
   } catch (err) {
     console.error("[TPM offers] delete failed", err);

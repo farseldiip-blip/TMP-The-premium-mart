@@ -9,7 +9,20 @@ const CACHE_KEY = "tpm-offers-v2";
 const CACHE_TTL = 10 * 60 * 1000;
 
 function slugify(s) {
-  return String(s).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s_]+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  return String(s ?? "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s_]+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+}
+
+function offerTitle(o) {
+  const t = typeof o?.title === "string" ? o.title.trim() : "";
+  return t;
+}
+
+function offerAlt(o) {
+  const t = offerTitle(o);
+  if (t) return t;
+  const b = typeof o?.badge === "string" ? o.badge.trim() : "";
+  if (b) return b;
+  return "Offer";
 }
 
 let modalEls = null;
@@ -53,27 +66,48 @@ function openOfferModal(o) {
   if (!o) return;
   const els = ensureModal();
   const pricing = priceOffer(o);
-  const slug = o.slug || slugify(o.title);
+  const slug = o.slug || slugify(o.title) || `offer-${o.id || "untitled"}`;
+  const title = offerTitle(o);
+  const alt = offerAlt(o);
   const discount = fmtDiscount(o);
   const status = statusLabel(o);
   const statusCls = statusClass(o);
   const img = imageUrl(o);
   const seal = discount || "Offer";
-  els.media.innerHTML = `
-    ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(o.title)}" width="1000" height="625" decoding="async" />` : `<div class="offer-noimg" role="img" aria-label="${escapeHtmlAttr(o.title)}"><span class="offer-noimg-value">${seal}</span><span class="offer-noimg-mark" aria-hidden="true">TPM</span></div>`}
-    ${discount ? `<span class="offer-seal">${discount}</span>` : ""}
-    ${statusCls !== "live" ? `<span class="offer-status offer-status--${statusCls}">${status}</span>` : ""}`;
-  els.body.innerHTML = `
-    ${o.badge ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : ""}
-    <h3 class="offer-modal-title" id="offerModalTitle">${escapeHtml(o.title)}</h3>
-    ${cardPriceHtml(pricing)}
-    ${o.description ? `<p class="offer-modal-desc">${escapeHtml(o.description)}</p>` : ""}
-    <p class="offer-card-dates">
+  const hasDates = !!(o.starts_at || o.ends_at);
+  const datesHtml = !hasDates ? "" : (o.starts_at && o.ends_at
+    ? `<p class="offer-card-dates">
       <span class="offer-date">${fmtDate(o.starts_at)}</span>
       <span class="offer-arrow" aria-hidden="true">→</span>
       <span class="offer-date">${fmtDate(o.ends_at)}</span>
-    </p>
-    ${pricing.count ? `<p class="offer-modal-subtitle">Included products</p><div class="offer-card-products">${productRowsHtml(pricing.lines)}</div>${modalSummaryHtml(pricing)}` : ""}`;
+    </p>`
+    : `<p class="offer-card-dates"><span class="offer-date">${fmtDate(o.starts_at || o.ends_at)}</span></p>`);
+  const badgeHtml = o.badge ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : "";
+  const titleHtml = title ? `<h3 class="offer-modal-title" id="offerModalTitle">${escapeHtml(title)}</h3>` : "";
+  const descHtml = o.description ? `<p class="offer-modal-desc">${escapeHtml(o.description)}</p>` : "";
+  const productsHtml = pricing.count ? `<p class="offer-modal-subtitle">Included products</p><div class="offer-card-products">${productRowsHtml(pricing.lines)}</div>${modalSummaryHtml(pricing)}` : "";
+  const hasBody = !!(badgeHtml || titleHtml || pricing.card || descHtml || datesHtml || productsHtml);
+  els.modal.classList.toggle("offer-modal--image-only", !hasBody);
+  if (!title) {
+    els.modal.setAttribute("aria-label", alt);
+    els.modal.removeAttribute("aria-labelledby");
+  } else {
+    els.modal.setAttribute("aria-labelledby", "offerModalTitle");
+    els.modal.removeAttribute("aria-label");
+  }
+  els.media.innerHTML = `
+    ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(alt)}" width="1000" height="625" decoding="async" />` : `<div class="offer-noimg" role="img" aria-label="${escapeHtmlAttr(alt)}"><span class="offer-noimg-value">${escapeHtml(seal)}</span><span class="offer-noimg-mark" aria-hidden="true">TPM</span></div>`}
+    ${discount ? `<span class="offer-seal">${escapeHtml(discount)}</span>` : ""}
+    ${statusCls !== "live" ? `<span class="offer-status offer-status--${statusCls}">${escapeHtml(status)}</span>` : ""}`;
+  els.body.innerHTML = `
+    ${badgeHtml}
+    ${titleHtml}
+    ${cardPriceHtml(pricing)}
+    ${descHtml}
+    ${datesHtml}
+    ${productsHtml}`;
+  if (!hasBody) els.body.style.display = "none";
+  else els.body.style.display = "";
   lastTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   modalOpenSlug = slug;
   els.backdrop.hidden = false;
@@ -104,7 +138,7 @@ function closeOfferModal() {
 }
 
 function openOfferBySlug(slug, push) {
-  const o = (offers || []).find(x => (x.slug || slugify(x.title)) === slug);
+  const o = (offers || []).find(x => (x.slug || slugify(x.title) || `offer-${x.id || "untitled"}`) === slug);
   if (!o) return false;
   if (push) { try { history.pushState(null, "", `#offer-${slug}`); } catch (_) {} }
   openOfferModal(o);
@@ -238,41 +272,49 @@ function renderOffers() {
   if (empty) empty.style.display = "none";
 
   grid.innerHTML = offers.map((o) => {
-    const slug = o.slug || slugify(o.title);
+    const slug = o.slug || slugify(o.title) || `offer-${o.id || "untitled"}`;
+    const title = offerTitle(o);
+    const alt = offerAlt(o);
     const status = statusLabel(o);
     const statusCls = statusClass(o);
     const discount = fmtDiscount(o);
-    const startStr = fmtDate(o.starts_at);
-    const endStr = fmtDate(o.ends_at);
     const img = imageUrl(o);
     const seal = discount || "Offer";
 
     const mediaHtml = img
-      ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(o.title)}" width="800" height="500" loading="lazy" decoding="async" />`
-      : `<div class="offer-noimg" role="img" aria-label="${escapeHtmlAttr(o.title)}"><span class="offer-noimg-value">${seal}</span><span class="offer-noimg-mark" aria-hidden="true">TPM</span></div>`;
+      ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(alt)}" width="800" height="500" loading="lazy" decoding="async" />`
+      : `<div class="offer-noimg" role="img" aria-label="${escapeHtmlAttr(alt)}"><span class="offer-noimg-value">${escapeHtml(seal)}</span><span class="offer-noimg-mark" aria-hidden="true">TPM</span></div>`;
 
     const fullDesc = o.description || "";
     const pricing = priceOffer(o);
+    const hasDates = !!(o.starts_at || o.ends_at);
+    const datesHtml = !hasDates ? "" : (o.starts_at && o.ends_at
+      ? `<p class="offer-card-dates">
+            <span class="offer-date">${fmtDate(o.starts_at)}</span>
+            <span class="offer-arrow" aria-hidden="true">→</span>
+            <span class="offer-date">${fmtDate(o.ends_at)}</span>
+          </p>`
+      : `<p class="offer-card-dates"><span class="offer-date">${fmtDate(o.starts_at || o.ends_at)}</span></p>`);
+    const badgeHtml = o.badge ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : "";
+    const titleHtml = title ? `<h3 class="offer-card-title">${escapeHtml(title)}</h3>` : "";
+    // Image-only poster card: image is the offer — no text/details reserved.
+    const isImageOnly = !!(img && !title && !o.badge && !fullDesc && !discount && !pricing.card && !hasDates && !pricing.count);
 
     return `
-      <a href="offers.html#offer-${slug}" class="offer-card" data-slug="${escapeHtmlAttr(slug)}">
+      <a href="offers.html#offer-${slug}" class="offer-card${title ? "" : " offer-card--no-title"}${isImageOnly ? " offer-card--image-only" : ""}" data-slug="${escapeHtmlAttr(slug)}"${title ? "" : ` aria-label="${escapeHtmlAttr(alt)}"`}>
         <div class="offer-card-media">
           ${mediaHtml}
-          ${discount ? `<span class="offer-seal">${discount}</span>` : ""}
-          ${statusCls !== "live" ? `<span class="offer-status offer-status--${statusCls}">${status}</span>` : ""}
+          ${discount ? `<span class="offer-seal">${escapeHtml(discount)}</span>` : ""}
+          ${statusCls !== "live" ? `<span class="offer-status offer-status--${statusCls}">${escapeHtml(status)}</span>` : ""}
         </div>
-        <div class="offer-card-body">
-          ${o.badge ? `<p class="offer-kicker">${escapeHtml(o.badge)}</p>` : ""}
-          <h3 class="offer-card-title">${escapeHtml(o.title)}</h3>
+        ${isImageOnly ? "" : `<div class="offer-card-body">
+          ${badgeHtml}
+          ${titleHtml}
           ${cardPriceHtml(pricing)}
           ${fullDesc ? `<p class="offer-card-desc">${escapeHtml(fullDesc)}</p>` : ""}
-          <p class="offer-card-dates">
-            <span class="offer-date">${startStr}</span>
-            <span class="offer-arrow" aria-hidden="true">→</span>
-            <span class="offer-date">${endStr}</span>
-          </p>
+          ${datesHtml}
           <span class="offer-cta">View offer <span aria-hidden="true">→</span></span>
-        </div>
+        </div>`}
       </a>`;
   }).join("");
 }
